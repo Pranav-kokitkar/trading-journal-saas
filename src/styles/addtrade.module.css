@@ -1,0 +1,143 @@
+.addtrade {
+  background-color: rgb(63, 54, 103);
+  min-height: 100vh;
+  padding-bottom: 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  padding: 6vh 3vw;
+  width: 60%;
+  margin-left: 8.5vw;
+  margin-bottom: 10vh;
+}
+
+.heading h3 {
+  margin-bottom: 1.3rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 6vh 3vw;
+  width: 60%;
+  margin: 0 auto 7vh auto;
+  border: 2px solid black;
+}
+
+.radioContainer {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.radioContainer label {
+  margin-left: 0.3rem;
+}
+
+/* PRICE  */
+
+h3 {
+  margin-bottom: 2rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.inputGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup label {
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.tradedirection {
+  display: flex;
+  flex-direction: column;
+}
+.tradedirection label {
+  margin-bottom: 1rem;
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea {
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  flex: 1; /* take available width */
+  font-size: 1rem;
+}
+
+/* clacluaotr  */
+
+.row3 {
+  display: flex;
+  flex-direction: row;
+  gap: 140px;
+}
+
+.col2 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* addd info  */
+
+.uploadconatiner {
+  display: flex;
+  flex-direction: column;
+}
+
+.col2 textarea {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+}
+
+
+/* button */
+
+.btncontainer {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-top: 2rem;
+}
+
+.btncontainer button {
+  padding: 0.8rem 2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  background: #5dc158;
+  color: #fff;
+  transition: background 0.3s ease;
+}
+
+.btncontainer button:hover {
+  background: #4d864a;
+}
+
+.btncontainer button:first-child {
+  background: #ef4444; /* red for Clear */
+}
+.btncontainer button:first-child:hover {
+  background: #b91c1c;
+}

@@ -1,0 +1,40 @@
+.slider {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 50px;
+  background-color: rgb(197, 197, 197);
+  width: 17%;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  padding: 5vh 3vw;
+}
+
+.sliderName {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.sliderLinks {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  width: 100%;
+  text-align: center;
+}
+
+.sliderLinks ul {
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.sliderLinks ul li {
+  list-style-type: none;
+}

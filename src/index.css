@@ -1,0 +1,12 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: white;
+}
+
+h3,
+h4,
+p {
+  margin: 0;
+}
