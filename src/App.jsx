@@ -1,6 +1,7 @@
 import './App.css'
 import { AddTrade } from './components/AddTrade'
 import { Slider } from './components/Slider'
+import { TradeHistory } from './components/TradeHistory'
 
 function App() {
 
@@ -8,6 +9,7 @@ function App() {
     <>
     {/* <Slider/> */}
     <AddTrade/>
+    {/* <TradeHistory/>  */}
     </>
   )
 }

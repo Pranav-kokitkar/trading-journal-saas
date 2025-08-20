@@ -1,5 +1,7 @@
 import { useState } from "react";
 import styles from "../styles/addtrade.module.css";
+import { TradeHistory } from "./TradeHistory";
+import { TradeStatus } from "./AddTrade/TradeStatus";
 
 export const AddTrade = () => {
   const [trade, setTrade] = useState({
@@ -9,6 +11,9 @@ export const AddTrade = () => {
     entryPrice: "",
     stoplossPrice: "",
     takeProfitPrice: "",
+    exitedPrice:[
+      {price: "", volume:"" }
+    ],
     riskAmount: "",
     tradeStatus: "",
     tradeNotes: "",
@@ -46,6 +51,7 @@ export const AddTrade = () => {
         <TradeInfo trade={trade} handleChange={handleChange} />
         <Buttons />
       </form>
+      <TradeHistory />
     </section>
   );
 };
@@ -200,37 +206,6 @@ const TradeCalculator = () => (
   </div>
 );
 
-const TradeStatus = ({ trade, handleChange }) => (
-  <div className={styles.card}>
-    <h3>Trade Status</h3>
-    <div className={styles.radioContainer}>
-      <div>
-        <input
-          type="radio"
-          id="live"
-          name="tradeStatus"
-          value="live"
-          checked={trade.tradeStatus === "live"}
-          onChange={handleChange}
-          required
-        />
-        <label htmlFor="live">Live (Ongoing)</label>
-      </div>
-      <div>
-        <input
-          type="radio"
-          id="exited"
-          name="tradeStatus"
-          value="exited"
-          checked={trade.tradeStatus === "exited"}
-          onChange={handleChange}
-          required
-        />
-        <label htmlFor="exited">Exited (Completed)</label>
-      </div>
-    </div>
-  </div>
-);
 
 const TradeInfo = ({ trade, handleChange }) => (
   <div className={styles.card}>
