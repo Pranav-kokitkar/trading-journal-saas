@@ -1,0 +1,166 @@
+.tardehistory {
+  padding: 2rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  font-family: "Segoe UI", sans-serif;
+
+  width: 60%;
+  margin: 0 auto;
+}
+
+.tardehistory h3 {
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+  color: #222;
+}
+
+.tardehistory p {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+/* Filter section */
+.filter {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.filter h3 {
+  margin-bottom: 0.8rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.filterinput {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.filterinput input,
+.filterinput select {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+.filterinput input:focus,
+.filterinput select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.filter3 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filter3 p {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.filter3 button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.filter3 button:hover {
+  background: #1d4ed8;
+}
+
+/* Trade Card */
+.tradecard {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow 0.2s ease;
+}
+
+.tradecard:hover {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+}
+
+.symbol {
+  flex: 1;
+}
+
+.symbol > div:first-child {
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #111;
+}
+
+.belowsymbol {
+  display: flex;
+  gap: 0.8rem;
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.tradequickdata {
+  display: flex;
+  gap: 2rem;
+  text-align: right;
+}
+
+.tradequickdata div {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.tradequickdata div p:first-child {
+  font-weight: 600;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .filterinput {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .filterinput input,
+  .filterinput select {
+    width: 100%;
+    flex: none;
+  }
+
+  .filter {
+    padding: 0.8rem;
+  }
+  .tradecard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .tradequickdata {
+    width: 100%;
+    justify-content: space-between;
+    text-align: left;
+    gap: 1rem;
+  }
+}

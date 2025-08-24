@@ -1,18 +1,21 @@
 import { useState } from "react";
-import styles from "../../styles/AddTrade.module.css";
+import styles from "./addtrade.module.css";
 
-const SingleExit = ({ handleChange }) => (
+const SingleExit = ({ handleSingleExit }) => (
   <div className={styles.inputGroup}>
     <label htmlFor="exitPrice">Exit Price</label>
     <input
       type="number"
       id="exitPrice"
       name="exitPrice"
-      onChange={handleChange}
+      step="any"
+      onChange={(e) => handleSingleExit(e.target.value)}
       placeholder="Enter exit price"
+      required
     />
   </div>
 );
+
 
 const MultipleExit = ({ exitLevels, handleExitChange, handleAddExitLevel }) => (
   <>
@@ -28,12 +31,14 @@ const MultipleExit = ({ exitLevels, handleExitChange, handleAddExitLevel }) => (
           type="number"
           placeholder={`Exit Price ${index + 1}`}
           value={level.price}
+          required
           onChange={(e) => handleExitChange(index, "price", e.target.value)}
         />
         <input
           type="number"
           placeholder="Volume %"
           value={level.volume}
+          required
           onChange={(e) => handleExitChange(index, "volume", e.target.value)}
         />
       </div>
@@ -50,7 +55,7 @@ const MultipleExit = ({ exitLevels, handleExitChange, handleAddExitLevel }) => (
   </>
 );
 
-export const TradeStatus = ({ trade, handleChange }) => {
+export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
   const [isMultipleTP, setIsMultipleTP] = useState(false);
   const [exitLevels, setExitLevels] = useState([]);
 
@@ -62,6 +67,7 @@ export const TradeStatus = ({ trade, handleChange }) => {
     const updated = [...exitLevels];
     updated[index][field] = value;
     setExitLevels(updated);
+    onExitChange(updated);
   };
 
   return (
@@ -113,7 +119,11 @@ export const TradeStatus = ({ trade, handleChange }) => {
               handleAddExitLevel={handleAddExitLevel}
             />
           ) : (
-            <SingleExit handleChange={handleChange} />
+            <SingleExit
+              handleSingleExit={(value) =>
+                onExitChange([{ price: value, volume: '100' }])
+              }
+            />
           )}
         </div>
       )}

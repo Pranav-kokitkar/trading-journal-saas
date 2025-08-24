@@ -1,15 +1,11 @@
 import './App.css'
-import { AddTrade } from './components/AddTrade'
-import { Slider } from './components/Slider'
-import { TradeHistory } from './components/TradeHistory'
+import { AddTrade } from './components/Pages/AddTrade/AddTrade'
 
 function App() {
 
   return (
     <>
-    {/* <Slider/> */}
     <AddTrade/>
-    {/* <TradeHistory/>  */}
     </>
   )
 }

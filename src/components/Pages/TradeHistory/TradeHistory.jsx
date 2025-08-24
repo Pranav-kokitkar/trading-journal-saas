@@ -1,5 +1,4 @@
-import styles from "../styles/tradehistory.module.css";
-
+import styles from "./TradeHistory.module.css"
 export const TradeHistory = () => {
   return (
     <section id="tarde-history" className={styles.tardehistory}>
@@ -31,42 +30,41 @@ export const TradeHistory = () => {
         </div>
 
         <div className={styles.filter3}>
-            <p>Showing 1 of 1 trade</p>
-            <button>Clear Filter</button>
+          <p>Showing 1 of 1 trade</p>
+          <button>Clear Filter</button>
         </div>
-
       </div>
 
-        <TradeCard/>
+      <TradeCard />
     </section>
   );
 };
 
-const TradeCard =()=>{
-    return(
-        <div className={styles.tradecard}>
-            <div>LOGO</div>
-            <div className={styles.symbol}>
-                <div>EUR/USD</div>
-                <div className={styles.belowsymbol}>
-                    <p>market</p>
-                    <p>jul 08, 2025 18:50</p>
-                </div>
-            </div>
-            <div className={styles.tradequickdata}>
-                <div>
-                    <p>Trade Direction:</p>
-                    <p>long</p>
-                </div>
-                <div>
-                    <p>RR:</p>
-                    <p>1:10</p>
-                </div>
-                <div>
-                    <p>Win</p>
-                    <p>$99</p>
-                </div>
-            </div>
+const TradeCard = () => {
+  return (
+    <div className={styles.tradecard}>
+      <div>LOGO</div>
+      <div className={styles.symbol}>
+        <div>EUR/USD</div>
+        <div className={styles.belowsymbol}>
+          <p>market</p>
+          <p>jul 08, 2025 18:50</p>
         </div>
-    )
-}
+      </div>
+      <div className={styles.tradequickdata}>
+        <div>
+          <p>Trade Direction:</p>
+          <p>long</p>
+        </div>
+        <div>
+          <p>RR:</p>
+          <p>1:10</p>
+        </div>
+        <div>
+          <p>Win</p>
+          <p>$99</p>
+        </div>
+      </div>
+    </div>
+  );
+};
