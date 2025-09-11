@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import styles from "./addtrade.module.css";
 import { TradeHistory } from "../TradeHistory/TradeHistory";
 import { TradeStatus } from "./TradeStatus";
@@ -9,6 +10,7 @@ import { TradeCalculator } from "./TradeCalculator";
 
 export const AddTrade = () => {
   const [trade, setTrade] = useState({
+    id :"",
     marketType: "",
     symbol: "",
     tradedirection: "",
@@ -18,6 +20,9 @@ export const AddTrade = () => {
     exitedPrice: [{ price: "", volume: "" }],
     riskAmount: "10",
     tradeStatus: "",
+    rr:"",
+    profit: "",
+    dateNtime:"",
     tradeNotes: "",
   });
 
@@ -28,6 +33,26 @@ export const AddTrade = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Get existing trades from localStorage
+    const existingTrades = JSON.parse(localStorage.getItem("trades") || "[]");
+
+    // Create unique ID and date/time
+    const tradeId = uuidv4();
+    const dateNtime = new Date().toLocaleString();
+
+    // Build new trade object with all fields
+    const newTrade = { ...trade, id: tradeId, dateNtime };
+
+    // Save trade array to localStorage
+    const updatedTrades = [...existingTrades, newTrade];
+    localStorage.setItem("trades", JSON.stringify(updatedTrades));
+
+    console.log("Trade saved:", newTrade);
+
+
+
+
     const totalVolume = trade.exitedPrice.reduce(
       (sum, lvl) => sum + Number(lvl.volume || 0),
       0
@@ -37,7 +62,6 @@ export const AddTrade = () => {
       alert("Total exit volume must equal 100%");
       return;
     }
-    console.log("Trade submitted:", trade);
     setTrade({
       marketType: "",
       symbol: "",
@@ -64,9 +88,9 @@ export const AddTrade = () => {
             setTrade((prev) => ({ ...prev, exitedPrice: levels }))
           }
         />
-        <TradeCalculator trade={trade} />
+        <TradeCalculator trade={trade} setTrade={setTrade} />
         <TradeInfo trade={trade} handleChange={handleChange} />
-        <Buttons />
+        <Buttons setTrade={setTrade} />
       </form>
       <TradeHistory />
     </section>
@@ -80,7 +104,7 @@ const PageHeading = () => (
   </div>
 );
 
-const Buttons = (setTrade) => {
+const Buttons = ({setTrade}) => {
   return (
     <div className={styles.btncontainer}>
       <button

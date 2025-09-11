@@ -1,6 +1,7 @@
+import { useEffect } from "react";
 import styles from "./addtrade.module.css";
 
-export const TradeCalculator = ({ trade }) => {
+export const TradeCalculator = ({ trade, setTrade }) => {
   const entry = parseFloat(trade.entryPrice) || 0;
   const stoploss = parseFloat(trade.stoplossPrice) || 0;
   const takeprofit = parseFloat(trade.takeProfitPrice) || 0;
@@ -17,6 +18,7 @@ export const TradeCalculator = ({ trade }) => {
     tradedirection === "long" ? takeprofit - entry : entry - takeprofit;
   const riskRewardRatio = rewardDistance / stopDistance;
 
+  // 🔹 Position Size
   const calculatePositionSize = () => {
     let positionSize;
 
@@ -35,8 +37,9 @@ export const TradeCalculator = ({ trade }) => {
     return positionSize.toFixed(2);
   };
 
-  const positionSize = calculatePositionSize(); // Call the function
+  const positionSize = calculatePositionSize();
 
+  // 🔹 Potential Profit
   const calculatePotentialProfit = () => {
     if (!trade.exitedPrice || trade.exitedPrice.length === 0) return 0;
 
@@ -44,18 +47,16 @@ export const TradeCalculator = ({ trade }) => {
 
     trade.exitedPrice.forEach((exit) => {
       const exitPrice = parseFloat(exit.price) || 0;
-      const volumeFraction = (parseFloat(exit.volume) || 0) / 100; // Convert 50% → 0.5
+      const volumeFraction = (parseFloat(exit.volume) || 0) / 100;
 
       let profit = 0;
 
       if (marketType === "forex") {
-        // Forex: use positionSize (lots) * pip difference * valuePerUnit ($ per pip per lot)
         const pipDifference =
           tradedirection === "long" ? exitPrice - entry : entry - exitPrice;
         const units = positionSize * volumeFraction;
         profit = units * pipDifference * valuePerUnit;
       } else {
-        // Crypto/Stocks: units = riskAmount / stopDistance
         const units =
           (riskAmount / Math.abs(entry - stoploss)) * volumeFraction;
         const profitPerUnit =
@@ -66,10 +67,12 @@ export const TradeCalculator = ({ trade }) => {
       totalProfit += profit;
     });
 
-    return totalProfit.toFixed(2);
+    return totalProfit;
   };
-  const potentialProfit = calculatePotentialProfit(); // FIXED
 
+  const potentialProfit = calculatePotentialProfit();
+
+  // 🔹 Risk Reward
   const calculateRiskReward = () => {
     if (!trade.exitedPrice || trade.exitedPrice.length === 0) return 0;
 
@@ -82,14 +85,23 @@ export const TradeCalculator = ({ trade }) => {
       const reward =
         tradedirection === "long" ? exitPrice - entry : entry - exitPrice;
 
-      totalReward += reward * volumeFraction; // weighted average
+      totalReward += reward * volumeFraction;
     });
 
-    const rr = totalReward / Math.abs(stopDistance); // Risk/Reward = Avg Reward / Risk
+    const rr = totalReward / Math.abs(stopDistance);
     return rr.toFixed(2);
   };
 
   const rr = calculateRiskReward();
+
+  // 🔹 Update Trade State (RR & Profit)
+  useEffect(() => {
+    setTrade((prev) => ({
+      ...prev,
+      rr,
+      profit: potentialProfit.toFixed(2), // keep it formatted
+    }));
+  }, [rr, potentialProfit, setTrade]);
 
   return (
     <div className={styles.card}>
@@ -107,7 +119,7 @@ export const TradeCalculator = ({ trade }) => {
             Potential Loss: <span>{riskAmount.toFixed(2)}</span>
           </p>
           <p>
-            Potential Profit: <span>{potentialProfit}</span>
+            Potential Profit: <span>{potentialProfit.toFixed(2)}</span>
           </p>
         </div>
       </div>

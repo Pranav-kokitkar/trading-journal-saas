@@ -1,5 +1,16 @@
-import styles from "./TradeHistory.module.css"
+import styles from "./TradeHistory.module.css";
+
 export const TradeHistory = () => {
+
+  
+  const savedTrade = JSON.parse(localStorage.getItem("trades") || "[]");
+
+
+  const handleClear = () => {
+    localStorage.clear(); // or localStorage.removeItem("keyName")
+    alert("LocalStorage cleared!");
+  };
+  
   return (
     <section id="tarde-history" className={styles.tardehistory}>
       <div>
@@ -31,40 +42,47 @@ export const TradeHistory = () => {
 
         <div className={styles.filter3}>
           <p>Showing 1 of 1 trade</p>
-          <button>Clear Filter</button>
+          <button onClick={handleClear}>Clear Filter</button>
         </div>
       </div>
 
-      <TradeCard />
+      <TradeCard savedTrade={savedTrade}/>
     </section>
   );
 };
 
-const TradeCard = () => {
+const TradeCard = ({savedTrade}) => {
+  if (!savedTrade || savedTrade.length === 0) return <p>No trades yet</p>;
   return (
-    <div className={styles.tradecard}>
-      <div>LOGO</div>
-      <div className={styles.symbol}>
-        <div>EUR/USD</div>
-        <div className={styles.belowsymbol}>
-          <p>market</p>
-          <p>jul 08, 2025 18:50</p>
+    <>
+      {savedTrade.map((tradeData, index) => (
+        <div key={index} className={styles.tradecard}>
+          <div>LOGO</div>
+          <div className={styles.symbol}>
+            <div>{tradeData.marketType}</div>
+            <div className={styles.belowsymbol}>
+              <p>{tradeData.dateNtime}</p>
+            </div>
+          </div>
+          <div className={styles.tradequickdata}>
+            <div>
+              <p>Trade Direction:</p>
+              <p>{tradeData.tradedirection}</p>
+            </div>
+            <div>
+              <p>RR:</p>
+              <p>
+                1:<span>{tradeData.rr || "0"}</span>
+              </p>
+            </div>
+            <div>
+              <p>Win</p>
+              <p>{tradeData.profit || "0"}</p>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className={styles.tradequickdata}>
-        <div>
-          <p>Trade Direction:</p>
-          <p>long</p>
-        </div>
-        <div>
-          <p>RR:</p>
-          <p>1:10</p>
-        </div>
-        <div>
-          <p>Win</p>
-          <p>$99</p>
-        </div>
-      </div>
-    </div>
+      ))}
+      ;
+    </>
   );
 };

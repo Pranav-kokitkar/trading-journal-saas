@@ -1,0 +1,53 @@
+.notessection {
+  background: #f9fafb;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 3rem 0;
+  width: 50%;
+  border-radius: 12px;
+  margin: 10vh 0vh;
+}
+
+.notes {
+  color: #000;
+  border-radius: 12px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  width: 70%;
+}
+
+.notesbox h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.noteCard {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin: 3vh 0vh;
+}
+
+.noteCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.025);
+}
+
+.noteTitle {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #222;
+}
+
+.noteDescription {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+}
