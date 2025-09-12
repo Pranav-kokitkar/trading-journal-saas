@@ -64,3 +64,18 @@
   line-height: 1.4;
   color: #555;
 }
+
+.addnotebutton button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.addnotebutton button:hover {
+  background: #1d4ed8;
+}

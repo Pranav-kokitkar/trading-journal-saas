@@ -1,6 +1,8 @@
 import { useState } from "react";
 import styles from "./AddNotes.module.css";
 import { DisplayNotes } from "./DisplayNotes";
+import { v4 as uuidv4 } from "uuid";
+
 
 export const AddNotes = () => {
   const [notes, setNotes] = useState([]); // all saved notes
@@ -13,11 +15,18 @@ export const AddNotes = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (note.title.trim() === "" && note.description.trim() === "") return; // ignore empty note
+    if (note.title.trim() === "" && note.description.trim() === "") return;
 
-    setNotes([...notes, note]); // ✅ push current note into the array
-    setNote({ title: "", description: "" }); // ✅ reset input fields
+    const newNote = { id: uuidv4(), ...note }; // ✅ attach unique id
+
+    setNotes([...notes, newNote]);
+    setNote({ title: "", description: "" });
   };
+
+  const deleteNote =(id)=>{
+    setNotes((prevNotes)=>prevNotes.filter((note)=>note.id !==id));
+    console.log("deleted");
+  }
 
   return (
     <section className={styles.addnotescontainer}>
@@ -46,12 +55,12 @@ export const AddNotes = () => {
             </div>
           </div>
 
-          <div>
+          <div className={styles.addnotebutton}>
             <button type="submit">Save Note</button>
           </div>
         </div>
       </form>
-      <DisplayNotes notes={notes} />
+      <DisplayNotes notes={notes} onDelete={deleteNote}/>
     </section>
   );
 };
