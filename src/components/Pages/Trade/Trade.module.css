@@ -1,0 +1,170 @@
+.trade {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  background-color: #121212; /* dark theme */
+  color: #f5f5f5;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.tradecontainer {
+  width: 80%;
+  max-width: 1000px;
+  background: #1e1e1e;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.tradecontainer > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #333;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.tradecontainer h2 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.tradecontainer p {
+  color: #bbb;
+  font-size: 0.95rem;
+}
+
+/* Grid for Info + Performance + Exit Price */
+.tradedata {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.tradeinfo,
+.tradeperformance {
+  background: #2a2a2a;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+.tradeinfo h4,
+.tradeperformance h4 {
+  margin-bottom: 1rem;
+  color: #f1f1f1;
+  font-size: 1.1rem;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.5rem;
+}
+
+.tradeinfo p,
+.tradeperformance p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+/* Exit Price Section - card style like notes */
+.exitprice {
+  grid-column: span 2; /* takes full width */
+  background: #2a2a2a;
+  padding: 1.5rem;
+  border-radius: 10px;
+}
+
+.exitprice::before {
+  content: "Exit Prices:";
+  display: block;
+  margin-bottom: 0.75rem;
+  font-weight: bold;
+  font-size: 1.05rem;
+  color: #f1f1f1;
+  border-bottom: 1px solid #444;
+  padding-bottom: 0.5rem;
+}
+
+.exitprice p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #ddd;
+}
+
+/* Trade Notes / Description */
+.tradedescription {
+  background: #2a2a2a;
+  padding: 1.5rem;
+  border-radius: 10px;
+  min-height: 100px;
+  margin-bottom: 1.5rem;
+}
+
+.tradedescription::before {
+  content: "Trade Notes:";
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #f1f1f1;
+}
+
+/* Screenshot placeholder */
+.tradescreenshot {
+  background: #2a2a2a;
+  border-radius: 10px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.tradescreenshot::before {
+  content: "Screenshot / Chart Placeholder";
+}
+.tradebtns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.tradebtns button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  min-width: 120px;
+  text-align: center;
+  color: #f5f5f5; /* text always light */
+}
+
+/* Edit Trade Button - Left */
+.edittrade {
+  background: #3a6ea5;
+}
+.edittrade:hover {
+  background: #335d8a;
+}
+
+/* Close Trade Button - Center */
+.closetrade {
+  background: #3b8c75;
+  margin: 0 auto;
+}
+.closetrade:hover {
+  background: #317060;
+}
+
+/* Delete Trade Button - Right */
+.deletetrade {
+  background: #a54242;
+}
+.deletetrade:hover {
+  background: #873636;
+}
