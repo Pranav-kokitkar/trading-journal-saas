@@ -1,17 +1,43 @@
-import './App.css'
-import { AddNotes } from './components/Pages/AddNotes/AddNotes'
-import { AddTrade } from './components/Pages/AddTrade/AddTrade'
-import { Trade } from './components/Pages/Trade/Trade'
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { AddTrade } from "./components/Pages/AddTrade/AddTrade";
+import { TradeHistory } from "./components/Pages/TradeHistory/TradeHistory";
+import { AddNotes } from "./components/Pages/AddNotes/AddNotes";
+import { Sidebar } from "./components/Layout/SideBar";
+import { Layout } from "./components/Layout/Layout";
 
-function App() {
-
-  return (
-    <>
-    {/* <AddTrade/>
-    <AddNotes/> */}
-    <Trade/>
-    </>
-  )
+function ErrorPage() {
+  return <h1>Oops! Page not found.</h1>;
 }
 
-export default App
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Layout/>,
+      children: [
+        {
+          path: "/",
+          element: <AddTrade/>,
+        },
+        {
+          path: "/tradehistory",
+          element: <TradeHistory />,
+          errorElement: <ErrorPage />,
+        },
+        {
+          path: "/addnotes",
+          element: <AddNotes />,
+          errorElement: <ErrorPage />,
+        },
+      ],
+      errorElement: <ErrorPage />,
+    },
+  ],
+  { basename: "/trading-journal-saas" }
+);
+
+function App() {
+  return <RouterProvider router={router} />;
+}
+
+export default App;

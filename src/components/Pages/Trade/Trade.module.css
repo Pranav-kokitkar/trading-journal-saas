@@ -9,7 +9,7 @@
 }
 
 .tradecontainer {
-  width: 80%;
+  width: 60%;
   max-width: 1000px;
   background: #1e1e1e;
   border-radius: 12px;
@@ -24,6 +24,8 @@
   border-bottom: 1px solid #333;
   padding-bottom: 1rem;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap; /* make responsive */
+  gap: 0.5rem;
 }
 
 .tradecontainer h2 {
@@ -124,11 +126,14 @@
 .tradescreenshot::before {
   content: "Screenshot / Chart Placeholder";
 }
+
 .tradebtns {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-top: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .tradebtns button {
@@ -167,4 +172,54 @@
 }
 .deletetrade:hover {
   background: #873636;
+}
+
+/* ---------------------- */
+/* RESPONSIVENESS */
+/* ---------------------- */
+
+/* Tablet */
+@media (max-width: 768px) {
+  .tradecontainer {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  .tradedata {
+    grid-template-columns: 1fr; /* stack info + performance */
+  }
+
+  .exitprice {
+    grid-column: span 1;
+  }
+
+  .tradebtns {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tradebtns button {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .tradecontainer h2 {
+    font-size: 1.2rem;
+  }
+
+  .tradecontainer p {
+    font-size: 0.85rem;
+  }
+
+  .tradeinfo h4,
+  .tradeperformance h4 {
+    font-size: 1rem;
+  }
+
+  .tradebtns button {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+  }
 }

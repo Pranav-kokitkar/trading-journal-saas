@@ -1,0 +1,23 @@
+.layout {
+  display: flex;
+  height: 100vh; /* lock full screen height */
+  width: 100%;
+  overflow: hidden; /* prevent body scrollbars */
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0; /* never shrink */
+  height: 100%; /* fill parent */
+  background: #f8f9fb;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 1px solid #e2e6ea;
+}
+
+.outlet {
+  flex: 1;
+  height: 100%; /* same height */
+  overflow-y: auto; /* scroll only outlet */
+}

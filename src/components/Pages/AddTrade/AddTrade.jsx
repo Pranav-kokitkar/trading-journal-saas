@@ -92,7 +92,6 @@ export const AddTrade = () => {
         <TradeInfo trade={trade} handleChange={handleChange} />
         <Buttons setTrade={setTrade} />
       </form>
-      <TradeHistory />
     </section>
   );
 };

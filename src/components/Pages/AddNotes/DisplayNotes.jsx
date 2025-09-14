@@ -1,6 +1,8 @@
 import styles from "./DisplayNotes.module.css";
 
 export const DisplayNotes = ({notes, onDelete}) => {
+  if (!notes || notes.length === 0)
+      return <p className={styles.nonotes}>No Notes yet</p>;
   return (
     <div className={styles.notessection}>
       <div className={styles.notes}>

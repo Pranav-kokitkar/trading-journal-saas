@@ -1,71 +1,90 @@
+.nonotes {
+  margin-top: 1.4rem;
+}
+
 .notessection {
-  background: #f9fafb;
-  height: auto;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: 3rem 0;
-  width: 50%;
-  border-radius: 12px;
-  margin: 10vh 0vh;
+  margin-top: 20px;
+  width: 100%;
 }
 
 .notes {
-  color: #000;
-  border-radius: 12px;
+  background-color: #1e1e1e;
   padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
-  width: 70%;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+
+  /* fixed width */
+  width: 60%;
+
+  color: white;
+  text-align: left;
 }
 
-.notesbox h3 {
-  text-align: center;
-  margin-bottom: 1rem;
+.notes h3 {
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-bottom: 1px solid #444;
+  padding-bottom: 5px;
 }
 
 .noteCard {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 1rem 1.5rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  margin: 3vh 0vh;
+  background-color: #2b2b2b;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+
+  width: 100%; /* <-- take full width of parent (.notes) */
+  box-sizing: border-box;
+
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  flex-direction: column; /* ✅ Stack content vertically */
+  gap: 10px;
+
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
-.noteCard:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.025);
+.notedata {
+  flex-grow: 1;
+}
+
+.noteTitle {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.noteDescription {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin: 1rem 0rem;
 }
 
 .notecarddelete {
   display: flex;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* ✅ Left align */
 }
 
 .notecarddelete button {
-  background-color: rgba(255, 19, 19, 0.676);
+  background-color: #a54242;
   border: none;
-  padding: 0.22rem 0.55rem;
-  border-radius: 10px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
   color: white;
-}
-
-.noteTitle {
-  font-size: 1.1rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: #222;
+  transition: background-color 0.2s;
 }
 
-.noteDescription {
-  font-size: 1rem;
-  color: #555;
-  line-height: 1.5;
+.notecarddelete button:hover {
+  background-color: #873636;
+}
+/* Responsive */
+@media (max-width: 768px) {
+  .notes {
+    width: 90%;
+  }
 }

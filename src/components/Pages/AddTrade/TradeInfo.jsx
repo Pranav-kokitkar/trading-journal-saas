@@ -8,7 +8,7 @@ export const TradeInfo = ({ trade, handleChange }) => {
       <div className={styles.col2}>
         <InputField label="Upload Screenshot" type="file" required={false} />
       </div>
-      <div className={styles.col2}>
+      <div className={styles.textareaGroup}>
         <label htmlFor="tradeNotes">Notes and Description</label>
         <textarea
           id="tradeNotes"

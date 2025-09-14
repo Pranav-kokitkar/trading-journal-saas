@@ -1,81 +1,146 @@
 .addnotescontainer {
-  background: linear-gradient(135deg, #000000, #474747);
-  height: auto;
+  background-color: #121212;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
+  color: #f5f5f5;
 }
 
 .addnotes {
-  background: #fff;
-  color: #000000;
+  background: #1e1e1e;
+  color: #f5f5f5;
   border-radius: 12px;
   padding: 2rem;
-  width: 50%;
+  width: 60%;
+  max-width: 800px;
   display: flex;
-  align-items: center;
   flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.addnotes h3 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #333;
+  padding-bottom: 0.5rem;
 }
 
 .addnotesinputfiled {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  margin: 2vh 0vw;
 }
 
 .row2 {
   display: flex;
-  flex-direction: row;
-  gap: 10px;
+  flex-direction: column; /* ✅ label on top */
+  gap: 0.5rem;
 }
 
-.noteslist {
-  margin-top: 3rem;
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.noteCard {
-  background: #ffffff;
-  color: #000;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.noteCard:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-}
-
-.noteTitle {
-  font-size: 1.3rem;
+.row2 label {
+  font-size: 0.95rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  color: #222;
+  color: #ddd;
 }
 
-.noteDescription {
-  font-size: 1rem;
-  line-height: 1.4;
-  color: #555;
+.row2 input,
+.row2 textarea {
+  padding: 0.8rem 1rem;
+  border: 1px solid #333;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #2a2a2a;
+  color: #f5f5f5;
+  resize: vertical;
+}
+
+.row2 textarea {
+  min-height: 120px; /* ✅ bigger */
+}
+
+.row2 input:focus,
+.row2 textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+}
+
+.addnotebutton {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
 }
 
 .addnotebutton button {
-  background: #2563eb;
+  background: #3a6ea5;
   color: white;
   border: none;
-  padding: 0.4rem 0.6rem;
+  padding: 0.6rem 1.2rem;
   font-size: 0.9rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .addnotebutton button:hover {
-  background: #1d4ed8;
+  background: #335d8a;
+  transform: translateY(-1px);
+}
+
+/* 📱 Responsive Styles */
+@media (max-width: 1024px) {
+  .addnotes {
+    width: 75%;
+    padding: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .addnotes {
+    width: 90%;
+    padding: 1.5rem;
+  }
+
+  .addnotes h3 {
+    font-size: 1.2rem;
+  }
+
+  .row2 input,
+  .row2 textarea {
+    font-size: 0.9rem;
+    padding: 0.7rem 1rem;
+  }
+
+  .addnotebutton {
+    justify-content: center; /* ✅ center button on mobile */
+  }
+
+  .addnotebutton button {
+    width: 100%; /* ✅ full width button */
+  }
+}
+
+@media (max-width: 480px) {
+  .addnotes {
+    width: 95%;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .row2 textarea {
+    min-height: 100px;
+  }
+
+  .addnotes h3 {
+    font-size: 1rem;
+  }
+
+  .addnotebutton button {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+  }
 }
