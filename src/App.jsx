@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AddTrade } from "./components/Pages/AddTrade/AddTrade";
 import { TradeHistory } from "./components/Pages/TradeHistory/TradeHistory";
 import { AddNotes } from "./components/Pages/AddNotes/AddNotes";
-import { Sidebar } from "./components/Layout/SideBar";
+import { Trade } from "./components/Pages/Trade/Trade";
 import { Layout } from "./components/Layout/Layout";
 
 function ErrorPage() {
@@ -16,8 +16,13 @@ const router = createBrowserRouter(
       element: <Layout/>,
       children: [
         {
-          path: "/",
+          path: "/trade/:id",
+          element: <Trade/>,
+        },
+        {
+          path: "/addtrade",
           element: <AddTrade/>,
+          errorElement: <ErrorPage />,
         },
         {
           path: "/tradehistory",

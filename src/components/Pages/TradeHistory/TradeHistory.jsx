@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import styles from "./TradeHistory.module.css";
 
 export const TradeHistory = () => {
@@ -58,32 +59,37 @@ const TradeCard = ({ savedTrade }) => {
   return (
     <>
       {savedTrade.map((tradeData, index) => (
-        <div key={index} className={styles.tradecard}>
-          <div className={styles.logo}>📈</div>
+        <NavLink
+          key={index}
+          to={`/trade/${tradeData.id}`}
+        >
+          <div className={styles.tradecard}>
+            <div className={styles.logo}>📈</div>
 
-          <div className={styles.symbol}>
-            <div>{tradeData.symbol || tradeData.marketType}</div>
-            <div className={styles.belowsymbol}>
-              <p>{tradeData.marketType}</p>
-              <p>{tradeData.dateNtime}</p>
+            <div className={styles.symbol}>
+              <div>{tradeData.symbol || tradeData.marketType}</div>
+              <div className={styles.belowsymbol}>
+                <p>{tradeData.marketType}</p>
+                <p>{tradeData.dateNtime}</p>
+              </div>
+            </div>
+
+            <div className={styles.tradequickdata}>
+              <div>
+                <p>Direction</p>
+                <span>{tradeData.tradedirection}</span>
+              </div>
+              <div>
+                <p>RR</p>
+                <span>1:{tradeData.rr || "0"}</span>
+              </div>
+              <div>
+                <p>Profit</p>
+                <span>{tradeData.profit || "0"}</span>
+              </div>
             </div>
           </div>
-
-          <div className={styles.tradequickdata}>
-            <div>
-              <p>Direction</p>
-              <span>{tradeData.tradedirection}</span>
-            </div>
-            <div>
-              <p>RR</p>
-              <span>1:{tradeData.rr || "0"}</span>
-            </div>
-            <div>
-              <p>Profit</p>
-              <span>{tradeData.profit || "0"}</span>
-            </div>
-          </div>
-        </div>
+        </NavLink>
       ))}
     </>
   );

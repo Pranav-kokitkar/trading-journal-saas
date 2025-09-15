@@ -1,23 +1,95 @@
 .layout {
   display: flex;
-  height: 100vh; /* lock full screen height */
+  height: 100vh;
   width: 100%;
-  overflow: hidden; /* prevent body scrollbars */
+  overflow: hidden;
 }
 
+/* Sidebar (default desktop) */
 .sidebar {
   width: 240px;
-  flex-shrink: 0; /* never shrink */
-  height: 100%; /* fill parent */
-  background: #f8f9fb;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-right: 1px solid #e2e6ea;
+  height: 100vh;
+  background: #1e1e1e;
+  border-right: 1px solid #333;
+  flex-shrink: 0;
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
 }
 
+/* Content */
 .outlet {
   flex: 1;
-  height: 100%; /* same height */
-  overflow-y: auto; /* scroll only outlet */
+  height: 100vh;
+  overflow-y: auto;
+  background: #0e1525;
+}
+
+/* Mobile header hidden by default */
+.mobileHeader {
+  display: none;
+}
+
+/* Tablet: shrink sidebar */
+@media (max-width: 992px) {
+  .sidebar {
+    width: 70px;
+  }
+}
+
+/* Mobile: hide sidebar and show top nav */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column; /* stack nav + content */
+  }
+
+  /* Sidebar becomes overlay */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100%;
+    transform: translateX(-100%); /* hidden */
+  }
+
+  .sidebar.show {
+    transform: translateX(0); /* slide in */
+  }
+
+  /* Mobile header visible */
+  .mobileHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    background: #1e1e1e;
+    color: white;
+    padding: 0 16px;
+    z-index: 1100;
+  }
+
+  /* Hamburger */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  .hamburger span {
+    height: 3px;
+    background: white;
+    border-radius: 2px;
+  }
+
+  /* Outlet takes full width below header */
+  .outlet {
+    flex: none;
+    width: 100%;
+    height: calc(100vh - 56px);
+  }
 }

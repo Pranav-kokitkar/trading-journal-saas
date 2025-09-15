@@ -9,7 +9,7 @@
 }
 
 .tradecontainer {
-  width: 60%;
+  width: 80%;
   max-width: 1000px;
   background: #1e1e1e;
   border-radius: 12px;
@@ -91,6 +91,13 @@
   margin: 0.5rem 0;
   font-size: 0.95rem;
   color: #ddd;
+}
+
+.exitpricedata {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-right: 25rem;
 }
 
 /* Trade Notes / Description */
