@@ -5,6 +5,9 @@ export const AddPrice = ({ trade, handleChange }) => {
   return (
     <div className={styles.card}>
       <h3>Price & Risk Management</h3>
+      <p style={{ fontSize: "0.8rem", color: "gray",paddingBottom:"1rem" }}>
+        Account Balance: ${trade.accountBalance}
+      </p>
 
       <div className={styles.row}>
         <InputField
@@ -42,6 +45,8 @@ export const AddPrice = ({ trade, handleChange }) => {
           type="number"
           placeholder="Enter risk amount"
           name="riskAmount"
+          min="0"
+          max={trade.accountBalance}
           value={trade.riskAmount}
           onChange={handleChange}
           required={true}

@@ -4,6 +4,7 @@ import { TradeHistory } from "./components/Pages/TradeHistory/TradeHistory";
 import { AddNotes } from "./components/Pages/AddNotes/AddNotes";
 import { Trade } from "./components/Pages/Trade/Trade";
 import { Layout } from "./components/Layout/Layout";
+import { AccountProvider } from "./context/AccountContext";
 
 function ErrorPage() {
   return <h1>Oops! Page not found.</h1>;
@@ -42,7 +43,11 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return <RouterProvider router={router} />;
+  return(
+    <AccountProvider>
+      <RouterProvider router={router} />
+    </AccountProvider>
+  )
 }
 
 export default App;

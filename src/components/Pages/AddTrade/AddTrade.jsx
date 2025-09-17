@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./addtrade.module.css";
-import { TradeHistory } from "../TradeHistory/TradeHistory";
 import { TradeStatus } from "./TradeStatus";
 import { TradeDetails } from "./TradeDetails";
 import { AddPrice } from "./AddPrice";
@@ -10,7 +8,7 @@ import { TradeCalculator } from "./TradeCalculator";
 
 export const AddTrade = () => {
   const [trade, setTrade] = useState({
-    id :"",
+    id: "",
     marketType: "",
     symbol: "",
     tradedirection: "",
@@ -20,9 +18,9 @@ export const AddTrade = () => {
     exitedPrice: [{ price: "", volume: "" }],
     riskAmount: "10",
     tradeStatus: "",
-    rr:"",
+    rr: "",
     profit: "",
-    dateNtime:"",
+    dateNtime: "",
     tradeNotes: "",
   });
 
@@ -34,7 +32,6 @@ export const AddTrade = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Get existing trades from localStorage
     const existingTrades = JSON.parse(localStorage.getItem("trades") || "[]");
 
     // Create unique ID and date/time
@@ -44,13 +41,10 @@ export const AddTrade = () => {
     // Build new trade object with all fields
     const newTrade = { ...trade, id: tradeId, dateNtime };
 
-    // Save trade array to localStorage
     const updatedTrades = [...existingTrades, newTrade];
     localStorage.setItem("trades", JSON.stringify(updatedTrades));
 
     console.log("Trade saved:", newTrade);
-
-
 
 
     const totalVolume = trade.exitedPrice.reduce(
@@ -103,7 +97,7 @@ const PageHeading = () => (
   </div>
 );
 
-const Buttons = ({setTrade}) => {
+const Buttons = ({ setTrade }) => {
   return (
     <div className={styles.btncontainer}>
       <button
@@ -124,8 +118,9 @@ const Buttons = ({setTrade}) => {
       >
         Clear All
       </button>
-      <button type="submit">Add Trade</button>
+      <button type="submit">
+        Add Trade
+      </button>
     </div>
   );
-  
 };
