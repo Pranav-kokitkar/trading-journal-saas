@@ -1,8 +1,8 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import styles from "./addtrade.module.css";
 import { AccountContext } from "../../../context/AccountContext";
 
-export const TradeCalculator = ({ trade }) => {
+export const TradeCalculator = ({ trade, setTrade }) => {
   const entry = parseFloat(trade.entryPrice) || 0;
   const stoploss = parseFloat(trade.stoplossPrice) || 0;
   const takeprofit = parseFloat(trade.takeProfitPrice) || 0;
@@ -11,9 +11,10 @@ export const TradeCalculator = ({ trade }) => {
   const riskAmount = parseFloat(trade.riskAmount) || 0;
   const tradeStatus = trade.tradeStatus || "";
   const symbol = (trade.symbol || "").toUpperCase();
+  const riskType = trade.riskType || "dollar";
 
-  const {accountDetails, setAccountDetails} =useContext(AccountContext);
-
+  const { accountDetails } = useContext(AccountContext);
+  const accountBalance = accountDetails?.balance || 0;
 
   const requiredFields = {
     entry,
@@ -23,11 +24,11 @@ export const TradeCalculator = ({ trade }) => {
     riskAmount,
     tradeStatus,
   };
+
   const missingFields = Object.entries(requiredFields)
     .filter(([key, val]) => !val)
     .map(([key]) => key);
 
-  // General top-level error if any main details missing
   const generalError = missingFields.length
     ? "Fill all above details to see the results."
     : "";
@@ -59,9 +60,16 @@ export const TradeCalculator = ({ trade }) => {
     }
   }
 
+  // ===== Adjust risk amount based on $ / % =====
+  let actualRisk = riskAmount;
+  if (riskType === "percent" && accountBalance) {
+    actualRisk = (riskAmount / 100) * accountBalance;
+  }
+
   // ===== Potential Loss =====
-  let potentialLoss = "-";
+  let riskamount = "-";
   let lossError = "";
+  let lossWarning = "";
   if (
     !missingFields.includes("entry") &&
     !missingFields.includes("stoploss") &&
@@ -70,19 +78,37 @@ export const TradeCalculator = ({ trade }) => {
   ) {
     const priceDiff = Math.abs(entry - stoploss);
     if (marketType === "crypto" || marketType === "stocks") {
-      potentialLoss = riskAmount.toFixed(2);
+      let calculatedLoss = actualRisk;
+      if (calculatedLoss > accountBalance) calculatedLoss = accountBalance;
+      riskamount = calculatedLoss.toFixed(2);
+
+      if (actualRisk > accountBalance) {
+        lossError = `Risk cannot exceed account balance ($${accountBalance}).`;
+      } else if (actualRisk > 0.2 * accountBalance) {
+        lossWarning = "Warning: Risk exceeds 20% of account balance.";
+      }
     } else if (marketType === "forex") {
       const pipSize = symbol.includes("JPY") ? 0.01 : 0.0001;
       const pips = priceDiff / pipSize;
       if (pips <= 0) lossError = "Invalid Entry/Stoploss for Forex.";
-      else potentialLoss = riskAmount.toFixed(2);
+      else {
+        let calculatedLoss = actualRisk;
+        if (calculatedLoss > accountBalance) calculatedLoss = accountBalance;
+        riskamount = calculatedLoss.toFixed(2);
+
+        if (actualRisk > accountBalance) {
+          lossError = `Risk cannot exceed account balance ($${accountBalance}).`;
+        } else if (actualRisk > 0.2 * accountBalance) {
+          lossWarning = "Warning: Risk exceeds 20% of account balance.";
+        }
+      }
     } else lossError = "Unsupported market type.";
   } else if (!lossError && !missingFields.includes("marketType")) {
     lossError = "Enter Entry, Stoploss, and Risk Amount.";
   }
 
   // ===== Potential Profit =====
-  let potentialProfit = "-";
+  let pnl = "-";
   let profitError = "";
   let effectiveExitPrice = null;
 
@@ -104,22 +130,34 @@ export const TradeCalculator = ({ trade }) => {
       tradedirection === "sell" || tradedirection === "short"
         ? entry - effectiveExitPrice
         : effectiveExitPrice - entry;
-    if (rewardDiff <= 0)
-      profitError = tradedirection.includes("buy")
-        ? "Exit must be above Entry."
-        : "Exit must be below Entry.";
-    else {
-      const priceDiff = Math.abs(entry - stoploss);
-      const positionSize = riskAmount / priceDiff;
-      potentialProfit = (rewardDiff * positionSize).toFixed(2);
+
+    const priceDiff = Math.abs(entry - stoploss);
+    const positionSize = actualRisk / priceDiff;
+
+    let rawProfit = rewardDiff * positionSize;
+
+    // ===== Cap negative profit at account balance =====
+    if (rawProfit < 0 && Math.abs(rawProfit) > accountBalance) {
+      pnl = (-accountBalance).toFixed(2);
+      profitError = "Loss capped at account balance.";
+    } else {
+      pnl = rawProfit.toFixed(2);
+      if (rawProfit < 0 && Math.abs(rawProfit) > 0.2 * accountBalance) {
+        lossWarning = "Warning: Loss exceeds 20% of account balance.";
+      }
     }
   }
 
-  // ===== risk amount error =====
-  if (riskAmount > trade.accountBalance) {
-    lossError = `Risk Amount cannot exceed account balance ($${trade.accountBalance}).`;
-    profitError = `Risk Amount cannot exceed account balance ($${trade.accountBalance}).`;
-  }
+  useEffect(() => {
+    if (setTrade) {
+      setTrade((prev) => ({
+        ...prev,
+        pnl: parseFloat(pnl) || 0,
+        riskamount: parseFloat(riskamount) || 0,
+        rr: parseFloat(rr) ||0,
+      }));
+    }
+  }, [pnl, riskamount,rr]);
 
   return (
     <div className={styles.card}>
@@ -141,19 +179,25 @@ export const TradeCalculator = ({ trade }) => {
 
         <div className={styles.col2}>
           <p>
-            Potential Loss:{" "}
-            <span>{potentialLoss !== "-" ? `$${potentialLoss}` : "-"}</span>
+            Risk Amount:{" "}
+            <span>{riskamount !== "-" ? `$${riskamount}` : "-"}</span>
           </p>
           {lossError && (
             <p style={{ color: "red", fontSize: "0.9rem" }}>{lossError}</p>
           )}
+          {lossWarning && (
+            <p style={{ color: "orange", fontSize: "0.9rem" }}>{lossWarning}</p>
+          )}
 
           <p>
-            Potential Profit:{" "}
-            <span>{potentialProfit !== "-" ? `$${potentialProfit}` : "-"}</span>
+            PNL:{" "}
+            <span>{pnl !== "-" ? `$${pnl}` : "-"}</span>
           </p>
           {profitError && (
             <p style={{ color: "red", fontSize: "0.9rem" }}>{profitError}</p>
+          )}
+          {lossWarning && (
+            <p style={{ color: "orange", fontSize: "0.9rem" }}>{lossWarning}</p>
           )}
         </div>
       </div>

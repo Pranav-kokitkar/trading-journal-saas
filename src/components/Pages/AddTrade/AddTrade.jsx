@@ -5,8 +5,13 @@ import { TradeDetails } from "./TradeDetails";
 import { AddPrice } from "./AddPrice";
 import { TradeInfo } from "./TradeInfo";
 import { TradeCalculator } from "./TradeCalculator"; 
+import {  useContext, useState } from "react";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const AddTrade = () => {
+
+  const {accountDetails, setAccountDetails} =useContext(AccountContext);
+
   const [trade, setTrade] = useState({
     id: "",
     marketType: "",
@@ -14,12 +19,13 @@ export const AddTrade = () => {
     tradedirection: "",
     entryPrice: "114600.2",
     stoplossPrice: "114542.4",
+    riskType: "dollar",
     takeProfitPrice: "114773.7",
-    exitedPrice: [{ price: "", volume: "" }],
-    riskAmount: "10",
     tradeStatus: "",
+    exitedPrice: [{ price: "", volume: "" }],
     rr: "",
-    profit: "",
+    pnl: "",
+    riskamount: "",
     dateNtime: "",
     tradeNotes: "",
   });
@@ -44,6 +50,14 @@ export const AddTrade = () => {
     const updatedTrades = [...existingTrades, newTrade];
     localStorage.setItem("trades", JSON.stringify(updatedTrades));
 
+    //updating balance
+    setAccountDetails((prev) => ({
+      ...prev,
+      balance: prev.balance + trade.pnl,
+      totaltrades : prev.totaltrades + 1,
+    }));
+
+
     console.log("Trade saved:", newTrade);
 
 
@@ -57,17 +71,25 @@ export const AddTrade = () => {
       return;
     }
     setTrade({
+      id: "",
       marketType: "",
       symbol: "",
       tradedirection: "",
-      entryPrice: "",
-      stoplossPrice: "",
-      takeProfitPrice: "",
-      riskAmount: "",
+      entryPrice: "114600.2",
+      stoplossPrice: "114542.4",
+      riskType: "dollar",
+      takeProfitPrice: "114773.7",
       tradeStatus: "",
+      exitedPrice: [{ price: "", volume: "" }],
+      rr: "",
+      pnl: "",
+      riskamount: "",
+      dateNtime: "",
       tradeNotes: "",
     });
   };
+
+  
 
   return (
     <section className={styles.addtrade}>
@@ -104,23 +126,27 @@ const Buttons = ({ setTrade }) => {
         type="reset"
         onClick={() =>
           setTrade({
+            id: "",
             marketType: "",
             symbol: "",
             tradedirection: "",
-            entryPrice: "",
-            stoplossPrice: "",
-            takeProfitPrice: "",
-            riskAmount: "",
+            entryPrice: "114600.2",
+            stoplossPrice: "114542.4",
+            riskType: "dollar",
+            takeProfitPrice: "114773.7",
             tradeStatus: "",
+            exitedPrice: [{ price: "", volume: "" }],
+            rr: "",
+            pnl: "",
+            riskamount: "",
+            dateNtime: "",
             tradeNotes: "",
           })
         }
       >
         Clear All
       </button>
-      <button type="submit">
-        Add Trade
-      </button>
+      <button type="submit">Add Trade</button>
     </div>
   );
 };

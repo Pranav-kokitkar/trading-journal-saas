@@ -5,6 +5,7 @@ import { AddNotes } from "./components/Pages/AddNotes/AddNotes";
 import { Trade } from "./components/Pages/Trade/Trade";
 import { Layout } from "./components/Layout/Layout";
 import { AccountProvider } from "./context/AccountContext";
+import { MyAccount } from "./components/Pages/MyAccount/MyAccount";
 
 function ErrorPage() {
   return <h1>Oops! Page not found.</h1>;
@@ -35,6 +36,11 @@ const router = createBrowserRouter(
           element: <AddNotes />,
           errorElement: <ErrorPage />,
         },
+        {
+          path: "/myaccount",
+          element: <MyAccount/>,
+          errorElement: <ErrorPage/>
+        }
       ],
       errorElement: <ErrorPage />,
     },

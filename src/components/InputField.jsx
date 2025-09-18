@@ -11,7 +11,7 @@ export const InputField = ({
     inputGroup: {
       flex: 1,
       display: "flex",
-      flexDirection: "column", // ✅ camelCase instead of flex-direction
+      flexDirection: "column",
       marginBottom: "1rem",
     },
     label: {
@@ -35,7 +35,7 @@ export const InputField = ({
         name={name}
         type={type}
         placeholder={placeholder}
-        value={type === "file" ? undefined : value}
+        value={type === "file" ? undefined : value || ""} // ✅ fix
         onChange={(e) => {
           if (type === "file") {
             onChange({ target: { name, value: e.target.files[0] } });
