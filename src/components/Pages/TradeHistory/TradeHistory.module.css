@@ -90,7 +90,14 @@
   margin-bottom: 1rem;
   gap: 1rem;
   flex-wrap: wrap;
+  color: #bbb;
 }
+
+a {
+  text-decoration: none;
+  color: inherit; /* keeps the text color same as parent */
+}
+
 .logo {
   font-size: 2rem;
   flex-shrink: 0;

@@ -1,12 +1,23 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import styles from "./Trade.module.css"
 import { useState } from "react";
 
 export const Trade =()=>{
 
   const {id} = useParams();
+  const navigate = useNavigate();
   const trades =JSON.parse(localStorage.getItem("trades")) || [];
   const trade = trades.find(t=>t.id === id);
+
+  const handleDelete = () => {
+    let trades = JSON.parse(localStorage.getItem("trades")) || [];
+
+    const updatedTrades = trades.filter((t) => String(t.id) !== String(id));
+
+    localStorage.setItem("trades", JSON.stringify(updatedTrades));
+    navigate("/trade-history");
+  };
+
 
   if(!trade){
     return <p>Trade not found</p>
@@ -23,7 +34,7 @@ export const Trade =()=>{
             <div className={styles.tradeinfo}>
               <h4>Trade Information</h4>
               <p>
-                market Type : <span>{trade.marketType}</span>
+                Market Type : <span>{trade.marketType}</span>
               </p>
               <p>
                 Direction : <span>{trade.tradedirection}</span>
@@ -41,20 +52,24 @@ export const Trade =()=>{
             <div className={styles.tradeperformance}>
               <h4>Performance</h4>
               <p>
-                Risk Amount: <span>{trade.riskAmount}</span>%
+                Risk Amount: <span>${trade.riskAmount}</span>
               </p>
               <p>
-                RR : <span>{trade.rr}</span>
+                RR : 1:<span>{trade.rr}</span>
               </p>
-              <p>Potential Loss : </p>
-              <p>Potential Profit : </p>
+              <p>
+                PNL : <span>{trade.pnl}</span>
+              </p>
             </div>
             <div className={styles.exitprice}>
               {trade.exitedPrice.map((exitedPrice, index) => (
                 <div className={styles.exitpricedata}>
-                  <p>Exit Price {index+1} : <span>{exitedPrice.price}</span>
+                  <p>
+                    Exit Price {index + 1} : <span>{exitedPrice.price}</span>
                   </p>
-                  <p>Volume : <span>{exitedPrice.volume}%</span></p>
+                  <p>
+                    Volume : <span>{exitedPrice.volume}%</span>
+                  </p>
                 </div>
               ))}
             </div>
@@ -67,7 +82,7 @@ export const Trade =()=>{
             <button className={styles.edittrade}>Edit Trade</button>
             <button className={styles.closetrade}>Close Trade </button>
             {/* close tarde only shows if the trade is on going */}
-            <button className={styles.deletetrade}>Delete Trade</button>
+            <button className={styles.deletetrade} onClick={handleDelete}>Delete Trade</button>
           </div>
         </div>
       </section>

@@ -22,27 +22,27 @@ export const Sidebar = () => {
       <nav className={styles.nav}>
         <ul>
           <li className={styles.active}>
-            <NavLink className={getNavLinkClass} to="/trade">
+            <NavLink className={getNavLinkClass} to="/dashboard">
               Dashboard
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/addtrade">
+            <NavLink className={getNavLinkClass} to="/add-trade">
               Add Trade
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/tradehistory">
+            <NavLink className={getNavLinkClass} to="/trade-history">
               Trade History
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/addnotes">
+            <NavLink className={getNavLinkClass} to="/add-notes">
               Add Notes
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/myaccount">
+            <NavLink className={getNavLinkClass} to="/my-account">
               My Account
             </NavLink>
           </li>

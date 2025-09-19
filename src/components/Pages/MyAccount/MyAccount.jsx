@@ -32,6 +32,13 @@ export const MyAccount = () => {
     alert("Account updated ✅");
   };
 
+  const handleReset=()=>{
+    localStorage.removeItem("trades");
+    localStorage.removeItem("accountDetails");
+    alert("Account has been Reset!");
+    window.location.reload(); // refresh to update UI
+  }
+
   return (
     <section className={styles.myaccount}>
       <div className={styles.myaccountpageheading}>
@@ -114,7 +121,7 @@ export const MyAccount = () => {
           This will permanently delete all your trades and reset your account
           balance to initial capital. <b>This action cannot be undone.</b>
         </p>
-        <button className={styles.dangerbtn}>Reset All Data</button>
+        <button className={styles.dangerbtn} onClick={handleReset}>Reset All Data</button>
       </div>
 
       {/* ✅ Help & About */}

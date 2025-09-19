@@ -53,9 +53,10 @@ export const AddTrade = () => {
     //updating balance
     setAccountDetails((prev) => ({
       ...prev,
-      balance: prev.balance + trade.pnl,
-      totaltrades : prev.totaltrades + 1,
+      balance: prev.balance + Math.round(trade.pnl * 100) / 100,
+      totaltrades: prev.totaltrades + 1,
     }));
+
 
 
     console.log("Trade saved:", newTrade);

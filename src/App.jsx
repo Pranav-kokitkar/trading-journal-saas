@@ -6,6 +6,7 @@ import { Trade } from "./components/Pages/Trade/Trade";
 import { Layout } from "./components/Layout/Layout";
 import { AccountProvider } from "./context/AccountContext";
 import { MyAccount } from "./components/Pages/MyAccount/MyAccount";
+import { Dashboard } from "./components/Pages/Dashboard/Dashboard";
 
 function ErrorPage() {
   return <h1>Oops! Page not found.</h1>;
@@ -15,32 +16,38 @@ const router = createBrowserRouter(
   [
     {
       path: "/",
-      element: <Layout/>,
+      element: <Layout />,
       children: [
         {
-          path: "/trade/:id",
-          element: <Trade/>,
-        },
-        {
-          path: "/addtrade",
-          element: <AddTrade/>,
+          path: "/dashboard",
+          element: <Dashboard />,
           errorElement: <ErrorPage />,
         },
         {
-          path: "/tradehistory",
+          path: "/trade/:id",
+          element: <Trade />,
+          errorElement: <ErrorPage />,
+        },
+        {
+          path: "/trade-history",
           element: <TradeHistory />,
           errorElement: <ErrorPage />,
         },
         {
-          path: "/addnotes",
+          path: "/add-trade",
+          element: <AddTrade />,
+          errorElement: <ErrorPage />,
+        },
+        {
+          path: "/add-notes",
           element: <AddNotes />,
           errorElement: <ErrorPage />,
         },
         {
-          path: "/myaccount",
-          element: <MyAccount/>,
-          errorElement: <ErrorPage/>
-        }
+          path: "/my-account",
+          element: <MyAccount />,
+          errorElement: <ErrorPage />,
+        },
       ],
       errorElement: <ErrorPage />,
     },

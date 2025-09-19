@@ -84,8 +84,8 @@ const TradeCard = ({ savedTrade }) => {
                 <span>1:{tradeData.rr || "0"}</span>
               </div>
               <div>
-                <p>Profit</p>
-                <span>{tradeData.profit || "0"}</span>
+                <p>PNL</p>
+                <span>${tradeData.pnl|| "0"}</span>
               </div>
             </div>
           </div>
