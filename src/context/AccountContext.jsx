@@ -8,7 +8,7 @@ export const AccountProvider = ({ children }) => {
     const saved = localStorage.getItem("accountDetails");
     return saved
       ? JSON.parse(saved)
-      : { initialCapital: 10000, balance: 10000, totaltrades: 0 }; 
+      : { initialCapital: 10000, balance: 10000, totaltrades: 0, totalLongTrades:0, totalShortTrades:0 }; 
   });
 
   // Whenever accountDetails changes, sync to localStorage

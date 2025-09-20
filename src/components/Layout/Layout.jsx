@@ -22,7 +22,7 @@ export const Layout = () => {
         </button>
         <h3>TradingJournal</h3>
       </header>
-
+    
       {/* Main content */}
       <main className={styles.outlet}>
         <Outlet />

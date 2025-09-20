@@ -25,10 +25,17 @@ export const AddTrade = () => {
     exitedPrice: [{ price: "", volume: "" }],
     rr: "",
     pnl: "",
+    tradeResult: "",
     riskamount: "",
+    riskPercent: "", // NEW
+    balanceAfterTrade: "", // NEW
+    tradeNumber: "", // NEW
     dateNtime: "",
     tradeNotes: "",
   });
+
+
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -40,37 +47,60 @@ export const AddTrade = () => {
 
     const existingTrades = JSON.parse(localStorage.getItem("trades") || "[]");
 
-    // Create unique ID and date/time
     const tradeId = uuidv4();
     const dateNtime = new Date().toLocaleString();
 
-    // Build new trade object with all fields
-    const newTrade = { ...trade, id: tradeId, dateNtime };
+    // Calculate trade result
+    let tradeResult = "breakeven";
+    if (trade.pnl > 0) tradeResult = "win";
+    else if (trade.pnl < 0) tradeResult = "loss";
+
+    // Calculate trade number
+    const tradeNumber = existingTrades.length + 1;
+
+    // Calculate balance after trade
+    const balanceAfterTrade =
+      accountDetails.balance + Math.round(trade.pnl * 100) / 100;
+
+    // Calculate risk percent (simple version)
+    const riskPercent =
+      trade.riskamount && accountDetails.balance
+        ? ((trade.riskamount / accountDetails.balance) * 100).toFixed(2)
+        : 0;
+
+    const newTrade = {
+      ...trade,
+      id: tradeId,
+      dateNtime,
+      tradeResult,
+      tradeNumber,
+      balanceAfterTrade,
+      riskPercent,
+    };
 
     const updatedTrades = [...existingTrades, newTrade];
     localStorage.setItem("trades", JSON.stringify(updatedTrades));
 
-    //updating balance
+    // Update account balance + stats
     setAccountDetails((prev) => ({
       ...prev,
-      balance: prev.balance + Math.round(trade.pnl * 100) / 100,
+      balance: balanceAfterTrade,
       totaltrades: prev.totaltrades + 1,
     }));
 
-
-
     console.log("Trade saved:", newTrade);
 
-
+    // Validation for exit volume
     const totalVolume = trade.exitedPrice.reduce(
       (sum, lvl) => sum + Number(lvl.volume || 0),
       0
     );
-
     if (trade.tradeStatus === "exited" && totalVolume !== 100) {
       alert("Total exit volume must equal 100%");
       return;
     }
+
+    // Reset form
     setTrade({
       id: "",
       marketType: "",
@@ -84,11 +114,16 @@ export const AddTrade = () => {
       exitedPrice: [{ price: "", volume: "" }],
       rr: "",
       pnl: "",
+      tradeResult: "",
       riskamount: "",
+      riskPercent: "",
+      balanceAfterTrade: "",
+      tradeNumber: "",
       dateNtime: "",
       tradeNotes: "",
     });
   };
+
 
   
 
