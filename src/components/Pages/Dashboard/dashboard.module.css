@@ -1,10 +1,23 @@
+h3,
+h2 {
+  padding: 0;
+  margin: 0;
+}
+
+h3 {
+  font-weight: 200;
+  margin: 8px 0;
+  font-size: 1rem;
+  color: #ffffff;
+}
+
 .dashboard {
   background-color: #121212;
   min-height: 100vh;
-  padding: 20px;
+  padding: 1rem 8rem;
   color: #e0e0e0;
   font-family: Arial, sans-serif;
-  overflow-x: hidden; /* stop horizontal scrollbar */
+  overflow-x: hidden;
 }
 
 .chartContainer {
@@ -13,11 +26,100 @@
   background: #1e1e1e;
   border-radius: 12px;
   padding: 15px;
-  overflow-x: hidden; /* prevent horizontal sliding */
+  overflow-x: hidden;
   box-sizing: border-box;
 }
 
 .chartTitle {
   color: #ffffff;
   margin-bottom: 10px;
+}
+/* 
+.tradingdata {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 9rem;
+  margin-top: 7rem;
+}
+
+.tradingdatal {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.tradingdatar {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+} */
+
+/* Container for left and right panels */
+.tradingdata {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  flex-wrap: wrap; /* responsive */
+  margin-bottom: 150px;
+  margin-top: 50px;
+}
+
+/* Left column (stacked boxes) */
+.tradingdatal {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.tradingdatal h3 {
+  background-color: #2a2a2a;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s ease;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.linecontainer {
+  display: flex;
+  justify-content: center; /* centers the line */
+  margin: 20px 0; /* space above and below the line */
+}
+
+.line {
+  width: 95%; /* length of the line */
+  height: 2px; /* thickness */
+  background-color: #88817a5d; /* neon orange */
+  border-radius: 20px;
+}
+
+/* .tradingdatal div:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+} */
+
+/* Right column (single box for metrics) */
+.tradingdatar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 280px;
+  background-color: #2a2a2a;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Responsive stacking */
+@media (max-width: 768px) {
+  .tradingdata {
+    flex-direction: column;
+  }
 }
