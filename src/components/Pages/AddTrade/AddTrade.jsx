@@ -7,10 +7,14 @@ import { TradeInfo } from "./TradeInfo";
 import { TradeCalculator } from "./TradeCalculator"; 
 import {  useContext, useState } from "react";
 import { AccountContext } from "../../../context/AccountContext";
+import { PerformanceContext } from "../../../context/PerformanceContext";
+
 
 export const AddTrade = () => {
 
   const {accountDetails, setAccountDetails} =useContext(AccountContext);
+  const { refreshPerformance } = useContext(PerformanceContext);
+
 
   const [trade, setTrade] = useState({
     id: "",
@@ -80,6 +84,8 @@ export const AddTrade = () => {
 
     const updatedTrades = [...existingTrades, newTrade];
     localStorage.setItem("trades", JSON.stringify(updatedTrades));
+
+    refreshPerformance();
 
     // Update account balance + stats
     setAccountDetails((prev) => ({

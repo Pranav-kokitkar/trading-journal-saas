@@ -7,6 +7,7 @@ import { Layout } from "./components/Layout/Layout";
 import { AccountProvider } from "./context/AccountContext";
 import { MyAccount } from "./components/Pages/MyAccount/MyAccount";
 import { Dashboard } from "./components/Pages/Dashboard/Dashboard";
+import { PerformanceProvider } from "./context/PerformanceContext";
 
 function ErrorPage() {
   return <h1>Oops! Page not found.</h1>;
@@ -56,11 +57,13 @@ const router = createBrowserRouter(
 );
 
 function App() {
-  return(
+  return (
     <AccountProvider>
-      <RouterProvider router={router} />
+      <PerformanceProvider>
+        <RouterProvider router={router} />
+      </PerformanceProvider>
     </AccountProvider>
-  )
+  );
 }
 
 export default App;
