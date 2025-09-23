@@ -6,7 +6,6 @@ h2 {
 
 h3 {
   font-weight: 200;
-  margin: 8px 0;
   font-size: 1rem;
   color: #ffffff;
 }
@@ -86,6 +85,10 @@ h3 {
   justify-content: flex-start;
 }
 
+.tradingdatal h3 span {
+  margin-left: 6px;
+}
+
 .linecontainer {
   display: flex;
   justify-content: center; /* centers the line */
@@ -106,7 +109,6 @@ h3 {
 
 /* Right column (single box for metrics) */
 .tradingdatar {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -115,6 +117,66 @@ h3 {
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+.icon {
+  padding: 0.5rem;
+  border-radius: 10px;
+  margin-right: 10px;
+}
+
+.iconBlue {
+  background-color: rgba(74, 164, 243, 0.416);
+}
+
+.iconGreen {
+  background-color: rgba(0, 128, 0, 0.557);
+}
+
+.iconYellow {
+  background-color: rgb(255, 187, 0);
+}
+
+.blue {
+  color: rgba(74, 164, 243, 0.416);
+}
+
+.yellow {
+  color: rgb(255, 187, 0);
+}
+
+.profit {
+  color: rgb(26, 255, 26);
+}
+
+.loss {
+  color: red;
+}
+
+.neutral {
+  color: orange;
+}
+
+/* charts */
+
+.tradingperformance h2 {
+  margin-bottom: 35px;
+}
+
+.chartCard {
+  background-color: #1e1e1e;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 130px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+}
+
+.chartCard h3 {
+  margin-bottom: 60px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #f0f0f0;
 }
 
 /* Responsive stacking */

@@ -57,18 +57,28 @@ const DirectionChart = ({ trades }) => {
       fill: "#f44336",
     },
   ];
-
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart
         data={data}
         margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
       >
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="direction" />
-        <YAxis domain={[0, 100]} tickFormatter={(val) => `${val}%`} />
-        <Tooltip formatter={(value) => `${value}%`} />
-        <Bar dataKey="successRate">
+        <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+        <XAxis dataKey="direction" stroke="#ccc" />
+        <YAxis
+          domain={[0, 100]}
+          tickFormatter={(val) => `${val}%`}
+          stroke="#ccc"
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "#2a2a2a",
+            border: "none",
+            color: "#fff",
+          }}
+          formatter={(value) => `${value}%`}
+        />
+        <Bar dataKey="successRate" radius={[6, 6, 0, 0]}>
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.fill} />
           ))}
@@ -76,6 +86,7 @@ const DirectionChart = ({ trades }) => {
             dataKey="total"
             position="top"
             formatter={(val) => `Total: ${val}`}
+            style={{ fill: "#fff", fontWeight: "bold" }}
           />
         </Bar>
       </BarChart>

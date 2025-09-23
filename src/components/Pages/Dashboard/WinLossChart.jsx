@@ -23,6 +23,10 @@ const WinLossChart = ({ trades }) => {
     { name: "Breakeven", value: breakeven },
   ];
 
+  if (trades.length === 0) {
+    return <p>No trades available for win/loss chart.</p>;
+  }
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>

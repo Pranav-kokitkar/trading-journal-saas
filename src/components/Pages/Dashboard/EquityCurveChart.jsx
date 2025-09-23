@@ -14,9 +14,12 @@ import { getEquityCurveData } from "../../../utils/chartData";
 const EquityCurveChart = ({ trades }) => {
   const data = getEquityCurveData(trades);
 
+  if (data.length === 0) {
+    return <p>No trades available for equity curve chart.</p>;
+  }
+
   return (
     <div style={{ width: "100%", height: 300 }}>
-      <h3>Equity Curve</h3>
       <ResponsiveContainer>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
