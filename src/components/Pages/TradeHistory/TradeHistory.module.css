@@ -12,8 +12,8 @@
 
 /* ===== Container ===== */
 .tradehistorycontainer {
-  width: 80%;
-  max-width: 1100px;
+  width: 90%;
+  max-width: 1200px;
   background: #1e1e1e;
   border-radius: 12px;
   padding: 2rem;
@@ -27,7 +27,7 @@
   margin-bottom: 1.5rem;
 }
 .heading h3 {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   margin: 0;
 }
 .heading p {
@@ -41,17 +41,17 @@
 }
 .filter h3 {
   font-size: 1.2rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 .filterinput {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.8rem;
 }
 .filterinput input,
 .filterinput select {
-  padding: 0.5rem;
+  padding: 0.6rem;
   border-radius: 6px;
   border: 1px solid #444;
   background: #1c1c1c;
@@ -60,24 +60,30 @@
   min-width: 120px;
   flex: 1;
 }
+.filterinput label {
+  font-size: 0.85rem;
+  color: #aaa;
+  margin-right: 0.3rem;
+}
 .filter3 {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.8rem;
 }
 .filter3 button {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border: none;
   border-radius: 6px;
-  background: #3a6ea5;
-  color: #f5f5f5;
+  background: #ff5555;
+  color: #fff;
   cursor: pointer;
   font-weight: bold;
+  transition: background 0.2s ease-in-out;
 }
 .filter3 button:hover {
-  background: #335d8a;
+  background: #e14b4b;
 }
 
 /* ===== Trade Cards ===== */
@@ -91,11 +97,16 @@
   gap: 1rem;
   flex-wrap: wrap;
   color: #bbb;
+  transition: transform 0.2s ease-in-out;
+}
+.tradecard:hover {
+  transform: scale(1.02);
+  background: #333;
 }
 
 a {
   text-decoration: none;
-  color: inherit; /* keeps the text color same as parent */
+  color: inherit;
 }
 
 .logo {
@@ -143,31 +154,52 @@ a {
 }
 
 /* ===== Responsiveness ===== */
+/* Limit inputs on medium screens */
 @media (max-width: 1024px) {
+  .filterinput input,
+  .filterinput select {
+    max-width: 300px; /* <-- prevents over-stretching */
+    width: 100%;
+  }
+
   .tradecard {
     flex-direction: column;
     align-items: flex-start;
-  }
-  .tradequickdata {
-    gap: 1rem;
+    margin-left: auto; /* <-- keep centered */
+    margin-right: auto; /* <-- keep centered */
+    width: 100%;
+    max-width: 600px; /* <-- don't stretch across whole screen */
   }
 }
 
+/* For tablets/mobiles */
 @media (max-width: 768px) {
   .tradehistorycontainer {
     width: 100%;
     padding: 1rem;
   }
+
   .filterinput {
     flex-direction: column;
+    align-items: flex-start;
   }
+
   .filterinput input,
   .filterinput select {
     width: 100%;
+    max-width: 100%; /* full width only for small screens */
   }
+
   .filter3 {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+
+  .tradecard {
+    width: 100%;
+    max-width: 100%; /* make cards fluid but centered */
+    margin-left: auto;
+    margin-right: auto;
   }
 }

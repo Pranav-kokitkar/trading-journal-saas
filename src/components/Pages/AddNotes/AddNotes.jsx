@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "./AddNotes.module.css";
 import { DisplayNotes } from "./DisplayNotes";
 import { v4 as uuidv4 } from "uuid";
+import FilterPanel from "../Comparision/FilterPanel";
 
 
 export const AddNotes = () => {
@@ -61,6 +62,8 @@ export const AddNotes = () => {
         </div>
       </form>
       <DisplayNotes notes={notes} onDelete={deleteNote}/>
+      <FilterPanel/>
     </section>
+    
   );
 };
