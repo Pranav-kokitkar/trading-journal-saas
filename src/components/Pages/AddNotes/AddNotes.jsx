@@ -62,7 +62,6 @@ export const AddNotes = () => {
         </div>
       </form>
       <DisplayNotes notes={notes} onDelete={deleteNote}/>
-      <FilterPanel/>
     </section>
     
   );
