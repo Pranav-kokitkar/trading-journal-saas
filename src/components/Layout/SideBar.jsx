@@ -11,10 +11,9 @@ export const Sidebar = () => {
     <div className={styles.sidebar}>
       {/* Logo */}
       <div className={styles.logo}>
-        <div className={styles.logoIcon}></div>
         <div className={styles.logoText}>
-          <h3>TradingJournal</h3>
-          <p>Professional Trading Analytics</p>
+          <h3>Log My Trade</h3>
+          <p>Professional Trading journal software</p>
         </div>
       </div>
 
@@ -51,9 +50,9 @@ export const Sidebar = () => {
 
       {/* Bottom User Info */}
       <div className={styles.user}>
-        <div className={styles.avatar}>T</div>
+        <div className={styles.avatar}>U</div>
         <div>
-          <p className={styles.username}>Trader</p>
+          <p className={styles.username}>User</p>
           <span className={styles.subText}>Demo Account</span>
         </div>
       </div>

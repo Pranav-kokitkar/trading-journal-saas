@@ -43,22 +43,22 @@ export const Trade =()=>{
                 Entry Price : <span>{trade.entryPrice}</span>
               </p>
               <p>
-                Stoploss : <span>{trade.stoplossPrice}</span>
+                Stop Loss : <span>{trade.stoplossPrice}</span>
               </p>
               <p>
-                Takeprofit: <span>{trade.takeProfitPrice}</span>
+                Take Profit: <span>{trade.takeProfitPrice}</span>
               </p>
             </div>
             <div className={styles.tradeperformance}>
               <h4>Performance</h4>
               <p>
-                Risk Amount: <span>${trade.riskAmount}</span>
+                Risk Amount: <span>${trade.riskamount}</span>
               </p>
               <p>
                 RR : 1:<span>{trade.rr}</span>
               </p>
               <p>
-                PNL : <span>{trade.pnl}</span>
+                PNL : <span>${trade.pnl}</span>
               </p>
             </div>
             <div className={styles.exitprice}>
