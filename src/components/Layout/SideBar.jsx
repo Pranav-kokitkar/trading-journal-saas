@@ -21,7 +21,7 @@ export const Sidebar = () => {
       <nav className={styles.nav}>
         <ul>
           <li className={styles.active}>
-            <NavLink className={getNavLinkClass} to="/dashboard">
+            <NavLink className={getNavLinkClass} to="/">
               Dashboard
             </NavLink>
           </li>
