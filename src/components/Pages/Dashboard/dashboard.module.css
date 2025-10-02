@@ -1,7 +1,7 @@
-h3,
-h2 {
-  padding: 0;
+h2,
+h3 {
   margin: 0;
+  padding: 0;
 }
 
 h3 {
@@ -19,6 +19,10 @@ h3 {
   overflow-x: hidden;
 }
 
+.tradingperformanceh2 {
+  margin-bottom: 70px;
+}
+
 .chartContainer {
   width: 100%;
   height: 300px;
@@ -33,38 +37,16 @@ h3 {
   color: #ffffff;
   margin-bottom: 10px;
 }
-/* 
-.tradingdata {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  margin-bottom: 9rem;
-  margin-top: 7rem;
-}
 
-.tradingdatal {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-}
-
-.tradingdatar {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
-} */
-
-/* Container for left and right panels */
+/* Left + Right Panels */
 .tradingdata {
   display: flex;
   gap: 20px;
   justify-content: space-between;
-  flex-wrap: wrap; /* responsive */
-  margin-bottom: 150px;
-  margin-top: 50px;
+  flex-wrap: wrap;
+  margin: 50px 0 150px 0;
 }
 
-/* Left column (stacked boxes) */
 .tradingdatal {
   flex: 1;
   min-width: 280px;
@@ -91,23 +73,17 @@ h3 {
 
 .linecontainer {
   display: flex;
-  justify-content: center; /* centers the line */
-  margin: 20px 0; /* space above and below the line */
+  justify-content: center;
+  margin: 20px 0;
 }
 
 .line {
-  width: 95%; /* length of the line */
-  height: 2px; /* thickness */
-  background-color: #88817a5d; /* neon orange */
+  width: 95%;
+  height: 2px;
+  background-color: #88817a5d;
   border-radius: 20px;
 }
 
-/* .tradingdatal div:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
-} */
-
-/* Right column (single box for metrics) */
 .tradingdatar {
   display: flex;
   flex-direction: column;
@@ -119,6 +95,7 @@ h3 {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
+/* Icons */
 .icon {
   padding: 0.5rem;
   border-radius: 10px;
@@ -157,7 +134,14 @@ h3 {
   color: orange;
 }
 
-/* charts */
+/* Charts Grid */
+.tradingperformance {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 150px;
+  column-gap: 40px;
+  margin: auto;
+}
 
 .tradingperformance h2 {
   margin-bottom: 35px;
@@ -165,23 +149,49 @@ h3 {
 
 .chartCard {
   background-color: #1e1e1e;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 130px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-  color: #ffffff;
+  color: white;
+  padding: 0 30px;
+  text-align: center;
+  border-radius: 8px;
 }
 
 .chartCard h3 {
-  margin-bottom: 60px;
+  margin: 20px 0;
   font-size: 1.2rem;
   font-weight: bold;
   color: #f0f0f0;
 }
 
-/* Responsive stacking */
+.chartcontainer {
+  width: 100%;
+}
+
+/* Quick Data */
+.quickdata {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  text-align: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.quickdata p {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background-color: rgba(84, 83, 83, 0.416);
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .tradingdata {
     flex-direction: column;
+  }
+
+  .tradingperformance {
+    grid-template-columns: 1fr;
   }
 }

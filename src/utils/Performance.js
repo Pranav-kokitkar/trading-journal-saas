@@ -1,6 +1,7 @@
 // src/utils/Performance.js
 export const calculatePerformance = (trades) => {
-  const totalTrades = trades.length; // ✅ singular naming corrected
+  const totalTrades = trades.length;
+
   const totalLongTrades = trades.filter(
     (t) => t.tradedirection === "long"
   ).length;
@@ -55,6 +56,22 @@ export const calculatePerformance = (trades) => {
     0
   );
 
+  // ✅ Extremes
+  const balances = trades.map((t) => Number(t.balanceAfterTrade) || 0);
+  const pnls = trades.map((t) => Number(t.pnl) || 0);
+  const risks = trades.map((t) => Number(t.riskamount) || 0);
+
+  const highestBalance = balances.length > 0 ? Math.max(...balances) : 0;
+  const lowestBalance = balances.length > 0 ? Math.min(...balances) : 0;
+
+  const highestWin =
+    pnls.length > 0 ? Math.max(...pnls.filter((p) => p > 0)) : 0;
+  const lowestLoss =
+    pnls.length > 0 ? Math.min(...pnls.filter((p) => p < 0)) : 0;
+
+  const highestRisk = risks.length > 0 ? Math.max(...risks) : 0;
+  const lowestRisk = risks.length < 0 ? Math.max(...risks) : 0;
+
   return {
     totalTrades,
     totalLongTrades,
@@ -68,5 +85,11 @@ export const calculatePerformance = (trades) => {
     totalPnL: Number(totalPnL.toFixed(2)),
     totalLiveTrades,
     totalRisk: Number(totalRisk.toFixed(2)),
+    highestBalance,
+    lowestBalance,
+    highestWin,
+    lowestLoss,
+    highestRisk,
+    lowestRisk,
   };
 };

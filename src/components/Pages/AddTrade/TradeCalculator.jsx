@@ -107,57 +107,62 @@ export const TradeCalculator = ({ trade, setTrade }) => {
     lossError = "Enter Entry, Stoploss, and Risk Amount.";
   }
 
-  // ===== Potential Profit =====
+  // ===== Potential Profit (Volume-aware) =====
   let pnl = "-";
   let profitError = "";
-  let effectiveExitPrice = null;
-
-  if (tradeStatus === "exited" && trade.exitedPrice?.length > 0) {
-    effectiveExitPrice = parseFloat(trade.exitedPrice[0].price);
-  }
-
   if (tradeStatus === "live") {
     profitError =
       "Trade is live. Add exit price to calculate potential profit.";
-  } else if (!effectiveExitPrice && tradeStatus === "exited") {
-    profitError = "Exit price required to calculate potential profit.";
-  } else if (
-    !missingFields.includes("entry") &&
-    !missingFields.includes("tradedirection") &&
-    effectiveExitPrice
-  ) {
-    const rewardDiff =
-      tradedirection === "sell" || tradedirection === "short"
-        ? entry - effectiveExitPrice
-        : effectiveExitPrice - entry;
+  } else if (tradeStatus === "exited" && trade.exitedPrice?.length > 0) {
+    const totalVolume = trade.exitedPrice.reduce(
+      (sum, lvl) => sum + Number(lvl.volume || 0),
+      0
+    );
 
-    const priceDiff = Math.abs(entry - stoploss);
-    const positionSize = actualRisk / priceDiff;
-
-    let rawProfit = rewardDiff * positionSize;
-
-    // ===== Cap negative profit at account balance =====
-    if (rawProfit < 0 && Math.abs(rawProfit) > accountBalance) {
-      pnl = (-accountBalance).toFixed(2);
-      profitError = "Loss capped at account balance.";
+    if (totalVolume !== 100) {
+      profitError = "Total exit volume must equal 100%";
     } else {
-      pnl = rawProfit.toFixed(2);
-      if (rawProfit < 0 && Math.abs(rawProfit) > 0.2 * accountBalance) {
-        lossWarning = "Warning: Loss exceeds 20% of account balance.";
+      let totalProfit = 0;
+
+      trade.exitedPrice.forEach((lvl) => {
+        const exitPrice = parseFloat(lvl.price);
+        const volumePercent = parseFloat(lvl.volume) / 100;
+        const rewardDiff =
+          tradedirection === "sell" || tradedirection === "short"
+            ? entry - exitPrice
+            : exitPrice - entry;
+
+        const priceDiff = Math.abs(entry - stoploss);
+        const positionSize = actualRisk / priceDiff;
+
+        totalProfit += rewardDiff * positionSize * volumePercent;
+      });
+
+      if (totalProfit < 0 && Math.abs(totalProfit) > accountBalance) {
+        pnl = (-accountBalance).toFixed(2);
+        profitError = "Loss capped at account balance.";
+      } else {
+        pnl = totalProfit.toFixed(2);
+        if (totalProfit < 0 && Math.abs(totalProfit) > 0.2 * accountBalance) {
+          lossWarning = "Warning: Loss exceeds 20% of account balance.";
+        }
       }
     }
+  } else {
+    profitError = "Exit price required to calculate potential profit.";
   }
 
+  // ===== Update trade state =====
   useEffect(() => {
     if (setTrade) {
       setTrade((prev) => ({
         ...prev,
         pnl: parseFloat(pnl) || 0,
         riskamount: parseFloat(riskamount) || 0,
-        rr: parseFloat(rr) ||0,
+        rr: parseFloat(rr) || 0,
       }));
     }
-  }, [pnl, riskamount,rr]);
+  }, [pnl, riskamount, rr]);
 
   return (
     <div className={styles.card}>
@@ -190,8 +195,7 @@ export const TradeCalculator = ({ trade, setTrade }) => {
           )}
 
           <p>
-            PNL:{" "}
-            <span>{pnl !== "-" ? `$${pnl}` : "-"}</span>
+            PNL: <span>{pnl !== "-" ? `$${pnl}` : "-"}</span>
           </p>
           {profitError && (
             <p style={{ color: "red", fontSize: "0.9rem" }}>{profitError}</p>

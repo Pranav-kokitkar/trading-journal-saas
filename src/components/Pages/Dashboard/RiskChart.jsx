@@ -1,5 +1,6 @@
 // src/components/Pages/Dashboard/RiskChart.jsx
-import React from "react";
+import React, { useContext } from "react";
+import styles from "./dashboard.module.css";
 import {
   LineChart,
   Line,
@@ -9,9 +10,11 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { PerformanceContext } from "../../../context/PerformanceContext";
 
 const RiskChart = ({ trades }) => {
-  // Transform trades into risk data
+  const { performance } = useContext(PerformanceContext);
+
   const data = trades.map((trade, index) => ({
     tradeNumber: index + 1,
     riskAmount: parseFloat(trade.riskamount) || 0,
@@ -22,29 +25,64 @@ const RiskChart = ({ trades }) => {
     return <p>No trades available for Risk chart.</p>;
   }
 
+  // Hide dots if too many trades
+  const showDots = data.length <= 50;
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="tradeNumber" />
-        <YAxis />
-        <Tooltip />
-        {/* Line for Dollar Risk */}
-        <Line
-          type="monotone"
-          dataKey="riskAmount"
-          stroke="#ff9800"
-          name="Risk ($)"
-        />
-        {/* Line for % Risk */}
-        <Line
-          type="monotone"
-          dataKey="riskPercent"
-          stroke="#2196f3"
-          name="Risk (%)"
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className={styles.chartcontainer}>
+      <div className={styles.chart} style={{ width: "100%", height: 320 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart
+            data={data}
+            margin={{ top: 20, right: 20, left: 20, bottom: 10 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+            <XAxis
+              dataKey="tradeNumber"
+              label={{ value: "Trade #", position: "insideBottom", offset: -5 }}
+              tick={{ fontSize: 12 }}
+              interval="preserveStartEnd"
+            />
+            <YAxis
+              tick={{ fontSize: 12 }}
+              label={{ value: "Risk", angle: -90, position: "outsideLeft" }}
+              domain={["auto", "auto"]}
+            />
+            <Tooltip
+              formatter={(value, name) =>
+                name === "riskPercent"
+                  ? [`${value}%`, "Risk (%)"]
+                  : [`$${value}`, "Risk ($)"]
+              }
+              labelFormatter={(label) => `Trade #${label}`}
+            />
+            {/* Dollar Risk Line */}
+            <Line
+              type="monotone"
+              dataKey="riskAmount"
+              stroke="#ff9800"
+              strokeWidth={2}
+              dot={showDots}
+              activeDot={{ r: 6 }}
+            />
+            {/* % Risk Line */}
+            <Line
+              type="monotone"
+              dataKey="riskPercent"
+              stroke="#2196f3"
+              strokeWidth={2}
+              dot={showDots}
+              activeDot={{ r: 6 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className={styles.quickdata}>
+        <p>Highest Risk: ${performance.highestRisk}</p>
+        <p>Lowest Risk: ${performance.lowestRisk}</p>
+      </div>
+    </div>
   );
 };
 
