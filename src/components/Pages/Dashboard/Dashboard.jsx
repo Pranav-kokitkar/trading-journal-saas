@@ -98,14 +98,14 @@ const TradingDashboard = ({ accountDetails, performance }) => {
                   : styles.neutral
               }
             >
-              {performance.totalPnL}
+              ${performance.totalPnL}
             </span>
           </h3>
 
           <h3>
             <FiTarget className={`${styles.icon} ${styles.iconYellow}`} />
-            Average RR:{" "}
-            <span className={styles.yellow}>{performance.averageRR}R</span>
+            Average RR: {" "}
+            <span className={styles.yellow}>1:{performance.averageRR}R</span>
           </h3>
         </div>
 
@@ -125,7 +125,7 @@ const TradingDashboard = ({ accountDetails, performance }) => {
                   : styles.neutral
               }
             >
-              {performance.totalPnL}
+              ${performance.totalPnL}
             </span>
           </h3>
 
@@ -138,7 +138,7 @@ const TradingDashboard = ({ accountDetails, performance }) => {
           <h3>
             <FaPercentage className={`${styles.icon} ${styles.iconYellow}`} />
             Total Risk:{" "}
-            <span className={styles.yellow}>{performance.totalRisk}</span>
+            <span className={styles.yellow}>${performance.totalRisk}</span>
           </h3>
 
           <div className={styles.linecontainer}>
@@ -147,10 +147,10 @@ const TradingDashboard = ({ accountDetails, performance }) => {
 
           <h2>Quick Stats</h2>
           <h3>
-            Initial Capital: <span>{accountDetails.initialCapital}$</span>
+            Initial Capital: <span>${accountDetails.initialCapital}</span>
           </h3>
           <h3>
-            Current Balance: <span>{accountDetails.balance}$</span>
+            Current Balance: <span>${accountDetails.balance}</span>
           </h3>
         </div>
       </div>

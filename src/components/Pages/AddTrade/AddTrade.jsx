@@ -4,17 +4,15 @@ import { TradeStatus } from "./TradeStatus";
 import { TradeDetails } from "./TradeDetails";
 import { AddPrice } from "./AddPrice";
 import { TradeInfo } from "./TradeInfo";
-import { TradeCalculator } from "./TradeCalculator"; 
-import {  useContext, useState } from "react";
+import { TradeCalculator } from "./TradeCalculator";
+import { useContext, useState } from "react";
 import { AccountContext } from "../../../context/AccountContext";
 import { PerformanceContext } from "../../../context/PerformanceContext";
-
+import { calculateTradeValues } from "../../../utils/tradeUtils";
 
 export const AddTrade = () => {
-
-  const {accountDetails, setAccountDetails} =useContext(AccountContext);
+  const { accountDetails, setAccountDetails } = useContext(AccountContext);
   const { refreshPerformance } = useContext(PerformanceContext);
-
 
   const [trade, setTrade] = useState({
     id: "",
@@ -31,14 +29,12 @@ export const AddTrade = () => {
     pnl: "",
     tradeResult: "",
     riskamount: "",
-    riskPercent: "", 
-    balanceAfterTrade: "", 
-    tradeNumber: "", 
+    riskPercent: "",
+    balanceAfterTrade: "",
+    tradeNumber: "",
     dateNtime: "",
     tradeNotes: "",
   });
-
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,25 +46,35 @@ export const AddTrade = () => {
 
     const existingTrades = JSON.parse(localStorage.getItem("trades") || "[]");
 
+    // Validate exit volume first
+    const totalVolume = trade.exitedPrice.reduce(
+      (sum, lvl) => sum + Number(lvl.volume || 0),
+      0
+    );
+    if (trade.tradeStatus === "exited" && totalVolume !== 100) {
+      alert("Total exit volume must equal 100%");
+      return;
+    }
+
+    // Get calculations from util
+    const { pnl, rr, riskamount } = calculateTradeValues({
+      trade,
+      accountBalance: accountDetails.balance,
+    });
+
+    // Trade result
+    let tradeResult = "breakeven";
+    if (pnl > 0) tradeResult = "win";
+    else if (pnl < 0) tradeResult = "loss";
+
     const tradeId = uuidv4();
     const dateNtime = new Date().toLocaleString();
-
-    // Calculate trade result
-    let tradeResult = "breakeven";
-    if (trade.pnl > 0) tradeResult = "win";
-    else if (trade.pnl < 0) tradeResult = "loss";
-
-    // Calculate trade number
     const tradeNumber = existingTrades.length + 1;
-
-    // Calculate balance after trade
     const balanceAfterTrade =
-      accountDetails.balance + Math.round(trade.pnl * 100) / 100;
-
-    // Calculate risk percent (simple version)
+      accountDetails.balance + Math.round(pnl * 100) / 100;
     const riskPercent =
-      trade.riskamount && accountDetails.balance
-        ? ((trade.riskamount / accountDetails.balance) * 100).toFixed(2)
+      riskamount && accountDetails.balance
+        ? ((riskamount / accountDetails.balance) * 100).toFixed(2)
         : 0;
 
     const newTrade = {
@@ -79,6 +85,9 @@ export const AddTrade = () => {
       tradeNumber,
       balanceAfterTrade,
       riskPercent,
+      pnl,
+      rr,
+      riskamount,
     };
 
     const updatedTrades = [...existingTrades, newTrade];
@@ -95,16 +104,6 @@ export const AddTrade = () => {
 
     console.log("Trade saved:", newTrade);
 
-    // Validation for exit volume
-    const totalVolume = trade.exitedPrice.reduce(
-      (sum, lvl) => sum + Number(lvl.volume || 0),
-      0
-    );
-    if (trade.tradeStatus === "exited" && totalVolume !== 100) {
-      alert("Total exit volume must equal 100%");
-      return;
-    }
-
     // Reset form
     setTrade({
       id: "",
@@ -119,18 +118,11 @@ export const AddTrade = () => {
       exitedPrice: [{ price: "", volume: "" }],
       rr: "",
       pnl: "",
-      tradeResult: "",
       riskamount: "",
-      riskPercent: "",
-      balanceAfterTrade: "",
-      tradeNumber: "",
       dateNtime: "",
       tradeNotes: "",
     });
   };
-
-
-  
 
   return (
     <section className={styles.addtrade}>
@@ -160,34 +152,32 @@ const PageHeading = () => (
   </div>
 );
 
-const Buttons = ({ setTrade }) => {
-  return (
-    <div className={styles.btncontainer}>
-      <button
-        type="reset"
-        onClick={() =>
-          setTrade({
-            id: "",
-            marketType: "",
-            symbol: "",
-            tradedirection: "",
-            entryPrice: "114600.2",
-            stoplossPrice: "114542.4",
-            riskType: "dollar",
-            takeProfitPrice: "114773.7",
-            tradeStatus: "",
-            exitedPrice: [{ price: "", volume: "" }],
-            rr: "",
-            pnl: "",
-            riskamount: "",
-            dateNtime: "",
-            tradeNotes: "",
-          })
-        }
-      >
-        Clear All
-      </button>
-      <button type="submit">Add Trade</button>
-    </div>
-  );
-};
+const Buttons = ({ setTrade }) => (
+  <div className={styles.btncontainer}>
+    <button
+      type="reset"
+      onClick={() =>
+        setTrade({
+          id: "",
+          marketType: "",
+          symbol: "",
+          tradedirection: "",
+          entryPrice: "114600.2",
+          stoplossPrice: "114542.4",
+          riskType: "dollar",
+          takeProfitPrice: "114773.7",
+          tradeStatus: "",
+          exitedPrice: [{ price: "", volume: "" }],
+          rr: "",
+          pnl: "",
+          riskamount: "",
+          dateNtime: "",
+          tradeNotes: "",
+        })
+      }
+    >
+      Clear All
+    </button>
+    <button type="submit">Add Trade</button>
+  </div>
+);

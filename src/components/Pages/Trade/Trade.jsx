@@ -43,46 +43,53 @@ export const Trade = () => {
     setTradeStatus(e.target.value);
   };
 
-  const handleSave = () => {
-    console.log("Exiting Save...", exitLevels);
+const handleSave = () => {
+  const updatedTrade = calculateTradeOnExit({
+    trade,
+    exitLevels,
+    accountBalance: accountDetails.balance,
+  });
+  if (!updatedTrade) return;
 
-    // Calculate updated trade
-    const updatedTrade = calculateTradeOnExit({
-      trade,
-      exitLevels,
-      accountBalance: accountDetails.balance, // use current balance
-    });
-    if (!updatedTrade) return;
+  const updatedTrades = trades.map((t) =>
+    String(t.id) === String(id) ? updatedTrade : t
+  );
 
-    // Update trades array
-    const updatedTrades = trades.map((t) =>
-      String(t.id) === String(id) ? updatedTrade : t
-    );
+  // Save to localStorage
+  localStorage.setItem("trades", JSON.stringify(updatedTrades));
 
-    console.log("Trade to update:", updatedTrade);
+  // Update account balance
+  setAccountDetails((prev) => ({
+    ...prev,
+    balance: prev.balance + parseFloat(updatedTrade.pnl || 0),
+  }));
 
-    // Save to localStorage
-    localStorage.setItem("trades", JSON.stringify(updatedTrades));
+  // Refresh performance **after updating account and localStorage**
+  refreshPerformance(updatedTrades); // pass updated trades if your function accepts it
 
-    // ===== Add PNL to account balance =====
-    const newBalance =
-      accountDetails.balance + parseFloat(updatedTrade.pnl || 0);
-    setAccountDetails({
-      ...accountDetails,
-      balance: newBalance,
-    });
+  setCloseTrade(false);
+  navigate(`/trade/${id}`);
+};
 
-    // Close modal
-    setCloseTrade(false);
-
-    // Navigate back
-    navigate(`/trade/${id}`);
-    refreshPerformance();
-  };
 
   const handleDelete = () => {
+    const tradeToDelete = trades.find((t) => String(t.id) === String(id));
+    if (!tradeToDelete) return;
+
     const updatedTrades = trades.filter((t) => String(t.id) !== String(id));
     localStorage.setItem("trades", JSON.stringify(updatedTrades));
+
+    // Update account balance and total trades
+    setAccountDetails((prev) => ({
+      ...prev,
+      balance: prev.balance - parseFloat(tradeToDelete.pnl || 0),
+      totaltrades: prev.totaltrades - 1,
+    }));
+
+    // Refresh charts
+    refreshPerformance();
+
+    // Navigate back
     navigate("/trade-history");
   };
 
@@ -169,16 +176,17 @@ export const Trade = () => {
 
         {/* Buttons */}
         <div className={styles.tradeBtns}>
-          <button className={styles.editTrade}>Edit Trade</button>
-          <button
-            onClick={() => setCloseTrade(true)}
-            className={styles.closeTrade}
-          >
-            Close Trade
-          </button>
           <button className={styles.deleteTrade} onClick={handleDelete}>
             Delete Trade
           </button>
+          {trade.tradeStatus === "live" && (
+            <button
+              onClick={() => setCloseTrade(true)}
+              className={styles.closeTrade}
+            >
+              Close Trade
+            </button>
+          )}
         </div>
       </div>
       {closeTrade && (

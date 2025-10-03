@@ -279,7 +279,7 @@ const TradeCard = ({ savedTrade }) => {
               <div>
                 <p>PNL</p>
                 <span>
-                  {tradeData.tradeStatus === "live"
+                  ${tradeData.tradeStatus === "live"
                     ? "Live"
                     : tradeData.pnl !== null && tradeData.pnl !== undefined
                     ? tradeData.pnl

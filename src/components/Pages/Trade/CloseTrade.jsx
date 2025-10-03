@@ -1,4 +1,4 @@
-// CloseTrade.jsx
+
 import styles from "./Trade.module.css";
 
 const SingleExit = ({ handleSingleExit }) => (
