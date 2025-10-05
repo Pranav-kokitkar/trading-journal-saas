@@ -185,15 +185,18 @@
 }
 
 /* ===== Responsiveness ===== */
-@media (max-width: 800px) {
+@media (max-width: 1024px) {
+  .addtrade {
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
   .addtrade form {
-    width: 100%;
-    padding: 0 10px;
-    box-sizing: border-box;
-    overflow-x: hidden;
+    width: 90%;
   }
 }
-@media (max-width: 768px) {
+
+@media (max-width: 800px) {
   .addtrade {
     flex-direction: column;
     align-items: center;
@@ -201,6 +204,25 @@
 
   .addtrade form {
     width: 100%;
+    padding: 1.5rem;
+    box-sizing: border-box;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+
+  .col2 {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .heading h3 {
+    font-size: 1.2rem;
+  }
+  .heading p {
+    font-size: 0.8rem;
   }
 
   .btncontainer {

@@ -209,24 +209,40 @@ input:checked + .slider:before {
 
 /* 📱 Responsive */
 @media (max-width: 768px) {
-  .accountdata {
-    flex-direction: column;
+  .myaccount {
+    padding: 2rem 7rem;
   }
 
   .btngroup {
     flex-direction: column;
   }
 
-  .inlineform {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   .inlineform input {
     width: 100%;
+    height: 50%;
   }
 
   .inlineform button {
     width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .myaccount {
+    padding: 2rem 4.5rem;
+  }
+
+  .inlineform {
+    flex-direction: column;
+  }
+
+  .inlineform input {
+    flex: 0 0 0px;
+  }
+}
+
+@media (max-width: 368px) {
+  .myaccount {
+    padding: 2rem 2rem;
   }
 }

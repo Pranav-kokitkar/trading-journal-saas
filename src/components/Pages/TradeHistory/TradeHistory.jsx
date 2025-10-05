@@ -165,73 +165,81 @@ export const TradeHistory = () => {
           </div>
 
           <div className={styles.filterinput}>
-            <label>PnL</label>
-            <select
-              name="pnlOperator"
-              value={filters.pnlOperator}
-              onChange={handleFilterChange}
-            >
-              <option value=">">&gt;</option>
-              <option value="<">&lt;</option>
-              <option value="=">=</option>
-            </select>
-            <input
-              type="number"
-              name="pnlValue"
-              placeholder="PnL"
-              value={filters.pnlValue}
-              onChange={handleFilterChange}
-            />
+            <div className={styles.filterinputsec}>
+              <label>PnL:</label>
+              <select
+                name="pnlOperator"
+                value={filters.pnlOperator}
+                onChange={handleFilterChange}
+              >
+                <option value=">">&gt;</option>
+                <option value="<">&lt;</option>
+                <option value="=">=</option>
+              </select>
+              <input
+                type="number"
+                name="pnlValue"
+                placeholder="PnL"
+                value={filters.pnlValue}
+                onChange={handleFilterChange}
+              />
+            </div>
 
-            <label>RR</label>
-            <select
-              name="rrOperator"
-              value={filters.rrOperator}
-              onChange={handleFilterChange}
-            >
-              <option value=">">&gt;</option>
-              <option value="<">&lt;</option>
-              <option value="=">=</option>
-            </select>
-            <input
-              type="number"
-              name="rrValue"
-              placeholder="RR"
-              value={filters.rrValue}
-              onChange={handleFilterChange}
-            />
+            <div className={styles.filterinputsec}>
+              <label>RR:</label>
+              <select
+                name="rrOperator"
+                value={filters.rrOperator}
+                onChange={handleFilterChange}
+              >
+                <option value=">">&gt;</option>
+                <option value="<">&lt;</option>
+                <option value="=">=</option>
+              </select>
+              <input
+                type="number"
+                name="rrValue"
+                placeholder="RR"
+                value={filters.rrValue}
+                onChange={handleFilterChange}
+              />
+            </div>
           </div>
 
           <div className={styles.filterinput}>
-            <label>Date:</label>
-            <input
-              type="date"
-              name="startDate"
-              value={filters.startDate}
-              onChange={handleFilterChange}
-            />
-            <input
-              type="date"
-              name="endDate"
-              value={filters.endDate}
-              onChange={handleFilterChange}
-            />
+            <div className={styles.filterinputsec}>
+              <label>Date:</label>
+              <input
+                type="date"
+                name="startDate"
+                value={filters.startDate}
+                onChange={handleFilterChange}
+              />
+              <input
+                type="date"
+                name="endDate"
+                value={filters.endDate}
+                onChange={handleFilterChange}
+              />
+            </div>
 
-            <label>Trade #</label>
-            <input
-              type="number"
-              name="startTradeNumber"
-              placeholder="From"
-              value={filters.startTradeNumber}
-              onChange={handleFilterChange}
-            />
-            <input
-              type="number"
-              name="endTradeNumber"
-              placeholder="To"
-              value={filters.endTradeNumber}
-              onChange={handleFilterChange}
-            />
+            <div className={styles.filterinputsec}>
+              <label>Trade:</label>
+              <input
+                type="number"
+                name="startTradeNumber"
+                placeholder="From"
+                value={filters.startTradeNumber}
+                onChange={handleFilterChange}
+              />
+              <input
+                type="number"
+                name="endTradeNumber"
+                placeholder="To"
+                value={filters.endTradeNumber}
+                onChange={handleFilterChange}
+              />
+            </div>
           </div>
 
           <div className={styles.filter3}>
@@ -275,7 +283,7 @@ const TradeCard = ({ savedTrade }) => {
               <div>
                 <p>RR</p>
                 <span>1:{tradeData.rr || "0"}</span>
-              </div>
+              </div> 
               <div>
                 <p>PNL</p>
                 <span>

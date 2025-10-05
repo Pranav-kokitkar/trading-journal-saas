@@ -16,7 +16,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 
   /* fixed width */
-  width: 60%;
+  width: 80%;
 
   color: white;
   text-align: left;
@@ -24,7 +24,7 @@
 
 .notes h3 {
   margin-bottom: 10px;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: bold;
   border-bottom: 1px solid #444;
   padding-bottom: 5px;
@@ -54,10 +54,11 @@
 .noteTitle {
   font-weight: bold;
   margin-bottom: 5px;
+  font-size: 1.2rem;
 }
 
 .noteDescription {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #ccc;
   margin: 1rem 0rem;
 }
@@ -70,12 +71,11 @@
 .notecarddelete button {
   background-color: #a54242;
   border: none;
-  padding: 0.3rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
   cursor: pointer;
   color: white;
-  font-weight: bold;
   transition: background-color 0.2s;
 }
 
@@ -85,6 +85,6 @@
 /* Responsive */
 @media (max-width: 768px) {
   .notes {
-    width: 90%;
+    width: 80%;
   }
 }

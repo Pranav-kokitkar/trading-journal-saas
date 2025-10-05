@@ -37,7 +37,7 @@
 
 /* ===== Filter Section ===== */
 .filter {
-  margin-bottom: 1.5rem;
+  margin-bottom: 3rem;
 }
 .filter h3 {
   font-size: 1.2rem;
@@ -60,10 +60,15 @@
   min-width: 120px;
   flex: 1;
 }
+
+.filterinputsec {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
 .filterinput label {
   font-size: 0.85rem;
   color: #aaa;
-  margin-right: 0.3rem;
 }
 .filter3 {
   display: flex;
@@ -158,16 +163,12 @@ a {
 @media (max-width: 1024px) {
   .filterinput input,
   .filterinput select {
-    max-width: 300px; /* <-- prevents over-stretching */
-    width: 100%;
+    max-width: 300px;
   }
 
   .tradecard {
-    flex-direction: column;
-    align-items: flex-start;
     margin-left: auto; /* <-- keep centered */
     margin-right: auto; /* <-- keep centered */
-    width: 100%;
     max-width: 600px; /* <-- don't stretch across whole screen */
   }
 }
@@ -180,14 +181,7 @@ a {
   }
 
   .filterinput {
-    flex-direction: column;
     align-items: flex-start;
-  }
-
-  .filterinput input,
-  .filterinput select {
-    width: 100%;
-    max-width: 100%; /* full width only for small screens */
   }
 
   .filter3 {
@@ -197,9 +191,15 @@ a {
   }
 
   .tradecard {
-    width: 100%;
-    max-width: 100%; /* make cards fluid but centered */
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+  }
+}
+
+@media (max-width: 368px) {
+  .filterinputsec {
+    flex-direction: column;
+    margin-top: 20px;
   }
 }
