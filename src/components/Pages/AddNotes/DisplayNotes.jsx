@@ -8,8 +8,8 @@ export const DisplayNotes = ({notes, onDelete}) => {
       <div className={styles.notes}>
         <h3>Saved Notes :</h3>
         <div>
-          {notes.map((n, index) => (
-            <div key={index} className={styles.noteCard}>
+          {notes.map((n) => (
+            <div key={n.id} className={styles.noteCard}>
 
               <div className={styles.notedata}>
                 <h4 className={styles.noteTitle}>{n.title}</h4>
@@ -19,6 +19,8 @@ export const DisplayNotes = ({notes, onDelete}) => {
                 <button
                   onClick={() => {
                     onDelete(n.id);
+                    console.log("Notes received in DisplayNotes:", notes);
+
                   }}
                 >
                   Delete

@@ -22,6 +22,7 @@ export const AddNotes = () => {
 
     setNotes([...notes, newNote]);
     setNote({ title: "", description: "" });
+    console.log("note added");
   };
 
   const deleteNote =(id)=>{

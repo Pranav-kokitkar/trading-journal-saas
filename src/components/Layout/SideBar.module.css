@@ -1,5 +1,4 @@
 .sidebar {
-  width: 240px;
   height: 100vh;
   background: #1e1e1e;
   display: flex;
@@ -100,3 +99,9 @@
   font-size: 12px;
   color: #888;
 }
+
+/* @media (max-width: 1050px) {
+  .sidebar {
+    width: 200px;
+  }
+} */

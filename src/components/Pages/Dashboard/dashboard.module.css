@@ -185,13 +185,59 @@ h3 {
   background-color: rgba(84, 83, 83, 0.416);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .tradingdata {
-    flex-direction: column;
-  }
+/* ====== Responsive ====== */
 
+/* Large tablets and below */
+@media (max-width: 1080px) {
   .tradingperformance {
     grid-template-columns: 1fr;
+    row-gap: 60px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .dashboard {
+    padding: 2rem 3rem; /* fixed comma issue */
+  }
+  .tradingdata {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .tradingperformance {
+    grid-template-columns: 1fr;
+    row-gap: 50px;
+  }
+}
+
+/* Small devices */
+@media (max-width: 500px) {
+  .dashboard {
+    padding: 1.5rem;
+  }
+  .tradingdatal h3 {
+    font-size: 0.9rem;
+    height: auto;
+    padding: 12px;
+  }
+  .chartCard {
+    padding: 15px;
+  }
+  .chartCard h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 368px) {
+  .dashboard {
+    padding: 1rem;
+  }
+  .tradingdata,
+  .tradingperformance {
+    gap: 20px;
+  }
+  h3 {
+    font-size: 0.85rem;
   }
 }
