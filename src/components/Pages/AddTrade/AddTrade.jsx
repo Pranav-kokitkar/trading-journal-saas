@@ -102,7 +102,10 @@ export const AddTrade = () => {
       totaltrades: prev.totaltrades + 1,
     }));
 
-    console.log("Trade saved:", newTrade);
+    console.log("trade added");
+    alert("Trade Added");
+
+    
 
     // Reset form
     setTrade({
@@ -110,10 +113,10 @@ export const AddTrade = () => {
       marketType: "",
       symbol: "",
       tradedirection: "",
-      entryPrice: "114600.2",
-      stoplossPrice: "114542.4",
-      riskType: "dollar",
-      takeProfitPrice: "114773.7",
+      entryPrice: "",
+      stoplossPrice: "",
+      riskType: "",
+      takeProfitPrice: "",
       tradeStatus: "",
       exitedPrice: [{ price: "", volume: "" }],
       rr: "",
@@ -162,10 +165,10 @@ const Buttons = ({ setTrade }) => (
           marketType: "",
           symbol: "",
           tradedirection: "",
-          entryPrice: "114600.2",
-          stoplossPrice: "114542.4",
-          riskType: "dollar",
-          takeProfitPrice: "114773.7",
+          entryPrice: "",
+          stoplossPrice: "",
+          riskType: "",
+          takeProfitPrice: "",
           tradeStatus: "",
           exitedPrice: [{ price: "", volume: "" }],
           rr: "",

@@ -7,7 +7,6 @@
   min-height: 100vh;
   font-family: Arial, sans-serif;
 }
-
 .tradeContainer {
   width: 80%;
   max-width: 1000px;
@@ -256,6 +255,16 @@
 }
 
 /* Input Fields */
+.inputGroup input {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: #fff;
+  outline: none;
+  transition: border 0.2s;
+}
+
 .row {
   display: flex;
   gap: 0.7rem;
