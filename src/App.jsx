@@ -8,6 +8,8 @@ import { AccountProvider } from "./context/AccountContext";
 import { MyAccount } from "./components/Pages/MyAccount/MyAccount";
 import { Dashboard } from "./components/Pages/Dashboard/Dashboard";
 import { PerformanceProvider } from "./context/PerformanceContext";
+import { Register } from "./components/Pages/Authorization/Register";
+import {Login} from "./components/Pages/Authorization/Login";
 
 function ErrorPage() {
   return <h1>Oops! Page not found.</h1>;
@@ -52,6 +54,12 @@ const router = createBrowserRouter(
       ],
       errorElement: <ErrorPage />,
     },
+    {
+      path: "/register",
+      element: <Register />,
+      errorElement: <ErrorPage />,
+    },
+    { path: "/login", element: <Login />, errorElement: <ErrorPage /> },
   ],
   { basename: "/trading-journal-saas" }
 );
