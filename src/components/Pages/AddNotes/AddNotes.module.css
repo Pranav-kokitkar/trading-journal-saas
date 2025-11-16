@@ -1,109 +1,176 @@
+:root {
+  --bg: #0f1724;
+  --panel: #07101a;
+  --muted: #9aa4b2;
+  --accent: #f6b93b;
+  --accent-2: #ffd98a;
+  --glass: rgba(255, 255, 255, 0.02);
+  --card-radius: 12px;
+  --pad: 18px;
+}
+
+/* Page wrapper (keeps same layout behavior) */
 .addnotescontainer {
-  background-color: #121212;
+  background: linear-gradient(180deg, var(--bg), #071226);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-  font-family: Arial, sans-serif;
-  color: #f5f5f5;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  color: #e6eef6;
   gap: 2rem;
 }
 
-.addnotescontainer form {
-  background: #1e1e1e;
-  color: #f5f5f5;
-  border-radius: 12px;
-  padding: 2rem;
+/* Form panel (card) */
+.addnotescontainer form,
+.addnotes {
   width: 80%;
   max-width: 900px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.015),
+    rgba(255, 255, 255, 0.01)
+  );
+  border-radius: var(--card-radius);
+  padding: calc(var(--pad) - 2px);
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  gap: 1.25rem;
+  box-shadow: 0 12px 36px rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-sizing: border-box;
 }
 
+/* Heading */
 .addnotes h3 {
   font-size: 1.4rem;
-  margin-bottom: 1rem;
-  border-bottom: 1px solid #333;
+  margin: 0;
   padding-bottom: 0.5rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
+/* Input field wrapper */
 .addnotesinputfiled {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
+/* row layout preserved */
 .row2 {
   display: flex;
-  flex-direction: column; /* ✅ label on top */
+  flex-direction: column; /* label on top */
   gap: 0.5rem;
 }
 
+/* Labels */
 .row2 label {
   font-size: 0.95rem;
-  font-weight: 600;
-  color: #ddd;
+  font-weight: 700;
+  color: var(--muted);
 }
 
+/* Inputs & textarea styling (white inputs for readability like AddTrade) */
 .row2 input,
 .row2 textarea {
-  padding: 0.8rem 1rem;
-  border: 1px solid #333;
+  padding: 10px 12px;
   border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #ffffff;
+  color: #07101a;
   font-size: 0.95rem;
-  background: #2a2a2a;
-  color: #f5f5f5;
+  box-sizing: border-box;
+  outline: none;
+  transition: box-shadow 150ms ease, border-color 150ms ease,
+    transform 120ms ease;
+}
+
+/* larger textarea */
+.row2 textarea {
+  min-height: 120px;
   resize: vertical;
 }
 
-.row2 textarea {
-  min-height: 120px; /* ✅ bigger */
-}
-
+/* focus */
 .row2 input:focus,
 .row2 textarea:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 10px 30px rgba(246, 185, 59, 0.06);
+  border-color: rgba(246, 185, 59, 0.35);
+  transform: translateY(-1px);
 }
 
+/* Save button area */
 .addnotebutton {
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
 }
 
+/* Buttons (themed) */
 .addnotebutton button {
-  background: #3a6ea5;
-  color: white;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #07101a;
   border: none;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.9rem;
-  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.95rem;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.1s ease;
+  font-weight: 800;
+  box-shadow: 0 10px 28px rgba(246, 185, 59, 0.08);
+  transition: transform 120ms ease, box-shadow 160ms ease;
 }
 
 .addnotebutton button:hover {
-  background: #335d8a;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(246, 185, 59, 0.12);
 }
 
-/* 📱 Responsive Styles */
+/* DisplayNotes component area (keeps spacing; visually match card style) */
+.DisplayNotes,
+.addnotes + .DisplayNotes,
+.addnotescontainer .DisplayNotes {
+  width: 80%;
+  max-width: 900px;
+  box-sizing: border-box;
+}
+
+/* If your DisplayNotes uses list/cards, give them a matching card style */
+.display-note-card,
+.note-card {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.015),
+    rgba(255, 255, 255, 0.01)
+  );
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  color: #e6eef6;
+}
+
+/* small helper text */
+.meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* RESPONSIVE: keep original breakpoints & behavior with theme applied */
 @media (max-width: 1024px) {
-  .addnotes {
-    width: 75%;
-    padding: 1.8rem;
+  .addnotes,
+  .addnotescontainer form {
+    width: 92%;
+    padding: 1.6rem;
   }
 }
 
 @media (max-width: 768px) {
-  .addnotes {
-    width: 90%;
-    padding: 1.5rem;
+  .addnotes,
+  .addnotescontainer form {
+    width: 95%;
+    padding: 1.25rem;
   }
 
   .addnotes h3 {
@@ -112,24 +179,25 @@
 
   .row2 input,
   .row2 textarea {
-    font-size: 0.9rem;
-    padding: 0.7rem 1rem;
+    font-size: 0.92rem;
+    padding: 0.8rem 1rem;
   }
 
   .addnotebutton {
-    justify-content: center; /* ✅ center button on mobile */
+    justify-content: center; /* center button on mobile */
   }
 
   .addnotebutton button {
-    width: 100%; /* ✅ full width button */
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .addnotes {
-    width: 95%;
+  .addnotes,
+  .addnotescontainer form {
+    width: 98%;
     padding: 1rem;
-    gap: 1rem;
+    gap: 0.9rem;
   }
 
   .row2 textarea {
@@ -141,7 +209,7 @@
   }
 
   .addnotebutton button {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem;
+    font-size: 0.88rem;
+    padding: 0.55rem 1rem;
   }
 }

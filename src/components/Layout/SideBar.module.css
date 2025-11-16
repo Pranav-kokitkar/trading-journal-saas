@@ -1,107 +1,127 @@
+/* THEMED but STRUCTURE-PRESERVING Sidebar (drop-in safe) */
+
+/* keep original spacings / layout exactly, only update visuals */
 .sidebar {
   height: 100vh;
-  background: #1e1e1e;
+  /* deep navy panel instead of flat #1e1e1e */
+  background: linear-gradient(180deg, #07101a, rgba(11, 18, 32, 0.95));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 16px 0;
-  border-right: 1px solid #e2e6ea;
+  padding: 16px 0; /* same as original */
+  border-right: 1px solid rgba(255, 255, 255, 0.04); /* lighter edge */
+  box-shadow: 0 6px 30px rgba(2, 6, 23, 0.45);
 }
 
+/* logo area keeps exact layout */
 .logo {
   display: flex;
   align-items: center;
   padding: 0 16px 20px 16px;
 }
 
+/* keep same font family container */
 .logoText {
   font-family: Arial, sans-serif;
 }
 
+/* headings unchanged in size/weight, color updated */
 .logoText h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 7px;
+  color: #ffffff; /* white title */
 }
 
+/* subtitle muted color */
 .logoText p {
   margin: 0;
   font-size: 12px;
-  color: #888;
+  color: #9aa4b2; /* muted theme color */
 }
 
+/* nav list structure preserved exactly */
 .nav ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/* keep li spacing same; update hover to theme */
 .nav li {
   display: flex;
   align-items: center;
   padding: 12px 20px;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s ease-in-out;
+  transition: background 0.18s ease-in-out, transform 0.12s ease;
+  border-radius: 8px; /* safe to add small radius, unobtrusive */
 }
 
+/* hover matches theme */
 .nav li:hover {
-  background: #313131;
+  background: rgba(255, 255, 255, 0.03);
+  transform: translateX(4px);
 }
 
+/* optional icon color (if you use icons) */
 .nav .icon {
   font-size: 16px;
   margin-right: 12px;
-  color: #777;
+  color: rgba(255, 255, 255, 0.68);
 }
 
-.active {
-  color: #ffc8c8 !important;
-  font-weight: 800;
-}
+/* active keeps same class name but themed color (no structural change) */
 
+/* navlink stays as text link; keep structure unchanged */
 .navlink {
-  color: white;
+  color: #ffffff;
   text-decoration: none;
+  width: 100%;
+  display: block;
+  font-weight: 600;
 }
 
+/* user area layout preserved */
 .user {
   display: flex;
   align-items: center;
   padding: 12px 16px;
-  border-top: 1px solid #e2e6ea;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
   margin-bottom: 25px;
 }
 
+/* avatar: keep shape & size, change fill to theme gradient */
 .avatar {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: #2d2f36;
-  color: #fff;
+  border-radius: 8px; /* keep square with rounded corners for theme */
+  background: linear-gradient(135deg, #f6b93b, #ffd98a);
+  color: #07101a;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: 700;
   margin-right: 10px;
 }
 
+/* username/subtext keep sizes, update colors for contrast */
 .username {
   font-size: 14px;
   font-weight: 600;
   margin: 0;
-  color: #c5c5c5;
+  color: #e6eef6; /* light text on dark panel */
   font-family: Arial, sans-serif;
 }
 
 .subText {
   font-size: 12px;
-  color: #888;
+  color: #9aa4b2; /* muted secondary color */
 }
 
-/* @media (max-width: 1050px) {
-  .sidebar {
-    width: 200px;
+@media (max-width: 768px) {
+  .logo {
+    visibility: hidden;
   }
-} */
+}

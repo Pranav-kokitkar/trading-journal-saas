@@ -1,45 +1,41 @@
+:root {
+  --bg: #0f1724;
+  --panel: #07101a;
+  --muted: #9aa4b2;
+  --accent: #f6b93b;
+  --accent-2: #ffd98a;
+  --card: rgba(255, 255, 255, 0.015);
+  --card2: rgba(255, 255, 255, 0.02);
+  --shadow: 0 18px 40px rgba(2, 6, 23, 0.55);
+}
+
+/* Reset */
 h2,
 h3 {
   margin: 0;
   padding: 0;
 }
 
-h3 {
-  font-weight: 200;
-  font-size: 1rem;
-  color: #ffffff;
-}
-
+/* ============= MAIN PAGE ============= */
 .dashboard {
-  background-color: #121212;
+  background: linear-gradient(180deg, var(--bg), #071226);
   min-height: 100vh;
-  padding: 1rem 8rem;
-  color: #e0e0e0;
-  font-family: Arial, sans-serif;
+  padding: 1rem 6rem;
+  color: #e6eef6;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
   overflow-x: hidden;
 }
 
+/* Section Heading */
 .tradingperformanceh2 {
-  margin-bottom: 70px;
   margin-top: 50px;
+  margin-bottom: 60px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #fff;
 }
 
-.chartContainer {
-  width: 100%;
-  height: 300px;
-  background: #1e1e1e;
-  border-radius: 12px;
-  padding: 15px;
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
-.chartTitle {
-  color: #ffffff;
-  margin-bottom: 10px;
-}
-
-/* Left + Right Panels */
+/* ============= TRADING DATA PANEL ============= */
 .tradingdata {
   display: flex;
   gap: 20px;
@@ -48,6 +44,7 @@ h3 {
   margin: 50px 0 150px 0;
 }
 
+/* LEFT PANEL */
 .tradingdatal {
   flex: 1;
   min-width: 280px;
@@ -57,46 +54,53 @@ h3 {
 }
 
 .tradingdatal h3 {
-  background-color: #2a2a2a;
+  background: linear-gradient(180deg, var(--card), var(--card2));
   padding: 15px;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-  transition: transform 0.2s ease;
+  box-shadow: var(--shadow);
+  transition: 160ms ease;
   height: 70px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.tradingdatal h3:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 24px 48px rgba(2, 6, 23, 0.65);
 }
 
 .tradingdatal h3 span {
   margin-left: 6px;
 }
 
+/* RIGHT PANEL */
+.tradingdatar {
+  min-width: 280px;
+  background: linear-gradient(180deg, var(--card), var(--card2));
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Separator Line */
 .linecontainer {
   display: flex;
   justify-content: center;
   margin: 20px 0;
 }
-
 .line {
   width: 95%;
   height: 2px;
-  background-color: #88817a5d;
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 20px;
 }
 
-.tradingdatar {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  min-width: 280px;
-  background-color: #2a2a2a;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
-}
-
-/* Icons */
+/* ============= ICONS ============= */
 .icon {
   padding: 0.5rem;
   border-radius: 10px;
@@ -104,78 +108,79 @@ h3 {
 }
 
 .iconBlue {
-  background-color: rgba(74, 164, 243, 0.416);
+  background: rgba(100, 160, 255, 0.2);
 }
-
 .iconGreen {
-  background-color: rgba(0, 128, 0, 0.557);
+  background: rgba(26, 255, 26, 0.25);
 }
-
 .iconYellow {
-  background-color: rgb(255, 187, 0);
+  background: rgba(246, 185, 59, 0.25);
 }
 
 .blue {
-  color: rgba(74, 164, 243, 0.416);
+  color: #64a0ff;
 }
-
 .yellow {
-  color: rgb(255, 187, 0);
+  color: var(--accent);
 }
-
 .profit {
-  color: rgb(26, 255, 26);
+  color: #66d19e;
 }
-
 .loss {
-  color: red;
+  color: #ff7b7b;
 }
-
 .neutral {
-  color: orange;
+  color: #ffd98a;
 }
 
-/* Charts Grid */
+/* ============= CHART CARDS ============= */
 .tradingperformance {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  row-gap: 150px;
   column-gap: 40px;
+  row-gap: 140px;
   margin: auto;
 }
 
-.tradingperformance h2 {
-  margin-bottom: 35px;
-}
-
 .chartCard {
-  background-color: #1e1e1e;
+  background: linear-gradient(180deg, var(--card), var(--card2));
   color: white;
   padding: 0 30px;
   text-align: center;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: 150ms ease;
+}
+
+.chartCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 50px rgba(2, 6, 23, 0.6);
 }
 
 .chartCard h3 {
   margin: 20px 0;
   font-size: 1.2rem;
-  font-weight: bold;
-  color: #f0f0f0;
+  font-weight: 700;
+  color: #fff;
 }
 
-.chartcontainer {
+/* Chart div */
+.chartContainer {
   width: 100%;
+  height: 300px;
+  border-radius: 12px;
+  padding: 15px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.01);
 }
 
-/* Quick Data */
+/* QUICK DATA CARDS */
 .quickdata {
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
   text-align: center;
-  align-items: center;
   gap: 20px;
-  width: 100%;
   margin: 20px 0;
 }
 
@@ -183,12 +188,10 @@ h3 {
   margin: 0;
   padding: 8px 10px;
   border-radius: 8px;
-  background-color: rgba(84, 83, 83, 0.416);
+  background: rgba(255, 255, 255, 0.08);
 }
 
-/* ====== Responsive ====== */
-
-/* Large tablets and below */
+/* ============= RESPONSIVE ============= */
 @media (max-width: 1080px) {
   .tradingperformance {
     grid-template-columns: 1fr;
@@ -196,10 +199,9 @@ h3 {
   }
 }
 
-/* Tablets */
 @media (max-width: 768px) {
   .dashboard {
-    padding: 2rem 3rem; /* fixed comma issue */
+    padding: 2rem 3rem;
   }
   .tradingdata {
     flex-direction: column;
@@ -211,15 +213,9 @@ h3 {
   }
 }
 
-/* Small devices */
 @media (max-width: 500px) {
   .dashboard {
     padding: 1.5rem;
-  }
-  .tradingdatal h3 {
-    font-size: 0.9rem;
-    height: auto;
-    padding: 12px;
   }
   .chartCard {
     padding: 15px;
@@ -229,14 +225,9 @@ h3 {
   }
 }
 
-/* Mobile phones */
 @media (max-width: 368px) {
   .dashboard {
     padding: 1rem;
-  }
-  .tradingdata,
-  .tradingperformance {
-    gap: 20px;
   }
   h3 {
     font-size: 0.85rem;

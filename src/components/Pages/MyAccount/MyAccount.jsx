@@ -1,11 +1,13 @@
 import { useContext, useState } from "react";
 import { AccountContext } from "../../../context/AccountContext";
+import { useAuth } from "../../../store/Auth";
 import styles from "./myaccount.module.css";
 
 export const MyAccount = () => {
   const { accountDetails, setAccountDetails } = useContext(AccountContext);
   const [darkTheme, setDarkTheme] = useState(true);
-
+  
+  const {logoutUser} = useAuth();
   // Local state just for input field
   const [tempCapital, setTempCapital] = useState(accountDetails.initialCapital);
 
@@ -37,6 +39,10 @@ export const MyAccount = () => {
     localStorage.removeItem("accountDetails");
     alert("Account has been Reset!");
     window.location.reload(); // refresh to update UI
+  }
+
+  const handleLogout =()=>{
+    logoutUser();
   }
 
   return (
@@ -121,7 +127,15 @@ export const MyAccount = () => {
           This will permanently delete all your trades and reset your account
           balance to initial capital. <b>This action cannot be undone.</b>
         </p>
-        <button className={styles.dangerbtn} onClick={handleReset}>Reset All Data</button>
+        <button className={styles.dangerbtn} onClick={handleReset}>
+          Reset All Data
+        </button>
+      </div>
+
+      <div className={styles.sectionbox}>
+        <button className={styles.dangerbtn} onClick={handleLogout}>
+          Logout
+        </button>
       </div>
 
       {/* ✅ Help & About */}

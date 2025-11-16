@@ -1,33 +1,53 @@
-.myaccount {
-  background: #121212;
-  min-height: 100vh;
-  padding: 2rem 8rem;
-  color: #f5f5f5;
-  font-family: Arial, sans-serif;
+:root {
+  --bg: #0f1724;
+  --panel: #07101a;
+  --muted: #9aa4b2;
+  --accent: #f6b93b;
+  --accent-2: #ffd98a;
+  --danger: #d9534f;
+  --card-radius: 12px;
+  --pad: 16px;
 }
 
+/* Page wrapper */
+.myaccount {
+  background: linear-gradient(180deg, var(--bg), #071226);
+  min-height: 100vh;
+  padding: 2rem 6rem;
+  color: #e6eef6;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Heading */
 .myaccountpageheading {
   text-align: center;
   margin-bottom: 2rem;
 }
-
 .myaccountpageheading h2 {
   font-size: 1.8rem;
   margin-bottom: 0.3rem;
+  color: #fff;
 }
-
 .myaccountpageheading p {
-  color: #aaa;
+  color: var(--muted);
   font-size: 0.95rem;
+  margin: 0;
 }
 
-/* ✅ Account Overview */
+/* Account overview card */
 .accountdatacontainer {
   margin-bottom: 2rem;
-  background: #1e1e1e;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.015),
+    rgba(255, 255, 255, 0.01)
+  );
+  padding: calc(var(--pad) - 4px);
+  border-radius: var(--card-radius);
+  box-shadow: 0 12px 36px rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  color: #e6eef6;
 }
 
 .accountdata {
@@ -40,19 +60,40 @@
 .accountbox {
   flex: 1;
   min-width: 150px;
-  background: #2a2a2a;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.01),
+    rgba(255, 255, 255, 0.007)
+  );
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: 10px;
   text-align: center;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+.accountbox p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.accountbox h3 {
+  margin: 8px 0 0 0;
+  font-size: 1.25rem;
+  color: #fff;
 }
 
-/* ✅ Update Capital */
+/* Update Capital */
 .updatecapitalcontainer {
-  background: #1e1e1e;
-  padding: 1.5rem;
-  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.015),
+    rgba(255, 255, 255, 0.01)
+  );
+  padding: calc(var(--pad) - 4px);
+  border-radius: var(--card-radius);
   margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.5);
 }
 
 .inlineform {
@@ -63,93 +104,103 @@
 }
 
 .inlineform input {
-  flex: 0 0 200px; /* ✅ shorter width */
-  padding: 0.6rem 0.8rem;
-  border: 1px solid #333;
+  flex: 0 0 220px; /* keep your shorter width */
+  padding: 0.6rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 8px;
-  background: #2a2a2a;
-  color: #f5f5f5;
+  background: #ffffff; /* white input for readability */
+  color: #07101a;
+  font-size: 0.95rem;
+  box-sizing: border-box;
 }
 
 .inlineform input:focus {
   outline: none;
-  border-color: #3a6ea5;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 10px 30px rgba(246, 185, 59, 0.06);
+  border-color: rgba(246, 185, 59, 0.35);
 }
 
 .inlineform button {
-  background: #3a6ea5;
-  color: white;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  color: #07101a;
   border: none;
   padding: 0.6rem 1rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  font-weight: 800;
 }
-
 .inlineform button:hover {
-  background: #335d8a;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(246, 185, 59, 0.08);
 }
 
+/* warning */
 .warning {
-  font-size: 0.85rem;
-  color: #f59e0b;
+  font-size: 0.88rem;
+  color: #ffb84d;
   margin-top: 0.5rem;
 }
 
-/* ✅ Section Boxes */
+/* Section boxes */
 .sectionbox {
-  background: #1e1e1e;
-  padding: 1.5rem;
-  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.015),
+    rgba(255, 255, 255, 0.01)
+  );
+  padding: calc(var(--pad) - 4px);
+  border-radius: var(--card-radius);
   margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.45);
 }
 
 .sectionbox h3 {
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem 0;
+  color: #fff;
 }
 
+/* Buttons group */
 .btngroup {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
 }
-
 .btngroup button {
-  background: #3a6ea5;
-  color: white;
+  background: linear-gradient(90deg, #9cc8ff, #61aef0);
+  color: #07101a;
   border: none;
   padding: 0.6rem 1rem;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  font-weight: 700;
 }
-
 .btngroup button:hover {
-  background: #335d8a;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(97, 174, 240, 0.08);
 }
 
-/* ✅ Toggle container */
+/* Toggle container */
 .togglecontainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-/* Toggle Switch */
+/* Toggle Switch (themed) */
 .switch {
   position: relative;
   display: inline-block;
-  width: 48px;
-  height: 24px;
+  width: 52px;
+  height: 28px;
 }
-
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
-
 .slider {
   position: absolute;
   cursor: pointer;
@@ -157,92 +208,108 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #555;
-  border-radius: 24px;
-  transition: 0.4s;
+  background-color: rgba(255, 255, 255, 0.07);
+  border-radius: 999px;
+  transition: background 200ms ease;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
 }
-
 .slider:before {
   position: absolute;
   content: "";
-  height: 18px;
-  width: 18px;
+  height: 22px;
+  width: 22px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: #fff;
   border-radius: 50%;
-  transition: 0.4s;
+  transition: transform 200ms ease;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.25);
 }
-
-input:checked + .slider {
-  background-color: #2563eb;
+.switch input:checked + .slider {
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
 }
-
-input:checked + .slider:before {
+.switch input:checked + .slider:before {
   transform: translateX(24px);
 }
 
-/* ✅ Danger Zone */
+/* Danger zone */
 .dangerzone {
-  border: 1px solid #a54242;
+  border: 1px solid rgba(217, 83, 79, 0.18);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.01),
+    rgba(255, 255, 255, 0.007)
+  );
 }
-
 .dangerzone h4 {
-  margin-top: 1rem;
-  color: #f87171;
+  margin-top: 0.75rem;
+  color: #ff8a8a;
 }
 
+/* Danger button */
 .dangerbtn {
-  background: #a54242;
-  color: white;
+  background: linear-gradient(90deg, #ff8a8a, var(--danger));
+  color: #07101a;
   border: none;
   padding: 0.7rem 1rem;
   border-radius: 8px;
   margin-top: 1rem;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  font-weight: 800;
 }
-
 .dangerbtn:hover {
-  background: #7f1d1d;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(217, 83, 79, 0.08);
 }
 
-/* 📱 Responsive */
+/* Help & About and other small boxes */
+.sectionbox p {
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1024px) {
+  .myaccount {
+    padding: 2rem 3.5rem;
+  }
+  .inlineform input {
+    flex: 0 0 180px;
+  }
+}
+
 @media (max-width: 768px) {
   .myaccount {
-    padding: 2rem 7rem;
+    padding: 1.5rem 2rem;
   }
-
   .btngroup {
     flex-direction: column;
   }
-
+  .inlineform {
+    flex-direction: column;
+    align-items: stretch;
+  }
   .inlineform input {
     width: 100%;
-    height: 50%;
+    flex: none;
   }
-
   .inlineform button {
     width: 100%;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 420px) {
   .myaccount {
-    padding: 2rem 4.5rem;
+    padding: 1.25rem;
   }
-
-  .inlineform {
-    flex-direction: column;
+  .accountbox h3 {
+    font-size: 1.05rem;
   }
-
   .inlineform input {
-    flex: 0 0 0px;
+    padding: 0.55rem;
   }
-}
-
-@media (max-width: 368px) {
-  .myaccount {
-    padding: 2rem 2rem;
+  .btngroup button {
+    width: 100%;
   }
 }

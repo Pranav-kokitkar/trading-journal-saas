@@ -1,3 +1,7 @@
+# =====================================================
+# FRONTEND & BACKEND IGNORE FOR FULL-STACK VITE + NODE
+# =====================================================
+
 # Logs
 logs
 *.log
@@ -7,12 +11,28 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Node modules (frontend)
+node_modules/
+
+# Build output (frontend)
+dist/
+dist-ssr/
+
+# Local environment settings
 *.local
 
-# Editor directories and files
+# -----------------------
+# BACKEND IGNORE (server)
+# -----------------------
+server/node_modules/
+server/.env
+server/dist/
+server/logs/
+
+# Root environment file
+.env
+
+# OS / Editor files
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -22,3 +42,4 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+

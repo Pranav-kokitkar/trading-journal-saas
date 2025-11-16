@@ -1,72 +1,130 @@
+:root {
+  --bg: #0f1724; /* page background */
+  --panel: #07101a; /* sidebar / panel */
+  --muted: #9aa4b2; /* muted text */
+  --accent: #f6b93b; /* gold accent */
+  --accent-2: #ffd98a; /* lighter gold */
+  --glass: rgba(255, 255, 255, 0.02);
+  --edge: rgba(255, 255, 255, 0.03);
+}
+
+/* ---------- LAYOUT (structure unchanged) ---------- */
 .layout {
   display: flex;
   height: 100vh;
   width: 100%;
   overflow: hidden;
+  background: linear-gradient(180deg, var(--bg), #071226);
+  color: #e6eef6;
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
 }
 
-/* Sidebar (default desktop) */
+/* Sidebar wrapper (keeps your sticky desktop behaviour) */
 .sidebar {
   height: 100vh;
-  background: #1e1e1e;
-  border-right: 1px solid #333;
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
   flex-shrink: 0;
   transition: transform 0.3s ease-in-out;
   z-index: 1000;
+  /* wrapper is neutral — inner panel styles live in SideBar.module.css */
+  background: transparent;
 }
 
-/* Content */
+/* main content area (Outlet) */
 .outlet {
   flex: 1;
   height: 100vh;
   overflow-y: auto;
-  background: #0e1525;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.01) 100%
+  );
+  padding: 28px;
+  box-sizing: border-box;
 }
 
-/* Mobile header hidden by default */
+/* mobile header (hidden on desktop) */
 .mobileHeader {
   display: none;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
 }
 
-@media (max-width: 1050px) {
-  .sidebar {
-    width: 200px;
-  }
+/* hamburger (visual only) */
+
+.hamburger:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+.hamburger span {
+  display: block;
+  height: 2px;
+  width: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2px;
 }
 
-/* Mobile: hide sidebar and show top nav */
+/* small heading text in header */
+.mobileHeader h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* helper center container (unchanged) */
+.contentWrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ---------- RESPONSIVE / MOBILE (keeps your original breakpoints & behaviour) ---------- */
 @media (max-width: 768px) {
   .layout {
     flex-direction: column; /* stack nav + content */
   }
 
-  /* Sidebar becomes overlay */
+  /* Sidebar becomes overlay — wrapper transform remains same as before */
   .sidebar {
     position: fixed;
     top: 0;
     left: 0;
     width: 240px;
     height: 100%;
-    transform: translateX(-100%); /* hidden */
+    transform: translateX(-100%); /* hidden by default (behavior unchanged) */
+    background: transparent;
   }
 
   .sidebar.show {
-    transform: translateX(0); /* slide in */
+    transform: translateX(0); /* slide in (unchanged behaviour) */
   }
 
-  /* Mobile header visible */
+  /* Mobile header visible (themed) */
   .mobileHeader {
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: 56px;
-    background: #1e1e1e;
-    color: white;
+    /* themed header background to match panel */
+    background: linear-gradient(
+      180deg,
+      rgba(7, 16, 26, 0.86),
+      rgba(11, 18, 32, 0.92)
+    );
+    color: #fff;
     padding: 0 16px;
     z-index: 1100;
   }
 
-  /* Hamburger */
+  /* hamburger variant on mobile (unchanged behavior, themed) */
   .hamburger {
     display: flex;
     flex-direction: column;
@@ -83,11 +141,17 @@
     background: white;
     border-radius: 2px;
   }
+  .hamburger span {
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+  }
 
-  /* Outlet takes full width below header */
+  /* Outlet pushed below header (behavior preserved) */
   .outlet {
     flex: none;
     width: 100%;
     height: calc(100vh - 56px);
+    padding: 16px;
   }
 }

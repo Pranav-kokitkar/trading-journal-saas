@@ -263,7 +263,7 @@ const TradeCard = ({ savedTrade }) => {
   return (
     <>
       {savedTrade.map((tradeData, index) => (
-        <NavLink key={index} to={`/trade/${tradeData.id}`}>
+        <NavLink key={index} to={`/app/trade/${tradeData.id}`}>
           <div className={styles.tradecard}>
             <div className={styles.logo}>📈</div>
 

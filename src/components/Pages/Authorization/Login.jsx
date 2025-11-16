@@ -1,9 +1,47 @@
 // src/pages/Login.jsx
-import React from "react";
+import React, { useState } from "react";
 import styles from "./Auth.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export const Login=()=> {
+
+  const [user,setUser] = useState({
+    email:"",
+    password:""
+  })
+
+  const navigate = useNavigate();
+
+  const handleChange = (e)=>{
+    let name = e.target.name;
+    let value= e.target.value;
+    setUser({
+      ...user,
+      [name]:value
+    })
+  }
+
+  const handleSubmit = async(e)=>{
+    e.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:3000/api/auth/login`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify(user)
+      });
+      if(response.ok){
+        console.log("login succesful");
+        navigate("/")
+      }else{
+        console.log("failed to login")
+      }
+    } catch (error) {
+      console.log("error while login", error)
+    }
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.card}>
@@ -16,13 +54,16 @@ export const Login=()=> {
             </div>
           </div>
 
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.formGroup}>
               <label className={styles.label}>Email</label>
               <input
                 className={styles.input}
                 type="email"
                 placeholder="Enter your email"
+                name="email"
+                value={user.email}
+                onChange={handleChange}
               />
             </div>
 
@@ -32,10 +73,13 @@ export const Login=()=> {
                 className={styles.input}
                 type="password"
                 placeholder="Enter your password"
+                name="password"
+                value={user.password}
+                onChange={handleChange}
               />
             </div>
 
-            <button className={styles.btn} type="button">
+            <button className={styles.btn} type="submit">
               Login
             </button>
 

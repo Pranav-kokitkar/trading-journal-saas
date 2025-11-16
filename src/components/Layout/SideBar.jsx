@@ -21,27 +21,27 @@ export const Sidebar = () => {
       <nav className={styles.nav}>
         <ul>
           <li className={styles.active}>
-            <NavLink className={getNavLinkClass} to="/">
+            <NavLink className={getNavLinkClass} to="/app/dashboard">
               Dashboard
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/add-trade">
+            <NavLink className={getNavLinkClass} to="/app/add-trade">
               Add Trade
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/trade-history">
+            <NavLink className={getNavLinkClass} to="/app/trade-history">
               Trade History
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/add-notes">
+            <NavLink className={getNavLinkClass} to="/app/add-notes">
               Add Notes
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/my-account">
+            <NavLink className={getNavLinkClass} to="/app/my-account">
               My Account
             </NavLink>
           </li>
