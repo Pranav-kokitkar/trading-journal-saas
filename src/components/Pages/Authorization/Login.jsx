@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../store/Auth";
 
 export const Login=()=> {
 
@@ -9,6 +10,8 @@ export const Login=()=> {
     email:"",
     password:""
   })
+
+  const {storeTokenInLS} = useAuth();
 
   const navigate = useNavigate();
 
@@ -32,8 +35,10 @@ export const Login=()=> {
         body:JSON.stringify(user)
       });
       if(response.ok){
+        const res_data = await response.json();
+        storeTokenInLS(res_data.token);
         console.log("login succesful");
-        navigate("/")
+        navigate("/app/dashboard")
       }else{
         console.log("failed to login")
       }

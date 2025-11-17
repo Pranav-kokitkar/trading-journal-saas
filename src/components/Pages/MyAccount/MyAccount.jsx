@@ -1,7 +1,8 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../../context/AccountContext";
 import { useAuth } from "../../../store/Auth";
 import styles from "./myaccount.module.css";
+import { useNavigate } from "react-router-dom";
 
 export const MyAccount = () => {
   const { accountDetails, setAccountDetails } = useContext(AccountContext);
@@ -10,6 +11,8 @@ export const MyAccount = () => {
   const {logoutUser} = useAuth();
   // Local state just for input field
   const [tempCapital, setTempCapital] = useState(accountDetails.initialCapital);
+
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setTempCapital(Number(e.target.value)); // only update local input state
@@ -41,9 +44,11 @@ export const MyAccount = () => {
     window.location.reload(); // refresh to update UI
   }
 
-  const handleLogout =()=>{
-    logoutUser();
-  }
+  const handleLogout = () => {
+      logoutUser();
+
+    navigate("/");
+  };
 
   return (
     <section className={styles.myaccount}>

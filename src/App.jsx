@@ -11,26 +11,39 @@ import { PerformanceProvider } from "./context/PerformanceContext";
 import { Register } from "./components/Pages/Authorization/Register";
 import { Login } from "./components/Pages/Authorization/Login";
 import { HomePage } from "./components/Pages/Homepage/HomePage";
-
-function ErrorPage() {
-  return <h1>Oops! Page not found.</h1>;
-}
+import { ErrorPage } from "./components/Pages/Error/ErrorPage";
+import { ProtectedRoute } from "./components/Pages/Authorization/ProtectedRoute";
 
 const router = createBrowserRouter(
   [
-    // Home (no layout / no sidebar)
+    // Public Routes
     {
       path: "/",
       element: <HomePage />,
       errorElement: <ErrorPage />,
     },
 
-    // App pages wrapped by Layout (sidebar, header, etc.)
+    {
+      path: "/register",
+      element: <Register />,
+      errorElement: <ErrorPage />,
+    },
+
+    {
+      path: "/login",
+      element: <Login />,
+      errorElement: <ErrorPage />,
+    },
+
+    // Protected App Routes
     {
       path: "/app",
-      element: <Layout />,
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
       children: [
-        // NOTE: these are RELATIVE paths (no leading slash)
         {
           path: "dashboard",
           element: <Dashboard />,
@@ -57,16 +70,19 @@ const router = createBrowserRouter(
           element: <MyAccount />,
           errorElement: <ErrorPage />,
         },
-        // optional: default child route under /app --> redirects to /app/dashboard
+
+        // Default child → /app/dashboard
         { index: true, element: <Dashboard /> },
       ],
-      errorElement: <ErrorPage />,
     },
 
-    // Auth (no layout)
-    { path: "/register", element: <Register />, errorElement: <ErrorPage /> },
-    { path: "/login", element: <Login />, errorElement: <ErrorPage /> },
+    // Catch all
+    {
+      path: "*",
+      element: <ErrorPage />,
+    },
   ],
+
   { basename: "/trading-journal-saas" }
 );
 
