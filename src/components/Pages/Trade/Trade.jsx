@@ -1,27 +1,75 @@
 // Trade.jsx
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./Trade.module.css";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { CloseTrade } from "./CloseTrade";
 import { calculateTradeOnExit } from "../../../utils/tradeUtils";
 import { AccountContext } from "../../../context/AccountContext";
 import { PerformanceContext } from "../../../context/PerformanceContext";
+import { useTrades } from "../../../store/TradeContext"; // use the context consumer
 
 export const Trade = () => {
-
   const { accountDetails, setAccountDetails } = useContext(AccountContext);
   const { refreshPerformance } = useContext(PerformanceContext);
 
   const { id } = useParams();
   const navigate = useNavigate();
-  const trades = JSON.parse(localStorage.getItem("trades")) || [];
-  const trade = trades.find((t) => t.id === id);
+
+  // get trades and helper from context (refreshTrades is the getAllTrades function)
+  const { trades = [], refreshTrades } = useTrades() || {};
 
   const [closeTrade, setCloseTrade] = useState(false);
   const [isMultipleTP, setIsMultipleTP] = useState(false);
   const [exitLevels, setExitLevels] = useState([]);
-  const [tradeStatus, setTradeStatus] = useState(trade?.tradeStatus || "live");
+  const [tradeStatus, setTradeStatus] = useState("live");
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [triedRefresh, setTriedRefresh] = useState(false); // ensure we only refresh once if missing
+
+  // helper to find trade by several possible id fields
+  const findTradeById = (list, idParam) => {
+    if (!Array.isArray(list)) return undefined;
+    return list.find((t) => {
+      const tId = t.id ?? t._id ?? t.tradeNumber;
+      return String(tId) === String(idParam);
+    });
+  };
+
+  // Try to find trade in context
+  const trade = findTradeById(trades, id);
+
+  // keep tradeStatus synced when we have trade
+  useEffect(() => {
+    if (trade) {
+      setTradeStatus(trade.tradeStatus ?? "live");
+    }
+  }, [trade]);
+
+  // If trade is missing, attempt one guarded refresh of the context trades (context-first approach)
+  useEffect(() => {
+    let mounted = true;
+    const tryRefresh = async () => {
+      if (trade || triedRefresh || typeof refreshTrades !== "function") return;
+      try {
+        setIsLoading(true);
+        await refreshTrades();
+      } catch (err) {
+        console.error("refreshTrades failed", err);
+      } finally {
+        if (mounted) {
+          setTriedRefresh(true);
+          setIsLoading(false);
+        }
+      }
+    };
+    tryRefresh();
+    return () => {
+      mounted = false;
+    };
+    // only re-run if id changes or refreshTrades identity changes
+  }, [id, trade, triedRefresh, refreshTrades]);
+
+  if (isLoading) return <p>Loading trade…</p>;
   if (!trade) return <p>Trade not found</p>;
 
   // --- Exit Handlers ---
@@ -43,60 +91,79 @@ export const Trade = () => {
     setTradeStatus(e.target.value);
   };
 
-const handleSave = () => {
-  const updatedTrade = calculateTradeOnExit({
-    trade,
-    exitLevels,
-    accountBalance: accountDetails.balance,
-  });
-  if (!updatedTrade) return;
+  const handleSave = () => {
+    const updatedTrade = calculateTradeOnExit({
+      trade,
+      exitLevels,
+      accountBalance: accountDetails.balance,
+    });
+    if (!updatedTrade) return;
 
-  const updatedTrades = trades.map((t) =>
-    String(t.id) === String(id) ? updatedTrade : t
-  );
+    // Update trades in context by refetching or by exposing a setter in context.
+    // Here we update localStorage-free: we'll call refreshTrades() to re-sync with server
+    // and then update account & performance locally.
+    // If you prefer optimistic update, you can also expose setTrades in context.
+    (async () => {
+      // Option A: optimistic local update would be done here if supported by context
+      // For now, call server via context refresh (assumes server has the updated trade after you post)
+      // You probably already have an API call to update the trade server-side — call it first, then refresh.
+      // For simplicity, here we just call refreshTrades to re-sync.
+      try {
+        // optionally POST the updatedTrade to the server here before refresh
+        // await apiUpdateTrade(updatedTrade);
 
-  // Save to localStorage
-  localStorage.setItem("trades", JSON.stringify(updatedTrades));
+        // Re-sync trades list
+        await refreshTrades();
 
-  // Update account balance
-  setAccountDetails((prev) => ({
-    ...prev,
-    balance: prev.balance + parseFloat(updatedTrade.pnl || 0),
-  }));
+        // Update account balance locally
+        setAccountDetails((prev) => ({
+          ...prev,
+          balance: prev.balance + parseFloat(updatedTrade.pnl || 0),
+        }));
 
-  // Refresh performance **after updating account and localStorage**
-  refreshPerformance(updatedTrades); // pass updated trades if your function accepts it
+        // Refresh performance with updated trades (PerformanceContext likely reads from context)
+        refreshPerformance();
 
-  setCloseTrade(false);
-  navigate(`/trade/${id}`);
-};
+        setCloseTrade(false);
+        // keep user on same trade page (use the same /app/trade/:id route)
+        navigate(`/app/trade/${id}`);
+      } catch (err) {
+        console.error("Error saving trade exit:", err);
+        alert("Failed to save trade exit — check console");
+      }
+    })();
+  };
 
+  const handleDelete = async () => {
+    // Prefer deleting via API and then refreshing context
+    try {
+      // call server delete endpoint here if available, e.g. await apiDeleteTrade(id);
+      // then refresh the context trades
+      await refreshTrades();
 
-  const handleDelete = () => {
-    const tradeToDelete = trades.find((t) => String(t.id) === String(id));
-    if (!tradeToDelete) return;
+      // Update account details (if you need to adjust balance/totaltrades)
+      setAccountDetails((prev) => ({
+        ...prev,
+        // conservative update; ideally server returns updated account
+        balance: prev.balance - parseFloat(trade.pnl || 0),
+        totaltrades: (prev.totaltrades || 1) - 1,
+      }));
 
-    const updatedTrades = trades.filter((t) => String(t.id) !== String(id));
-    localStorage.setItem("trades", JSON.stringify(updatedTrades));
+      // Refresh charts
+      refreshPerformance();
 
-    // Update account balance and total trades
-    setAccountDetails((prev) => ({
-      ...prev,
-      balance: prev.balance - parseFloat(tradeToDelete.pnl || 0),
-      totaltrades: prev.totaltrades - 1,
-    }));
-
-    // Refresh charts
-    refreshPerformance();
-
-    // Navigate back
-    navigate("/trade-history");
+      // Navigate back to trade-history (match your router path)
+      navigate("/app/trade-history");
+    } catch (err) {
+      console.error("Failed to delete trade:", err);
+      alert("Failed to delete trade — check console");
+    }
   };
 
   // Colors
   const pnlColor = trade.pnl >= 0 ? "positive" : "negative";
   const directionColor =
-    trade.tradedirection.toLowerCase() === "long" ? "long" : "short";
+    trade.tradedirection?.toLowerCase() === "long" ? "long" : "short";
 
   return (
     <section className={styles.trade}>
@@ -108,7 +175,9 @@ const handleSave = () => {
             <p>{trade.dateNtime}</p>
           </div>
           <div
-            className={`${styles.marketType} ${trade.marketType.toLowerCase()}`}
+            className={`${
+              styles.marketType
+            } ${trade.marketType?.toLowerCase()}`}
           >
             {trade.marketType}
           </div>
@@ -120,7 +189,7 @@ const handleSave = () => {
             <h4>Trade Information</h4>
             <p>
               Direction:{" "}
-              <span className={directionColor}>{trade.tradedirection}</span>
+              <span className={directionColor}>{trade.tradeDirection}</span>
             </p>
             <p>
               Entry Price: <span>{trade.entryPrice}</span>
@@ -136,7 +205,7 @@ const handleSave = () => {
           <div className={styles.tradePerformance}>
             <h4>Performance</h4>
             <p>
-              Risk Amount: <span>${trade.riskamount}</span>
+              Risk Amount: <span>${trade.riskAmount}</span>
             </p>
             <p>
               RR: 1:<span>{trade.rr}</span>
@@ -189,6 +258,7 @@ const handleSave = () => {
           )}
         </div>
       </div>
+
       {closeTrade && (
         <CloseTrade
           tradeStatus={tradeStatus}

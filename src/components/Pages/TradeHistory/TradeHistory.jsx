@@ -1,10 +1,19 @@
-import { NavLink } from "react-router-dom";
-import { useState, useMemo } from "react";
+
+import { useState, useMemo, useContext } from "react";
 import styles from "./TradeHistory.module.css";
+import { useTrades } from "../../../store/TradeContext"; 
+import { TradeCard } from "./TradeCard";
 
 export const TradeHistory = () => {
-  const [tardes, setTrades] = useState("");
-  const savedTrade = JSON.parse(localStorage.getItem("trades") || "[]");
+  // get trades from TradeContext (single source of truth)
+  const { trades: contextTrades = [] } = useTrades() || {};
+
+  // fallback for legacy/local dev: read from localStorage if context empty
+  const savedFromLocal = JSON.parse(localStorage.getItem("trades") || "[]");
+  const trades =
+    Array.isArray(contextTrades) && contextTrades.length > 0
+      ? contextTrades
+      : savedFromLocal;
 
   const [filters, setFilters] = useState({
     symbol: "",
@@ -22,7 +31,7 @@ export const TradeHistory = () => {
     endTradeNumber: "",
   });
 
-  const handleClearFilters = () => {
+  const handleClearFilters = () =>
     setFilters({
       symbol: "",
       marketType: "",
@@ -38,17 +47,16 @@ export const TradeHistory = () => {
       startTradeNumber: "",
       endTradeNumber: "",
     });
-  };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Filter trades dynamically
+  // compute filtered trades from the `trades` variable
   const filteredTrades = useMemo(() => {
-    return savedTrade.filter((t) => {
-      // Symbol search (partial match, case-insensitive)
+    return (trades || []).filter((t) => {
+      // symbol search (partial, case-insensitive)
       if (filters.symbol) {
         const search = filters.symbol.toLowerCase();
         if (!t.symbol?.toLowerCase().includes(search)) return false;
@@ -56,32 +64,42 @@ export const TradeHistory = () => {
 
       if (filters.marketType && t.marketType !== filters.marketType)
         return false;
-      if (filters.status && t.tradeStatus !== filters.status) return false;
-      if (filters.result && t.tradeResult !== filters.result) return false;
-      if (filters.direction && t.tradedirection !== filters.direction)
+      if (filters.status && (t.tradeStatus || t.status) !== filters.status)
+        return false;
+      if (filters.result && (t.tradeResult || t.result) !== filters.result)
+        return false;
+      if (
+        filters.direction &&
+        (t.tradedirection || t.tradeDirection) !== filters.direction
+      )
         return false;
 
-      // PnL filter
+      // PnL
       if (filters.pnlValue) {
         const val = Number(filters.pnlValue);
-        if (filters.pnlOperator === ">" && !(t.pnl > val)) return false;
-        if (filters.pnlOperator === "<" && !(t.pnl < val)) return false;
-        if (filters.pnlOperator === "=" && !(t.pnl === val)) return false;
+        const tPnl = Number(t.pnl || 0);
+        if (filters.pnlOperator === ">" && !(tPnl > val)) return false;
+        if (filters.pnlOperator === "<" && !(tPnl < val)) return false;
+        if (filters.pnlOperator === "=" && !(tPnl === val)) return false;
       }
 
-      // RR filter
+      // RR
       if (filters.rrValue) {
         const val = Number(filters.rrValue);
-        if (filters.rrOperator === ">" && !(t.rr > val)) return false;
-        if (filters.rrOperator === "<" && !(t.rr < val)) return false;
-        if (filters.rrOperator === "=" && !(t.rr === val)) return false;
+        const tRr = Number(t.rr || 0);
+        if (filters.rrOperator === ">" && !(tRr > val)) return false;
+        if (filters.rrOperator === "<" && !(tRr < val)) return false;
+        if (filters.rrOperator === "=" && !(tRr === val)) return false;
       }
 
-      // Date range filter
+      // Date range: support both dateTime and dateNtime
       if (filters.startDate || filters.endDate) {
-        const tradeDate = new Date(t.dateNtime);
+        const raw = t.dateTime ?? t.dateNtime ?? t.date ?? null;
+        if (!raw) return false;
+        const tradeDate = new Date(raw);
         if (filters.startDate && tradeDate < new Date(filters.startDate))
           return false;
+        // add one day to endDate to include trades on that day (optional)
         if (filters.endDate && tradeDate > new Date(filters.endDate))
           return false;
       }
@@ -89,18 +107,18 @@ export const TradeHistory = () => {
       // Trade number range
       if (
         filters.startTradeNumber &&
-        t.tradeNumber < Number(filters.startTradeNumber)
+        Number(t.tradeNumber) < Number(filters.startTradeNumber)
       )
         return false;
       if (
         filters.endTradeNumber &&
-        t.tradeNumber > Number(filters.endTradeNumber)
+        Number(t.tradeNumber) > Number(filters.endTradeNumber)
       )
         return false;
 
       return true;
     });
-  }, [filters, savedTrade]);
+  }, [filters, trades]);
 
   return (
     <section id="trade-history" className={styles.tardehistory}>
@@ -110,7 +128,6 @@ export const TradeHistory = () => {
           <p>Review and analyze all your trades here</p>
         </div>
 
-        {/* 🔥 Advanced Filters */}
         <div className={styles.filter}>
           <h3>Advanced Filter & Search</h3>
 
@@ -245,61 +262,17 @@ export const TradeHistory = () => {
 
           <div className={styles.filter3}>
             <p>
-              Showing {filteredTrades.length} of {savedTrade.length} trades
+              Showing {filteredTrades.length} of {trades.length} trades
             </p>
-            <button onClick={handleClearFilters}>Clear Filters</button>
+            <button type="button" onClick={handleClearFilters}>
+              Clear Filters
+            </button>
           </div>
         </div>
 
         <TradeCard savedTrade={filteredTrades} />
       </div>
     </section>
-  );
-};
-
-const TradeCard = ({ savedTrade }) => {
-  if (!savedTrade || savedTrade.length === 0)
-    return <p className={styles.notrades}>No trades yet</p>;
-
-  return (
-    <>
-      {savedTrade.map((tradeData, index) => (
-        <NavLink key={index} to={`/app/trade/${tradeData.id}`}>
-          <div className={styles.tradecard}>
-            <div className={styles.logo}>📈</div>
-
-            <div className={styles.symbol}>
-              <div>{tradeData.symbol || tradeData.marketType}</div>
-              <div className={styles.belowsymbol}>
-                <p>{tradeData.marketType}</p>
-                <p>{tradeData.dateNtime}</p>
-              </div>
-            </div>
-
-            <div className={styles.tradequickdata}>
-              <div>
-                <p>Direction</p>
-                <span>{tradeData.tradedirection}</span>
-              </div>
-              <div>
-                <p>RR</p>
-                <span>1:{tradeData.rr || "0"}</span>
-              </div> 
-              <div>
-                <p>PNL</p>
-                <span>
-                  ${tradeData.tradeStatus === "live"
-                    ? "Live"
-                    : tradeData.pnl !== null && tradeData.pnl !== undefined
-                    ? tradeData.pnl
-                    : "0"}
-                </span>
-              </div>
-            </div>
-          </div>
-        </NavLink>
-      ))}
-    </>
   );
 };
 

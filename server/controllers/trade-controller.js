@@ -1,3 +1,4 @@
+const { success } = require("zod");
 const Trade = require("../models/trade-model");
 
 const AddTrade = async (req, res, next) => {
@@ -72,4 +73,30 @@ const AddTrade = async (req, res, next) => {
   }
 };
 
-module.exports = { AddTrade };
+const getAllTrades = async (req, res, next) => {
+  try {
+    const userId = req.userID || (req.user && req.user._id);
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const response = await Trade.find({ userId }).sort({ date: -1 });
+    if (!response) {
+      return res.status(401).json({ message: "no trades found" });
+    }
+    res.status(200).json({ response });
+  } catch (error) {
+    console.log("get all tardes error", error);
+    return res.status(400).json({ success: false, message: "server error" });
+  }
+};
+
+const getTradeByID = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+    const data = await Trade.findOne({ _id: id });
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(400).json({ message: error });
+  }
+};
+
+module.exports = { AddTrade, getAllTrades, getTradeByID };
