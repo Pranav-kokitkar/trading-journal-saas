@@ -3,6 +3,8 @@ const express = require("express");
 const connectDB = require("./utils/db");
 const cors = require("cors");
 const authRoute = require("./routers/Auth-router");
+const tradeRoute = require("./routers/Trade-router");
+const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth/", authRoute);
+app.use("/api/trades/", tradeRoute);
+app.use(errorMiddleware);
 
 PORT = 3000;
 connectDB().then(() => {

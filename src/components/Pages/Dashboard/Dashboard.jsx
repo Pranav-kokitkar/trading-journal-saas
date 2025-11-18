@@ -12,13 +12,12 @@ import { PerformanceContext } from "../../../context/PerformanceContext";
 
 import { FiActivity, FiTrendingUp, FiTarget } from "react-icons/fi";
 import { FaTrophy, FaPercentage } from "react-icons/fa";
-import { useAuth } from "../../../store/Auth";
+
 
 export const Dashboard = () => {
   const { accountDetails } = useContext(AccountContext);
   const { performance } = useContext(PerformanceContext);
 
-  const {user} = useAuth();
 
   const trades = JSON.parse(localStorage.getItem("trades")) || [];
 
@@ -30,8 +29,7 @@ export const Dashboard = () => {
       />
 
       <h2 className={styles.tradingperformanceh2}>
-        Hello {!user ? "user" : `${user.name}`} this is your Trading
-        Performance
+        Trading Performance
       </h2>
       <div className={styles.tradingperformance}>
         <div className={styles.chartCard}>

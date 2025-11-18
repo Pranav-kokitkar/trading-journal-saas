@@ -14,7 +14,7 @@ const Register = async (req, res, next) => {
       userID: userCreated._id.toString(),
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    next(error);
   }
 };
 
@@ -38,7 +38,7 @@ const Login = async (req, res, next) => {
       userID: userExist._id.toString(),
     });
   } catch (error) {
-    res.status(400).json({ message: "error while login" });
+    next(error);
   }
 };
 

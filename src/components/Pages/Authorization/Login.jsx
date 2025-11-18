@@ -3,49 +3,55 @@ import React, { useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
+import { toast } from "react-toastify";
 
-export const Login=()=> {
+export const Login = () => {
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
 
-  const [user,setUser] = useState({
-    email:"",
-    password:""
-  })
-
-  const {storeTokenInLS} = useAuth();
+  const { storeTokenInLS } = useAuth();
 
   const navigate = useNavigate();
 
-  const handleChange = (e)=>{
+  const handleChange = (e) => {
     let name = e.target.name;
-    let value= e.target.value;
+    let value = e.target.value;
     setUser({
       ...user,
-      [name]:value
-    })
-  }
+      [name]: value,
+    });
+  };
 
-  const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:3000/api/auth/login`,{
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
+      const response = await fetch(`http://localhost:3000/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify(user)
+        body: JSON.stringify(user),
       });
-      if(response.ok){
-        const res_data = await response.json();
+      const res_data = await response.json();
+      if (response.ok) {
         storeTokenInLS(res_data.token);
-        console.log("login succesful");
-        navigate("/app/dashboard")
-      }else{
-        console.log("failed to login")
+        navigate("/app/dashboard");
+        setUser({
+          name: "",
+          email: "",
+          password: "",
+        });
+      } else {
+        toast.error(
+          res_data.extraDetails ? res_data.extraDetails : res_data.message
+        );
       }
     } catch (error) {
-      console.log("error while login", error)
+      console.log("error while login", error);
     }
-  }
+  };
 
   return (
     <div className={styles.container}>
@@ -90,11 +96,13 @@ export const Login=()=> {
 
             <div className={styles.row}>
               <div className={styles.small}>Don't have an account?</div>
-              <Link className={styles.link} to="/register">Register</Link>
+              <Link className={styles.link} to="/register">
+                Register
+              </Link>
             </div>
           </form>
         </div>
       </div>
     </div>
   );
-}
+};

@@ -3,6 +3,7 @@ import React, { useRef, useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
+import { toast } from "react-toastify";
 
 export const Register = () => {
   const [user, setUser] = useState({
@@ -12,7 +13,7 @@ export const Register = () => {
   });
   const navigate = useNavigate();
   const confirmPasswordRef = useRef();
-  const {storeTokenInLS} = useAuth();
+  const { storeTokenInLS } = useAuth();
 
   const handleChange = async (e) => {
     let name = e.target.name;
@@ -27,9 +28,9 @@ export const Register = () => {
     e.preventDefault();
     const confirmPass = confirmPasswordRef.current.value;
 
-    if(user.password!==confirmPass){
-        alert("password does not match");
-        return
+    if (user.password !== confirmPass) {
+      alert("password does not match");
+      return;
     }
     try {
       const response = await fetch(`http://localhost:3000/api/auth/register`, {
@@ -39,8 +40,10 @@ export const Register = () => {
         },
         body: JSON.stringify(user),
       });
+      const res_data = await response.json();
+      console.log(res_data.extraDetails);
+
       if (response.ok) {
-        const res_data = await response.json();
         storeTokenInLS(res_data.token);
         console.log("register sucess");
         setUser({
@@ -50,10 +53,10 @@ export const Register = () => {
         });
         navigate("/");
       } else {
-        console.log("failed to regsiter");
+        toast.error(res_data.extraDetails?res_data.extraDetails:res_data.message);
       }
     } catch (error) {
-      console.log(error);
+      console.log("error while register",error);
     }
   };
 

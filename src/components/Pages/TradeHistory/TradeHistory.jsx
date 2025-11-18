@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import styles from "./TradeHistory.module.css";
 
 export const TradeHistory = () => {
+  const [tardes, setTrades] = useState("");
   const savedTrade = JSON.parse(localStorage.getItem("trades") || "[]");
 
   const [filters, setFilters] = useState({

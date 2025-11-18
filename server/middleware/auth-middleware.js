@@ -4,7 +4,9 @@ const User = require("../models/user-model");
 const authMiddleware = async (req, res, next) => {
   const token = req.header("Authorization");
   if (!token) {
-    res.status(400).json({ message: "Unauthorized: Token not provided" });
+    return res
+      .status(400)
+      .json({ message: "Unauthorized: Token not provided" });
   }
 
   const jwttoken = token.replace("Bearer", "").trim();

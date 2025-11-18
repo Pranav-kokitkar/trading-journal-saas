@@ -49,10 +49,18 @@ export const AuthProvider = ({ children }) => {
   // Run when token changes
   useEffect(() => {
       userAuthentication();
-  }, []);
+  }, [token]);
 
   return (
-    <AuthContext.Provider value={{ storeTokenInLS, logoutUser, isLoggedIn, user }}>
+    <AuthContext.Provider
+      value={{
+        storeTokenInLS,
+        logoutUser,
+        isLoggedIn,
+        user,
+        authorizationToken,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

@@ -1,7 +1,10 @@
 import styles from "./SideBar.module.css";
-import {NavLink} from "react-router-dom"
+import {NavLink, Link} from "react-router-dom";
+import { useAuth } from "../../store/Auth";
 
 export const Sidebar = () => {
+
+  const {user} = useAuth();
 
   const getNavLinkClass = ({ isActive }) => {
     return isActive ? `${styles.navlink} ${styles.active}` : `${styles.navlink}`; 
@@ -40,22 +43,19 @@ export const Sidebar = () => {
               Add Notes
             </NavLink>
           </li>
-          <li>
-            <NavLink className={getNavLinkClass} to="/app/my-account">
-              My Account
-            </NavLink>
-          </li>
         </ul>
       </nav>
 
       {/* Bottom User Info */}
+        <Link to="/app/my-account">
       <div className={styles.user}>
         <div className={styles.avatar}>U</div>
         <div>
-          <p className={styles.username}>User</p>
-          <span className={styles.subText}>Demo Account</span>
+          <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
+          <span className={styles.subText}>Your Account</span>
         </div>
       </div>
+      </Link>
     </div>
   );
 };
