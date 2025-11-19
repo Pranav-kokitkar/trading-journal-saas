@@ -9,17 +9,37 @@ import DirectionChart from "./DirectionChart";
 
 import { AccountContext } from "../../../context/AccountContext";
 import { PerformanceContext } from "../../../context/PerformanceContext";
+import { useTrades } from "../../../store/TradeContext"; // <- import the hook
 
 import { FiActivity, FiTrendingUp, FiTarget } from "react-icons/fi";
 import { FaTrophy, FaPercentage } from "react-icons/fa";
-
 
 export const Dashboard = () => {
   const { accountDetails } = useContext(AccountContext);
   const { performance } = useContext(PerformanceContext);
 
+  // Read trades from TradeContext (fallback to empty array)
+  const { trades = [] } = useTrades() || {};
 
-  const trades = JSON.parse(localStorage.getItem("trades")) || [];
+  // Accept both "closed" and "exited" as finished trades (case-insensitive)
+  const finishedStatuses = new Set(["closed", "exited"]);
+
+  // Filter closed/exited trades only for charts and performance-sensitive visuals
+  const closedTrades = Array.isArray(trades)
+    ? trades.filter((t) =>
+        finishedStatuses.has(String(t.tradeStatus || "").toLowerCase())
+      )
+    : [];
+
+  // debug logs (remove in prod)
+  console.log("all trades:", trades);
+  console.log("closed/exited trades (for charts):", closedTrades);
+  console.log(
+    "counts -> all:",
+    trades.length,
+    "closed/exited:",
+    closedTrades.length
+  );
 
   return (
     <section className={styles.dashboard}>
@@ -28,33 +48,31 @@ export const Dashboard = () => {
         performance={performance}
       />
 
-      <h2 className={styles.tradingperformanceh2}>
-        Trading Performance
-      </h2>
+      <h2 className={styles.tradingperformanceh2}>Trading Performance</h2>
       <div className={styles.tradingperformance}>
         <div className={styles.chartCard}>
           <h3>Equity Curve</h3>
-          <EquityCurveChart trades={trades} />
+          <EquityCurveChart trades={closedTrades} />
         </div>
 
         <div className={styles.chartCard}>
           <h3>Win / Loss</h3>
-          <WinLossChart trades={trades} />
+          <WinLossChart trades={closedTrades} />
         </div>
 
         <div className={styles.chartCard}>
           <h3>PnL Per Trade</h3>
-          <PnLChart trades={trades} />
+          <PnLChart trades={closedTrades} />
         </div>
 
         <div className={styles.chartCard}>
           <h3>Risk Overview</h3>
-          <RiskChart trades={trades} />
+          <RiskChart trades={closedTrades} />
         </div>
 
         <div className={styles.chartCard}>
           <h3>Direction Success</h3>
-          <DirectionChart trades={trades} />
+          <DirectionChart trades={closedTrades} />
         </div>
       </div>
     </section>
@@ -108,7 +126,7 @@ const TradingDashboard = ({ accountDetails, performance }) => {
 
           <h3>
             <FiTarget className={`${styles.icon} ${styles.iconYellow}`} />
-            Average RR: {" "}
+            Average RR:{" "}
             <span className={styles.yellow}>1:{performance.averageRR}R</span>
           </h3>
         </div>

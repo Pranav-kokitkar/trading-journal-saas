@@ -167,9 +167,81 @@ export const TradeProvider = ({ children }) => {
     }
   };
 
+  const closeTradeByID = async (
+    id,
+    exitedPrice,
+    pnl,
+    rr,
+    tradeResult,
+    balanceAfterTrade
+  ) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/trades/${id}/close`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            // ensure "Bearer " prefix if your token is raw
+            Authorization: authorizationToken?.startsWith("Bearer ")
+              ? authorizationToken
+              : `Bearer ${authorizationToken}`,
+          },
+          body: JSON.stringify({
+            exitedPrice,
+            pnl,
+            rr,
+            tradeResult,
+            balanceAfterTrade,
+          }),
+        }
+      );
+
+      // parse response safely
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        const text = await response.text();
+        throw new Error(
+          `Unexpected server response: ${text || response.status}`
+        );
+      }
+
+      console.log("closeTradeByID response:", response.status, data);
+
+      // handle non-OK status
+      if (!response.ok) {
+        // if 409, optionally fetch fresh trade (handled upstream if you want)
+        const errMsg = data?.message || `HTTP ${response.status}`;
+        throw new Error(errMsg);
+      }
+
+      // accept either { success:true, trade: {...} } or the trade doc itself
+      const returnedTrade = data?.trade ?? data;
+      if (!returnedTrade || Object.keys(returnedTrade).length === 0) {
+        throw new Error("Server did not return updated trade.");
+      }
+
+      // update local trades state: replace matching trade by id/_id
+      setTrades((prevTrades) =>
+        prevTrades.map((t) =>
+          String(t._id ?? t.id) === String(id) ? returnedTrade : t
+        )
+      );
+
+      // return the updated trade so callers can use it
+      return returnedTrade;
+    } catch (err) {
+      console.error("closeTradeByID error:", err);
+      throw err;
+    }
+  };
+
+
   return (
     <TradeContext.Provider
-      value={{ AddTrade, trades, trade, setTrade, refreshTrades: getAllTrades }}
+      value={{ AddTrade, trades, trade, setTrade, refreshTrades: getAllTrades, closeTradeByID}}
     >
       {children}
     </TradeContext.Provider>

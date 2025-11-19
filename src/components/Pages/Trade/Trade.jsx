@@ -6,7 +6,8 @@ import { CloseTrade } from "./CloseTrade";
 import { calculateTradeOnExit } from "../../../utils/tradeUtils";
 import { AccountContext } from "../../../context/AccountContext";
 import { PerformanceContext } from "../../../context/PerformanceContext";
-import { useTrades } from "../../../store/TradeContext"; // use the context consumer
+import { useTrades } from "../../../store/TradeContext";
+import { useAuth } from "../../../store/Auth";
 
 export const Trade = () => {
   const { accountDetails, setAccountDetails } = useContext(AccountContext);
@@ -15,8 +16,8 @@ export const Trade = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // get trades and helper from context (refreshTrades is the getAllTrades function)
-  const { trades = [], refreshTrades } = useTrades() || {};
+  // get trades
+  const { trades = [], refreshTrades, closeTradeByID } = useTrades() || {};
 
   const [closeTrade, setCloseTrade] = useState(false);
   const [isMultipleTP, setIsMultipleTP] = useState(false);
@@ -24,7 +25,9 @@ export const Trade = () => {
   const [tradeStatus, setTradeStatus] = useState("live");
 
   const [isLoading, setIsLoading] = useState(false);
-  const [triedRefresh, setTriedRefresh] = useState(false); // ensure we only refresh once if missing
+  const [triedRefresh, setTriedRefresh] = useState(false);
+
+  const { authorizationToken } = useAuth();
 
   // helper to find trade by several possible id fields
   const findTradeById = (list, idParam) => {
@@ -91,69 +94,126 @@ export const Trade = () => {
     setTradeStatus(e.target.value);
   };
 
-  const handleSave = () => {
-    const updatedTrade = calculateTradeOnExit({
-      trade,
-      exitLevels,
-      accountBalance: accountDetails.balance,
-    });
-    if (!updatedTrade) return;
+  const handleSave = async () => {
+    // basic validation: there must be at least one exit level
+    if (!Array.isArray(exitLevels) || exitLevels.length === 0) {
+      alert("Please enter at least one exit price.");
+      return;
+    }
 
-    // Update trades in context by refetching or by exposing a setter in context.
-    // Here we update localStorage-free: we'll call refreshTrades() to re-sync with server
-    // and then update account & performance locally.
-    // If you prefer optimistic update, you can also expose setTrades in context.
-    (async () => {
-      // Option A: optimistic local update would be done here if supported by context
-      // For now, call server via context refresh (assumes server has the updated trade after you post)
-      // You probably already have an API call to update the trade server-side — call it first, then refresh.
-      // For simplicity, here we just call refreshTrades to re-sync.
-      try {
-        // optionally POST the updatedTrade to the server here before refresh
-        // await apiUpdateTrade(updatedTrade);
+    // If using percent volumes, ensure they sum to ~100
+    const totalPct = exitLevels.reduce((s, l) => s + Number(l.volume || 0), 0);
+    if (totalPct > 0 && Math.abs(totalPct - 100) > 0.1) {
+      alert(
+        "Total exit volume must equal 100% (or leave volumes 0 if using absolute qty)."
+      );
+      return;
+    }
 
-        // Re-sync trades list
-        await refreshTrades();
-
-        // Update account balance locally
-        setAccountDetails((prev) => ({
-          ...prev,
-          balance: prev.balance + parseFloat(updatedTrade.pnl || 0),
-        }));
-
-        // Refresh performance with updated trades (PerformanceContext likely reads from context)
-        refreshPerformance();
-
-        setCloseTrade(false);
-        // keep user on same trade page (use the same /app/trade/:id route)
-        navigate(`/app/trade/${id}`);
-      } catch (err) {
-        console.error("Error saving trade exit:", err);
-        alert("Failed to save trade exit — check console");
-      }
-    })();
-  };
-
-  const handleDelete = async () => {
-    // Prefer deleting via API and then refreshing context
+    setIsLoading(true);
     try {
-      // call server delete endpoint here if available, e.g. await apiDeleteTrade(id);
-      // then refresh the context trades
+      // 1) compute updated trade using your util
+      const updatedTrade = calculateTradeOnExit({
+        trade,
+        exitLevels,
+        accountBalance: accountDetails?.balance ?? 0,
+      });
+
+      if (!updatedTrade) {
+        throw new Error("Calculation failed");
+      }
+
+      // normalize exitedPrice shape to send to backend (numbers)
+      const exitedPrice = (updatedTrade.exitedPrice || exitLevels || []).map(
+        (lvl) => ({
+          price: Number(lvl.price),
+          volume: Number(lvl.volume),
+        })
+      );
+
+      // derive fields backend expects
+      const pnl = Number(updatedTrade.pnl || 0);
+      const rr = Number(updatedTrade.rr || 0);
+      const tradeResult = updatedTrade.tradeResult || "breakeven";
+      const balanceAfterTrade = Number(
+        updatedTrade.balanceAfterTrade || accountDetails?.balance + pnl || 0
+      );
+
+      console.log("CALC INPUTS", {
+        tradeId: trade._id,
+        dir: trade.tradeDirection || trade.tradedirection,
+        entry: Number(trade.entryPrice),
+        exitLevels,
+        exitFirst: Number(exitLevels[0]?.price),
+        quantity: trade.quantity || trade.positionSize || trade.riskAmount,
+        pnlPreview: updatedTrade.pnl,
+      });
+
+      // 2) call TradeContext API to close on server
+      const closedTrade = await closeTradeByID(
+        trade._id || trade.id,
+        exitedPrice,
+        pnl,
+        rr,
+        tradeResult,
+        balanceAfterTrade
+      );
+
+      if (!closedTrade) {
+        throw new Error("Server did not return updated trade.");
+      }
+
+      // 3) refresh local lists & performance (server is source of truth)
       await refreshTrades();
 
-      // Update account details (if you need to adjust balance/totaltrades)
+      // update account snapshot locally (prefer server-sent value if available)
       setAccountDetails((prev) => ({
         ...prev,
-        // conservative update; ideally server returns updated account
-        balance: prev.balance - parseFloat(trade.pnl || 0),
-        totaltrades: (prev.totaltrades || 1) - 1,
+        balance:
+          closedTrade.balanceAfterTrade ??
+          prev.balance + (closedTrade.pnl ?? pnl),
       }));
 
-      // Refresh charts
-      refreshPerformance();
+      // refresh analytics/charts
+      if (typeof refreshPerformance === "function") refreshPerformance();
 
-      // Navigate back to trade-history (match your router path)
-      navigate("/app/trade-history");
+      // close modal & stay on same page (trade will now be closed)
+      setCloseTrade(false);
+      navigate(`/app/trade/${id}`);
+    } catch (err) {
+      console.error("Error saving trade exit:", err);
+      alert(err.message || "Failed to save trade exit — check console");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this trade? This cannot be undone.")) return;
+
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/trades/delete/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: authorizationToken,
+          },
+        }
+      );
+      if (response.ok) {
+        await refreshTrades();
+        setAccountDetails((prev) => ({
+          ...prev,
+          balance: prev.balance - parseFloat(trade.pnl || 0),
+          totaltrades: (prev.totaltrades || 1) - 1,
+        }));
+        // Refresh charts
+        refreshPerformance();
+        navigate("/app/trade-history");
+      } else {
+        console.log("unable to delete");
+      }
     } catch (err) {
       console.error("Failed to delete trade:", err);
       alert("Failed to delete trade — check console");
@@ -245,7 +305,10 @@ export const Trade = () => {
 
         {/* Buttons */}
         <div className={styles.tradeBtns}>
-          <button className={styles.deleteTrade} onClick={handleDelete}>
+          <button
+            className={styles.deleteTrade}
+            onClick={() => handleDelete(trade._id)}
+          >
             Delete Trade
           </button>
           {trade.tradeStatus === "live" && (

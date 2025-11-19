@@ -16,7 +16,6 @@ const SingleExit = ({ handleSingleExit }) => (
   </div>
 );
 
-
 const MultipleExit = ({ exitLevels, handleExitChange, handleAddExitLevel }) => (
   <>
     {/* Disclaimer */}
@@ -121,7 +120,7 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
           ) : (
             <SingleExit
               handleSingleExit={(value) =>
-                onExitChange([{ price: value, volume: '100' }])
+                onExitChange([{ price: value, volume: "100" }])
               }
             />
           )}

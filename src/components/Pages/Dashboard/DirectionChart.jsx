@@ -13,47 +13,81 @@ import {
   Cell,
 } from "recharts";
 
+/**
+ * Helper: read a property from a trade object trying multiple key variants.
+ * Usage: read(trade, "tradeDirection", "tradedirection")
+ */
+const read = (obj, ...keys) => {
+  if (!obj) return undefined;
+  for (const k of keys) {
+    if (Object.prototype.hasOwnProperty.call(obj, k)) return obj[k];
+    // try lowercase match
+    const lower = k.toLowerCase();
+    const found = Object.keys(obj).find((x) => x.toLowerCase() === lower);
+    if (found) return obj[found];
+  }
+  return undefined;
+};
+
 const DirectionChart = ({ trades }) => {
-  if (!trades || trades.length === 0) {
+  if (!Array.isArray(trades) || trades.length === 0) {
     return <p>No trades available for Direction chart.</p>;
   }
 
-  // Separate Long and Short trades
-  const longTrades = trades.filter((trade) => trade.tradedirection === "long");
-  const shortTrades = trades.filter(
-    (trade) => trade.tradedirection === "short"
+  // Normalize and filter only finished trades (if your Dashboard passes closedTrades, this is fine)
+  // but still tolerate trades that might be passed unfiltered.
+  const finishedStatuses = new Set(["closed", "exited"]);
+  const finished = trades.filter((t) =>
+    finishedStatuses.has(String(read(t, "tradeStatus") || "").toLowerCase())
   );
 
-  // Count wins
+  // If finished array is empty, fallback to input trades (so chart shows something if caller already filtered)
+  const source = finished.length > 0 ? finished : trades;
+
+  // Separate Long and Short trades (case-insensitive, flexible keys)
+  const longTrades = source.filter(
+    (trade) =>
+      String(
+        read(trade, "tradeDirection", "tradedirection") || ""
+      ).toLowerCase() === "long"
+  );
+  const shortTrades = source.filter(
+    (trade) =>
+      String(
+        read(trade, "tradeDirection", "tradedirection") || ""
+      ).toLowerCase() === "short"
+  );
+
+  // Count wins (case-insensitive)
   const longWins = longTrades.filter(
-    (trade) => trade.tradeResult === "win"
+    (trade) =>
+      String(read(trade, "tradeResult", "tradeResult") || "").toLowerCase() ===
+      "win"
   ).length;
   const shortWins = shortTrades.filter(
-    (trade) => trade.tradeResult === "win"
+    (trade) =>
+      String(read(trade, "tradeResult", "tradeResult") || "").toLowerCase() ===
+      "win"
   ).length;
 
-  // Total trades
+  // Totals
   const longTotal = longTrades.length;
   const shortTotal = shortTrades.length;
 
-  // Success rates
-  const longSuccessRate = longTotal
-    ? ((longWins / longTotal) * 100).toFixed(1)
-    : 0;
-  const shortSuccessRate = shortTotal
-    ? ((shortWins / shortTotal) * 100).toFixed(1)
-    : 0;
+  // Success rates (numbers)
+  const longSuccessRate = longTotal ? (longWins / longTotal) * 100 : 0;
+  const shortSuccessRate = shortTotal ? (shortWins / shortTotal) * 100 : 0;
 
   const data = [
     {
       direction: "Long",
-      successRate: parseFloat(longSuccessRate),
+      successRate: Number(longSuccessRate.toFixed(1)),
       total: longTotal,
       fill: "#4caf50",
     },
     {
       direction: "Short",
-      successRate: parseFloat(shortSuccessRate),
+      successRate: Number(shortSuccessRate.toFixed(1)),
       total: shortTotal,
       fill: "#f44336",
     },
@@ -82,11 +116,11 @@ const DirectionChart = ({ trades }) => {
                 color: "#fff",
               }}
               formatter={(value, name, props) => {
-                const index = props.payload.index;
-                return [`${value}%`, `Success Rate`];
+                // value is numeric percent, show with % in tooltip
+                return [`${value}%`, "Success Rate"];
               }}
               labelFormatter={(label, payload) => {
-                const total = payload?.payload?.total || 0;
+                const total = payload?.payload?.total ?? 0;
                 return `Direction: ${label} (Total: ${total})`;
               }}
             />
@@ -98,15 +132,20 @@ const DirectionChart = ({ trades }) => {
                 dataKey="total"
                 position="top"
                 formatter={(val) => (val > 0 ? `Total: ${val}` : "")}
-                style={{ fill: "#ffffffff", fontWeight: "bold" }}
+                style={{ fill: "#ffffff", fontWeight: "bold" }}
               />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
+
       <div className={styles.quickdata}>
-        <p>L - Win Rate: {longSuccessRate}%</p>
-        <p>S - Win Rate: {shortSuccessRate}%</p>
+        <p>
+          L - Win Rate: {longTotal ? Number(longSuccessRate.toFixed(1)) : 0}%
+        </p>
+        <p>
+          S - Win Rate: {shortTotal ? Number(shortSuccessRate.toFixed(1)) : 0}%
+        </p>
       </div>
     </div>
   );

@@ -10,10 +10,13 @@ import { AccountContext } from "../../../context/AccountContext";
 import { calculateTradeValues } from "../../../utils/tradeUtils";
 import { useAuth } from "../../../store/Auth";
 import { useTrades } from "../../../store/TradeContext"; // renamed to useTrades in TradeContext
+import { PerformanceContext } from "../../../context/PerformanceContext";
 
 export const AddTrade = () => {
   const { authorizationToken } = useAuth();
-  const { AddTrade: addTradeFromContext } = useTrades(); // rename to avoid name clash
+  const { AddTrade: addTradeFromContext } = useTrades(); 
+
+  const {refreshPerformance} = useContext(PerformanceContext);
 
   // get accountDetails from AccountContext (this was missing)
   const { accountDetails } = useContext(AccountContext) || {};
@@ -152,6 +155,7 @@ export const AddTrade = () => {
 
     try {
       await addTradeFromContext(normalizedTrade);
+      refreshPerformance();
     } catch (err) {
       console.error("Failed to add trade:", err);
       alert("Failed to add trade — check console for details.");

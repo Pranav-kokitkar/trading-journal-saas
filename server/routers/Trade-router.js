@@ -4,6 +4,8 @@ const {
   AddTrade,
   getAllTrades,
   getTradeByID,
+  closeTradeByID,
+  deleteTradeById,
 } = require("../controllers/trade-controller");
 const router = express.Router();
 
@@ -13,5 +15,7 @@ router
   .get(authMiddleware, getAllTrades);
 
 router.route("/:id").get(authMiddleware, getTradeByID);
+router.route("/:id/close").patch(authMiddleware, closeTradeByID);
+router.route("/delete/:id").delete(authMiddleware, deleteTradeById);
 
 module.exports = router;

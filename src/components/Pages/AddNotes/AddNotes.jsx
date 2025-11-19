@@ -1,34 +1,69 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./AddNotes.module.css";
 import { DisplayNotes } from "./DisplayNotes";
-import { v4 as uuidv4 } from "uuid";
-import FilterPanel from "../Comparision/FilterPanel";
-
+import { useAuth } from "../../../store/Auth";
 
 export const AddNotes = () => {
-  const [notes, setNotes] = useState([]); // all saved notes
-  const [note, setNote] = useState({ title: "", description: "" }); // current note being typed
+  const [notes, setNotes] = useState([]);
+  const [note, setNote] = useState({ title: "", description: "" });
+
+  const { authorizationToken } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNote((prev) => ({ ...prev, [name]: value })); // ✅ update the single note
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
     if (note.title.trim() === "" && note.description.trim() === "") return;
+    e.preventDefault();
+    console.log(note);
 
-    const newNote = { id: uuidv4(), ...note }; // ✅ attach unique id
+    try {
+      const response = await fetch(`http://localhost:3000/notes/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authorizationToken,
+        },
+        body: JSON.stringify(note),
+      });
 
-    setNotes([...notes, newNote]);
-    setNote({ title: "", description: "" });
-    console.log("note added");
+      if (response.ok) {
+        setNote({ title: "", description: "" });
+        console.log("note added sucess");
+        getAllNotes();
+      } else {
+        console.log("note failed to add");
+      }
+    } catch (error) {
+      console.log("add notes error", error);
+    }
   };
 
-  const deleteNote =(id)=>{
-    setNotes((prevNotes)=>prevNotes.filter((note)=>note.id !==id));
-    console.log("deleted");
+  const getAllNotes = async ()=>{
+    try {
+      const response = await fetch(`http://localhost:3000/notes/`,{
+        method:"GET",
+        headers:{
+          "Content-Type": "application/json",
+          Authorization:authorizationToken
+        }
+      });
+      const res_data = await response.json();
+      if(response.ok){
+        console.log("notes fetched")
+        setNotes(res_data);
+      }
+    } catch (error) {
+      console.lof("error while getting all notes",error)
+    }
   }
+
+  useEffect(()=>{
+    getAllNotes();
+  },[])
+
 
   return (
     <section className={styles.addnotescontainer}>
@@ -62,8 +97,7 @@ export const AddNotes = () => {
           </div>
         </div>
       </form>
-      <DisplayNotes notes={notes} onDelete={deleteNote}/>
+      <DisplayNotes notes={notes} getAllNotes={getAllNotes} />
     </section>
-    
   );
 };

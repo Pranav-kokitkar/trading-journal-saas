@@ -5,17 +5,27 @@ export const calculateTradeOnExit = ({
 }) => {
   if (!trade) return null;
 
+  // Build a normalized updated trade
   const updatedTrade = {
     ...trade,
     tradeStatus: "exited",
     exitedPrice: exitLevels,
   };
 
-  const entry = parseFloat(updatedTrade.entryPrice) || 0;
-  const stoploss = parseFloat(updatedTrade.stoplossPrice) || 0;
-  const takeprofit = parseFloat(updatedTrade.takeProfitPrice) || 0;
-  const tradedirection = (updatedTrade.tradedirection || "").toLowerCase();
-  const riskAmount = parseFloat(updatedTrade.riskAmount) || 0;
+  const entry = Number(updatedTrade.entryPrice) || 0;
+  const stoploss = Number(updatedTrade.stoplossPrice) || 0;
+  const takeprofit = Number(updatedTrade.takeProfitPrice) || 0;
+
+  // Normalize direction: accept both tradeDirection and tradedirection
+  const tradedirection = (
+    (updatedTrade.tradeDirection ?? updatedTrade.tradedirection) ||
+    ""
+  )
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  const riskAmount = Number(updatedTrade.riskAmount) || 0;
   const riskType = updatedTrade.riskType || "dollar";
 
   // Actual Risk
@@ -24,23 +34,34 @@ export const calculateTradeOnExit = ({
 
   // ===== RR Calculation (weighted exit) =====
   let rr = 0;
-  if (tradedirection && entry && stoploss && exitLevels.length > 0) {
+  if (
+    tradedirection &&
+    entry &&
+    stoploss &&
+    Array.isArray(exitLevels) &&
+    exitLevels.length > 0
+  ) {
     let weightedExit = 0;
     let totalVolume = 0;
 
     exitLevels.forEach((lvl) => {
-      const price = parseFloat(lvl.price) || 0;
-      const volumePercent = parseFloat(lvl.volume) || 0;
+      const price = Number(lvl.price) || 0;
+      const volumePercent = Number(lvl.volume) || 0;
       weightedExit += price * volumePercent;
       totalVolume += volumePercent;
     });
 
     weightedExit = totalVolume ? weightedExit / totalVolume : takeprofit;
 
-    rr =
-      tradedirection === "short" || tradedirection === "sell"
-        ? (entry - weightedExit) / (stoploss - entry)
-        : (weightedExit - entry) / (entry - stoploss);
+    // avoid division by zero
+    const denomShort = Number(stoploss) - Number(entry);
+    const denomLong = Number(entry) - Number(stoploss);
+
+    if (tradedirection === "short" || tradedirection === "sell") {
+      rr = denomShort !== 0 ? (entry - weightedExit) / denomShort : 0;
+    } else {
+      rr = denomLong !== 0 ? (weightedExit - entry) / denomLong : 0;
+    }
 
     rr = parseFloat(rr.toFixed(2));
   }
@@ -51,17 +72,22 @@ export const calculateTradeOnExit = ({
 
   // PnL Calculation (volume-aware)
   let pnl = 0;
-  exitLevels.forEach((lvl) => {
-    const exitPrice = parseFloat(lvl.price);
-    const volumePercent = parseFloat(lvl.volume) / 100;
-    const rewardDiff =
-      tradedirection === "short" || tradedirection === "sell"
-        ? entry - exitPrice
-        : exitPrice - entry;
-    const positionSize = actualRisk / priceDiff;
-    pnl += rewardDiff * positionSize * volumePercent;
-  });
+  if (priceDiff > 0) {
+    exitLevels.forEach((lvl) => {
+      const exitPrice = Number(lvl.price);
+      const volumePercent = Number(lvl.volume) / 100;
+      const rewardDiff =
+        tradedirection === "short" || tradedirection === "sell"
+          ? entry - exitPrice
+          : exitPrice - entry;
+      const positionSize = actualRisk / priceDiff;
+      pnl += rewardDiff * positionSize * volumePercent;
+    });
+  } else {
+    pnl = 0;
+  }
 
+  // cap extreme loss
   if (pnl < 0 && Math.abs(pnl) > accountBalance) pnl = -accountBalance;
   pnl = parseFloat(pnl.toFixed(2));
 
@@ -69,7 +95,7 @@ export const calculateTradeOnExit = ({
   const tradeResult = pnl >= 0 ? "win" : "loss";
 
   // Update balance after this trade
-  const balanceAfterTrade = parseFloat(accountBalance + pnl);
+  const balanceAfterTrade = parseFloat((accountBalance + pnl).toFixed(2));
 
   return {
     ...updatedTrade,
@@ -80,16 +106,21 @@ export const calculateTradeOnExit = ({
     balanceAfterTrade,
   };
 };
-
 export const calculateTradeValues = ({ trade, accountBalance }) => {
-  const entry = parseFloat(trade.entryPrice) || 0;
-  const stoploss = parseFloat(trade.stoplossPrice) || 0;
-  const takeprofit = parseFloat(trade.takeProfitPrice) || 0;
-  const tradedirection = (trade.tradedirection || "").toLowerCase();
-  const marketType = (trade.marketType || "").toLowerCase();
-  const riskAmount = parseFloat(trade.riskAmount) || 0;
+  const entry = Number(trade.entryPrice) || 0;
+  const stoploss = Number(trade.stoplossPrice) || 0;
+  const takeprofit = Number(trade.takeProfitPrice) || 0;
+
+  // Normalize direction (both field names)
+  const tradedirection = ((trade.tradeDirection ?? trade.tradedirection) || "")
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  const marketType = (trade.marketType || "").toString().toLowerCase();
+  const riskAmount = Number(trade.riskAmount) || 0;
   const tradeStatus = trade.tradeStatus || "";
-  const symbol = (trade.symbol || "").toUpperCase();
+  const symbol = (trade.symbol || "").toString().toUpperCase();
   const riskType = trade.riskType || "dollar";
 
   const requiredFields = {
@@ -122,7 +153,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
   ) {
     const rrExit =
       trade.exitedPrice?.length > 0
-        ? parseFloat(trade.exitedPrice[0].price)
+        ? Number(trade.exitedPrice[0].price)
         : takeprofit;
 
     if (tradedirection === "buy" || tradedirection === "long") {
@@ -139,7 +170,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
   }
 
   // ===== Adjust risk amount based on $ / % =====
-  let actualRisk = riskAmount;
+  let actualRisk = Number(riskAmount);
   if (riskType === "percent" && accountBalance) {
     actualRisk = (riskAmount / 100) * accountBalance;
   }
@@ -194,17 +225,19 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
       profitError = "Total exit volume must equal 100%";
     } else {
       let totalProfit = 0;
-      trade.exitedPrice.forEach((lvl) => {
-        const exitPrice = parseFloat(lvl.price);
-        const volumePercent = parseFloat(lvl.volume) / 100;
-        const rewardDiff =
-          tradedirection === "sell" || tradedirection === "short"
-            ? entry - exitPrice
-            : exitPrice - entry;
-        const priceDiff = Math.abs(entry - stoploss);
-        const positionSize = actualRisk / priceDiff;
-        totalProfit += rewardDiff * positionSize * volumePercent;
-      });
+      const priceDiff = Math.abs(entry - stoploss);
+      if (priceDiff > 0) {
+        trade.exitedPrice.forEach((lvl) => {
+          const exitPrice = Number(lvl.price);
+          const volumePercent = Number(lvl.volume) / 100;
+          const rewardDiff =
+            tradedirection === "sell" || tradedirection === "short"
+              ? entry - exitPrice
+              : exitPrice - entry;
+          const positionSize = actualRisk / priceDiff;
+          totalProfit += rewardDiff * positionSize * volumePercent;
+        });
+      }
 
       if (totalProfit < 0 && Math.abs(totalProfit) > accountBalance) {
         pnl = (-accountBalance).toFixed(2);
