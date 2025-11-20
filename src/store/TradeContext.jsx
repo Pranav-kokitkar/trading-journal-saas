@@ -39,8 +39,6 @@ export const TradeProvider = ({ children }) => {
 
   const { authorizationToken } = useAuth();
 
-  // guard to prevent concurrent fetches / duplicates
-  const isFetchingRef = useRef(false);
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -57,19 +55,9 @@ export const TradeProvider = ({ children }) => {
 
   async function getAllTrades() {
     if (!authorizationToken) {
-      // nothing we can do without token
       return;
     }
 
-    // skip if already fetching
-    if (isFetchingRef.current) {
-      console.debug("getAllTrades: skipping duplicate call (already fetching)");
-      return;
-    }
-    isFetchingRef.current = true;
-
-    // helpful trace (remove later if too noisy)
-    console.trace("getAllTrades called");
 
     try {
       const response = await fetch(`http://localhost:3000/api/trades/`, {
@@ -92,11 +80,6 @@ export const TradeProvider = ({ children }) => {
       }
     } catch (error) {
       console.error("get trades error", error);
-    } finally {
-      // small delay to avoid immediate re-trigger storms
-      setTimeout(() => {
-        isFetchingRef.current = false;
-      }, 200);
     }
   }
 
@@ -131,7 +114,6 @@ export const TradeProvider = ({ children }) => {
               pnl: Number(normalizedTrade.pnl || 0),
               deltaTrades: 1,
             });
-
           } else {
             console.warn("updateAccount is not a function on AccountContext");
           }
@@ -185,26 +167,23 @@ export const TradeProvider = ({ children }) => {
     balanceAfterTrade
   ) => {
     try {
-      const response = await fetch(
-        `http://localhost:3000/api/trades/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            // ensure "Bearer " prefix if your token is raw
-            Authorization: authorizationToken?.startsWith("Bearer ")
-              ? authorizationToken
-              : `Bearer ${authorizationToken}`,
-          },
-          body: JSON.stringify({
-            exitedPrice,
-            pnl,
-            rr,
-            tradeResult,
-            balanceAfterTrade,
-          }),
-        }
-      );
+      const response = await fetch(`http://localhost:3000/api/trades/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          // ensure "Bearer " prefix if your token is raw
+          Authorization: authorizationToken?.startsWith("Bearer ")
+            ? authorizationToken
+            : `Bearer ${authorizationToken}`,
+        },
+        body: JSON.stringify({
+          exitedPrice,
+          pnl,
+          rr,
+          tradeResult,
+          balanceAfterTrade,
+        }),
+      });
 
       // parse response safely
       let data;
@@ -218,8 +197,8 @@ export const TradeProvider = ({ children }) => {
       }
 
       console.log("closeTradeByID response:", response.status, data);
+      await getAllTrades();
 
-      // handle non-OK status
       if (!response.ok) {
         // if 409, optionally fetch fresh trade (handled upstream if you want)
         const errMsg = data?.message || `HTTP ${response.status}`;
@@ -247,10 +226,46 @@ export const TradeProvider = ({ children }) => {
     }
   };
 
+  const deleteTradeByID = async (id, pnl) => {
+    if (!window.confirm("Delete this trade? This cannot be undone.")) return;
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/trades/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: authorizationToken,
+        },
+      });
+      if (response.ok) {
+        try {
+          if (typeof updateAccount === "function") {
+            const pnlToAdjust = -parseFloat(pnl || 0) || 0;
+            await updateAccount({ pnl: pnlToAdjust, deltaTrades: -1 });
+            await getAllTrades();
+          }
+        } catch (err) {
+          console.error("updateAccount failed on delete", err);
+        }
+      } else {
+        console.log("unable to delete");
+      }
+    } catch (err) {
+      console.error("Failed to delete trade:", err);
+      alert("Failed to delete trade — check console");
+    }
+  };
 
   return (
     <TradeContext.Provider
-      value={{ AddTrade, trades, trade, setTrade, refreshTrades: getAllTrades, closeTradeByID}}
+      value={{
+        AddTrade,
+        trades,
+        trade,
+        setTrade,
+        refreshTrades: getAllTrades,
+        closeTradeByID,
+        deleteTradeByID,
+      }}
     >
       {children}
     </TradeContext.Provider>

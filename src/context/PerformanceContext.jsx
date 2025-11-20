@@ -1,5 +1,5 @@
 // src/context/PerformanceContext.jsx
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useMemo } from "react";
 import { calculatePerformance } from "../utils/Performance";
 import { useTrades } from "../store/TradeContext";
 
@@ -30,53 +30,38 @@ export const PerformanceProvider = ({ children }) => {
   // read trades from TradeContext (assumes TradeProvider is mounted above this)
   const { trades } = useTrades();
 
-  // initialize from trades (if available), otherwise fall back to persisted performance or empty
-  const [performance, setPerformance] = useState(() => {
+  // ✅ derive performance directly from current trades, no extra state
+  const performance = useMemo(() => {
     try {
-      if (Array.isArray(trades) && trades.length > 0) {
-        return calculatePerformance(trades);
+      const safeTrades = Array.isArray(trades) ? [...trades] : [];
+      if (safeTrades.length > 0) {
+        return calculatePerformance(safeTrades);
       }
-      const persisted = localStorage.getItem("performance");
-      return persisted ? JSON.parse(persisted) : emptyPerformance;
-    } catch (e) {
-      console.error("PerformanceProvider init error:", e);
       return emptyPerformance;
-    }
-  });
-
-  // recompute whenever trades change
-  useEffect(() => {
-    try {
-      const newPerformance =
-        Array.isArray(trades) && trades.length > 0
-          ? calculatePerformance(trades)
-          : emptyPerformance;
-      setPerformance(newPerformance);
-      // persist so other parts of app (if any) can still read it from localStorage
-      localStorage.setItem("performance", JSON.stringify(newPerformance));
     } catch (e) {
-      console.error("Failed to calculate performance on trades update:", e);
+      console.error("PerformanceProvider calculation error:", e);
+      return emptyPerformance;
     }
   }, [trades]);
 
-  // manual refresh (now uses current trades from context)
-  const refreshPerformance = () => {
+  // still persist, but we don't read from localStorage anymore
+  useEffect(() => {
     try {
-      const newPerformance =
-        Array.isArray(trades) && trades.length > 0
-          ? calculatePerformance(trades)
-          : emptyPerformance;
-      setPerformance(newPerformance);
-      localStorage.setItem("performance", JSON.stringify(newPerformance));
+      localStorage.setItem("performance", JSON.stringify(performance));
     } catch (e) {
-      console.error("refreshPerformance error:", e);
+      console.error("Failed to persist performance:", e);
     }
+  }, [performance]);
+
+  // Manual refresh is basically a no-op now, kept for compatibility
+  const refreshPerformance = () => {
+    console.log(
+      "refreshPerformance called — performance is already derived from latest trades."
+    );
   };
 
   return (
-    <PerformanceContext.Provider
-      value={{ performance, setPerformance, refreshPerformance }}
-    >
+    <PerformanceContext.Provider value={{ performance, refreshPerformance }}>
       {children}
     </PerformanceContext.Provider>
   );

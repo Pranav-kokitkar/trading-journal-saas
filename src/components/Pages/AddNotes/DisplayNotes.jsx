@@ -14,7 +14,7 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
         },
       });
       if (response.ok) {
-        getAllNotes();
+        await getAllNotes();
         console.log("note deleted");
       } else {
         console.log("failed to delete");

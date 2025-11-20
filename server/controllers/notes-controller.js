@@ -18,11 +18,7 @@ const getAllNotes = async (req, res) => {
 
     const notes = await Notes.find({ userId });
 
-    if (notes.length === 0) {
-      return res.status(404).json({ message: "No notes found" });
-    }
-
-    return res.status(200).json(notes);
+     return res.status(200).json(notes);
   } catch (error) {
     return res.status(500).json({ message: "Failed to get notes from server" });
   }

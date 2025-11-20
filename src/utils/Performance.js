@@ -1,18 +1,18 @@
 // src/utils/Performance.js
 export const calculatePerformance = (trades = []) => {
-  // Defensive: ensure trades is an array
+  // Ensure we always work with an array
   const allTrades = Array.isArray(trades) ? trades : [];
 
-  // Accept both "closed" and "exited" as finished trades (case-insensitive)
+  // Treat "closed" and "exited" as finished trades
   const isClosedStatus = (s) =>
     typeof s === "string" &&
     ["closed", "exited"].includes(s.toString().toLowerCase());
 
-  // Partition trades: closed/exited vs live/other
+  // Split into closed/exited and live/other
   const closedTrades = allTrades.filter((t) => isClosedStatus(t.tradeStatus));
   const liveTrades = allTrades.filter((t) => !isClosedStatus(t.tradeStatus));
 
-  // helper to read fields with flexible casing
+  // Helper: read a value with flexible field names / casing
   const read = (t, ...keys) => {
     for (const k of keys) {
       if (t == null) continue;
@@ -27,10 +27,10 @@ export const calculatePerformance = (trades = []) => {
     return undefined;
   };
 
-  // total closed trades
+  // Closed trades count
   const totalTrades = closedTrades.length;
 
-  // directions (support tradeDirection / tradedirection)
+  // Direction stats
   const totalLongTrades = closedTrades.filter(
     (t) =>
       String(
@@ -45,9 +45,7 @@ export const calculatePerformance = (trades = []) => {
       ).toLowerCase() === "short"
   ).length;
 
-  // -----------------------------
-  // AVERAGE RR: now only from WIN trades
-  // -----------------------------
+  // Average RR (wins only)
   const closedWinTrades = closedTrades.filter(
     (t) => String(read(t, "tradeResult") || "").toLowerCase() === "win"
   );
@@ -64,20 +62,20 @@ export const calculatePerformance = (trades = []) => {
   });
   const averageRR = rrCount > 0 ? rrSum / rrCount : 0;
 
-  // Win / Loss stats (closed trades)
+  // Win / loss counts (closed)
   const totalWins = closedWinTrades.length;
 
   const totalLosses = closedTrades.filter(
     (t) => String(read(t, "tradeResult") || "").toLowerCase() === "loss"
   ).length;
 
-  // Win rate: wins / (wins + losses) * 100
+  // Win rate in %
   const winRate =
     totalWins + totalLosses > 0
       ? (totalWins / (totalWins + totalLosses)) * 100
       : 0;
 
-  // Streak calculation (iterate closed trades in chronological order)
+  // Streaks (closed trades sorted by time)
   const sortedClosed = closedTrades.slice().sort((a, b) => {
     const da = new Date(read(a, "dateTime", "dateNtime")).getTime() || 0;
     const db = new Date(read(b, "dateTime", "dateNtime")).getTime() || 0;
@@ -106,17 +104,17 @@ export const calculatePerformance = (trades = []) => {
     if (currentLossStreak > maxLossStreak) maxLossStreak = currentLossStreak;
   });
 
-  // Total PnL (sum of pnl from closed trades)
+  // Total PnL (closed)
   const totalPnL = closedTrades.reduce((sum, t) => {
     const raw = read(t, "pnl");
     const n = raw === undefined || raw === null ? 0 : Number(raw);
     return sum + (isNaN(n) ? 0 : n);
   }, 0);
 
-  // Total live trades — use live partition length
+  // Live trades count
   const totalLiveTrades = liveTrades.length;
 
-  // Total Risk (sum riskAmount / riskamount) for closed trades
+  // Total risk (closed)
   const totalRisk = closedTrades.reduce((sum, t) => {
     const raw = read(t, "riskAmount", "riskamount");
     const n = raw === undefined || raw === null ? 0 : Number(raw);
@@ -151,10 +149,13 @@ export const calculatePerformance = (trades = []) => {
   const highestBalance = balances.length > 0 ? Math.max(...balances) : 0;
   const lowestBalance = balances.length > 0 ? Math.min(...balances) : 0;
 
-  const highestWin =
-    pnls.length > 0 ? Math.max(...pnls.filter((p) => p > 0)) : 0;
-  const lowestLoss =
-    pnls.length > 0 ? Math.min(...pnls.filter((p) => p < 0)) : 0;
+  // Safely compute highest win (no -Infinity)
+  const positivePnls = pnls.filter((p) => p > 0);
+  const highestWin = positivePnls.length > 0 ? Math.max(...positivePnls) : 0;
+
+  // Safely compute lowest loss (no Infinity)
+  const negativePnls = pnls.filter((p) => p < 0);
+  const lowestLoss = negativePnls.length > 0 ? Math.min(...negativePnls) : 0;
 
   const highestRisk = risks.length > 0 ? Math.max(...risks) : 0;
   const lowestRisk = risks.length > 0 ? Math.min(...risks) : 0;

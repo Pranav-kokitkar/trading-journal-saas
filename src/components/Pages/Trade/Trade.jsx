@@ -6,13 +6,15 @@ import { CloseTrade } from "./CloseTrade";
 import { calculateTradeOnExit } from "../../../utils/tradeUtils";
 import { AccountContext } from "../../../context/AccountContext";
 import { PerformanceContext } from "../../../context/PerformanceContext";
-import { useTrades } from "../../../store/TradeContext";
+import { TradeContext, useTrades } from "../../../store/TradeContext";
 import { useAuth } from "../../../store/Auth";
 
 export const Trade = () => {
   // use updateAccount instead of setAccountDetails so backend receives pnl in body
   const { accountDetails, updateAccount } = useContext(AccountContext);
   const { refreshPerformance } = useContext(PerformanceContext);
+  const {deleteTradeByID} = useContext(TradeContext);
+
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -172,6 +174,7 @@ export const Trade = () => {
       try {
         if (typeof updateAccount === "function") {
           await updateAccount({ pnl });
+
         }
       } catch (err) {
         console.error("updateAccount failed", err);
@@ -193,41 +196,9 @@ export const Trade = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this trade? This cannot be undone.")) return;
-
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/trades/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: authorizationToken,
-          },
-        }
-      );
-      if (response.ok) {
-        await refreshTrades();
-
-        //  instead of mutating local account, ask backend to adjust account by sending pnl
-        try {
-          if (typeof updateAccount === "function") {
-            const pnlToAdjust = -parseFloat(trade.pnl || 0) || 0;
-            await updateAccount({ pnl: pnlToAdjust });
-          }
-        } catch (err) {
-          console.error("updateAccount failed on delete", err);
-        }
-
-        // Refresh charts
-        refreshPerformance();
-        navigate("/app/trade-history");
-      } else {
-        console.log("unable to delete");
-      }
-    } catch (err) {
-      console.error("Failed to delete trade:", err);
-      alert("Failed to delete trade — check console");
-    }
+    await deleteTradeByID(id, trade.pnl);
+    navigate("/app/trade-history");
+    refreshPerformance();
   };
 
   // Colors

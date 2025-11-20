@@ -31,15 +31,9 @@ export const Dashboard = () => {
       )
     : [];
 
-  // debug logs (remove in prod)
-  console.log("all trades:", trades);
-  console.log("closed/exited trades (for charts):", closedTrades);
-  console.log(
-    "counts -> all:",
-    trades.length,
-    "closed/exited:",
-    closedTrades.length
-  );
+    console.log("performnce",performance);
+    console.log("calosed tardes",closedTrades)
+
 
   return (
     <section className={styles.dashboard}>
