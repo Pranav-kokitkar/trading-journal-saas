@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose; // Destructure Schema for clarity
+const { Schema } = mongoose; 
 
 const notesSchema = new Schema(
   {

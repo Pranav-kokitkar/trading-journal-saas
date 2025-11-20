@@ -1,4 +1,4 @@
-// Trade.jsx
+// src/components/.../Trade.jsx
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "./Trade.module.css";
 import { useContext, useState, useEffect } from "react";
@@ -10,7 +10,8 @@ import { useTrades } from "../../../store/TradeContext";
 import { useAuth } from "../../../store/Auth";
 
 export const Trade = () => {
-  const { accountDetails, setAccountDetails } = useContext(AccountContext);
+  // use updateAccount instead of setAccountDetails so backend receives pnl in body
+  const { accountDetails, updateAccount } = useContext(AccountContext);
   const { refreshPerformance } = useContext(PerformanceContext);
 
   const { id } = useParams();
@@ -166,13 +167,16 @@ export const Trade = () => {
       // 3) refresh local lists & performance (server is source of truth)
       await refreshTrades();
 
-      // update account snapshot locally (prefer server-sent value if available)
-      setAccountDetails((prev) => ({
-        ...prev,
-        balance:
-          closedTrade.balanceAfterTrade ??
-          prev.balance + (closedTrade.pnl ?? pnl),
-      }));
+      // 4) update account on server by sending pnl in body so backend can adjust account
+      // 4) update account on server by sending pnl (do NOT change totalTrades when closing)
+      try {
+        if (typeof updateAccount === "function") {
+          await updateAccount({ pnl });
+        }
+      } catch (err) {
+        console.error("updateAccount failed", err);
+        // we continue — server trade was closed; account sync can be retried
+      }
 
       // refresh analytics/charts
       if (typeof refreshPerformance === "function") refreshPerformance();
@@ -193,7 +197,7 @@ export const Trade = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/trades/delete/${id}`,
+        `http://localhost:3000/api/trades/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -203,11 +207,17 @@ export const Trade = () => {
       );
       if (response.ok) {
         await refreshTrades();
-        setAccountDetails((prev) => ({
-          ...prev,
-          balance: prev.balance - parseFloat(trade.pnl || 0),
-          totaltrades: (prev.totaltrades || 1) - 1,
-        }));
+
+        //  instead of mutating local account, ask backend to adjust account by sending pnl
+        try {
+          if (typeof updateAccount === "function") {
+            const pnlToAdjust = -parseFloat(trade.pnl || 0) || 0;
+            await updateAccount({ pnl: pnlToAdjust });
+          }
+        } catch (err) {
+          console.error("updateAccount failed on delete", err);
+        }
+
         // Refresh charts
         refreshPerformance();
         navigate("/app/trade-history");

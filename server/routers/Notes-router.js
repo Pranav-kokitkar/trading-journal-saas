@@ -7,8 +7,10 @@ const {
 } = require("../controllers/notes-controller");
 const router = express.Router();
 
-router.route("/").get(authMiddleware, getAllNotes);
-router.route("/add").post(authMiddleware, addNotes);
-router.route("/delete/:id").delete(authMiddleware, deleteNoteByID);
+router
+  .route("/")
+  .get(authMiddleware, getAllNotes)
+  .post(authMiddleware, addNotes);
+router.route("/:id").delete(authMiddleware, deleteNoteByID);
 
 module.exports = router;

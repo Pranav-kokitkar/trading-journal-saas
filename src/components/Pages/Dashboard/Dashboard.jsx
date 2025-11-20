@@ -169,10 +169,10 @@ const TradingDashboard = ({ accountDetails, performance }) => {
 
           <h2>Quick Stats</h2>
           <h3>
-            Initial Capital: <span>${accountDetails.initialCapital}</span>
+            Initial Capital: <span>${accountDetails?.initialCapital}</span>
           </h3>
           <h3>
-            Current Balance: <span>${accountDetails.balance}</span>
+            Current Balance: <span>${accountDetails?.balance}</span>
           </h3>
         </div>
       </div>

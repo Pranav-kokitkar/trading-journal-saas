@@ -1,3 +1,4 @@
+// src/components/.../MyAccount.jsx
 import { useContext, useEffect, useState } from "react";
 import { AccountContext } from "../../../context/AccountContext";
 import { useAuth } from "../../../store/Auth";
@@ -5,48 +6,107 @@ import styles from "./myaccount.module.css";
 import { useNavigate } from "react-router-dom";
 
 export const MyAccount = () => {
-  const { accountDetails, setAccountDetails } = useContext(AccountContext);
+  const { accountDetails, setAccountDetails, updateAccount, getAccount } =
+    useContext(AccountContext);
   const [darkTheme, setDarkTheme] = useState(true);
-  
-  const {logoutUser} = useAuth();
-  // Local state just for input field
-  const [tempCapital, setTempCapital] = useState(accountDetails.initialCapital);
+
+  const { logoutUser } = useAuth();
+
+  // Initialize tempCapital from accountDetails when it becomes available
+  const [tempCapital, setTempCapital] = useState("");
+
+  useEffect(() => {
+    if (
+      accountDetails &&
+      typeof accountDetails.initialCapital !== "undefined"
+    ) {
+      setTempCapital(Number(accountDetails.initialCapital));
+    }
+  }, [accountDetails]);
 
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
-    setTempCapital(Number(e.target.value)); // only update local input state
+    setTempCapital(e.target.value === "" ? "" : Number(e.target.value)); // local numeric state or empty
   };
 
-  const changeAccountBalance = () => {
-    setAccountDetails((prev) => ({
-      ...prev,
-      initialCapital: tempCapital,
-      balance: tempCapital, // reset balance only when saved
-    }));
+  const changeAccountBalance = async () => {
+    // ensure we have accountDetails
+    if (!accountDetails) {
+      alert("Account not loaded yet. Try again in a moment.");
+      return;
+    }
 
-    localStorage.setItem(
-      "accountDetails",
-      JSON.stringify({
+    // validate input
+    const newInitial = Number(tempCapital);
+    if (Number.isNaN(newInitial) || newInitial < 0) {
+      alert("Please enter a valid non-negative number for initial capital.");
+      return;
+    }
+
+    if (
+      !window.confirm(
+        `Save new initial capital of $${newInitial}? This will set current balance to $${newInitial}.`
+      )
+    ) {
+      return;
+    }
+
+    const prevBalance = Number(accountDetails.balance ?? 0);
+    const pnlDelta = Number(newInitial) - prevBalance; // amount to add/subtract to current balance
+
+    try {
+      // Persist balance change to backend by sending pnl delta
+      // updateAccount accepts either a number or { pnl: number } per your contract
+      await updateAccount(pnlDelta);
+
+      // Now update initialCapital locally (backend doesn't expose an endpoint for initialCapital)
+      const updated = {
         ...accountDetails,
-        initialCapital: tempCapital,
-        balance: tempCapital,
-      })
-    );
+        initialCapital: newInitial,
+        balance: Number(prevBalance + pnlDelta), // should equal newInitial
+      };
+      setAccountDetails(updated);
 
-    alert("Account updated ✅");
+      // Persist local snapshot in localStorage for reload behavior
+      localStorage.setItem("accountDetails", JSON.stringify(updated));
+
+      alert("Account updated ✅");
+    } catch (err) {
+      console.error("Failed to update account balance:", err);
+      alert(
+        "Failed to update account on server. Check console and try again. No local changes were saved."
+      );
+    }
   };
 
-  const handleReset=()=>{
+  const handleReset = () => {
+    if (
+      !window.confirm(
+        "Are you sure? This will remove local trades and account snapshot from this browser."
+      )
+    )
+      return;
+
     localStorage.removeItem("trades");
     localStorage.removeItem("accountDetails");
+
+    // Clear local account state and re-fetch from server (if available)
+    setAccountDetails(undefined);
+    try {
+      // try to re-fetch from server if getAccount is available
+      if (typeof getAccount === "function") getAccount();
+    } catch (e) {
+      // ignore
+    }
+
     alert("Account has been Reset!");
-    window.location.reload(); // refresh to update UI
-  }
+    // update UI
+    window.location.reload();
+  };
 
   const handleLogout = () => {
-      logoutUser();
-
+    logoutUser();
     navigate("/");
   };
 
@@ -63,15 +123,17 @@ export const MyAccount = () => {
         <div className={styles.accountdata}>
           <div className={styles.accountbox}>
             <p>Initial Capital</p>
-            <h3>${accountDetails.initialCapital}</h3>
+            <h3>${accountDetails?.initialCapital ?? "—"}</h3>
           </div>
           <div className={styles.accountbox}>
             <p>Current Balance</p>
-            <h3>${accountDetails.balance}</h3>
+            <h3>${accountDetails?.balance ?? "—"}</h3>
           </div>
           <div className={styles.accountbox}>
             <p>Total Trades</p>
-            <h3>{accountDetails.totaltrades}</h3>
+            <h3>
+              {accountDetails?.totalTrades ?? accountDetails?.totaltrades ?? 0}
+            </h3>
           </div>
         </div>
       </div>
@@ -84,10 +146,16 @@ export const MyAccount = () => {
             type="number"
             placeholder="Enter Initial Capital"
             name="initialCapital"
-            value={tempCapital || ""}
+            value={tempCapital === "" ? "" : tempCapital}
             onChange={handleInputChange}
+            min="0"
           />
-          <button onClick={changeAccountBalance}>Save</button>
+          <button
+            onClick={changeAccountBalance}
+            disabled={tempCapital === "" || Number.isNaN(Number(tempCapital))}
+          >
+            Save
+          </button>
         </div>
         <p className={styles.warning}>
           ⚠ Updating capital will reset your current balance to the new amount.

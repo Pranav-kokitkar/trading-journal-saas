@@ -14,8 +14,10 @@ router
   .post(authMiddleware, AddTrade)
   .get(authMiddleware, getAllTrades);
 
-router.route("/:id").get(authMiddleware, getTradeByID);
-router.route("/:id/close").patch(authMiddleware, closeTradeByID);
-router.route("/delete/:id").delete(authMiddleware, deleteTradeById);
+router
+  .route("/:id")
+  .get(authMiddleware, getTradeByID)
+  .patch(authMiddleware, closeTradeByID)
+  .delete(authMiddleware, deleteTradeById);
 
 module.exports = router;

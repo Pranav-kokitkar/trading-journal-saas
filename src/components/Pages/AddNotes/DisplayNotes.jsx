@@ -7,7 +7,7 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
   const deleteNote = async (id) => {
     if (!window.confirm("Delete this Note This cannot be undone.")) return;
     try {
-      const response = await fetch(`http://localhost:3000/notes/delete/${id}`, {
+      const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: authorizationToken,

@@ -51,7 +51,7 @@ export const Register = () => {
           email: "",
           password: "",
         });
-        navigate("/");
+        navigate("/app/dashboard");
       } else {
         toast.error(res_data.extraDetails?res_data.extraDetails:res_data.message);
       }

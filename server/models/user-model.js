@@ -1,42 +1,70 @@
+// models/User.js
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    require: true,
-  },
-  email: {
-    type: String,
-    require: true,
-  },
-  password: {
-    type: String,
-    require: true,
-  },
-  iAdmin: {
-    type: Boolean,
-    require: false,
-  },
-});
+const userSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
 
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+
+    // --- Account details & stats (new fields) ---
+    initialCapital: {
+      type: Number,
+      default: 10000,
+    },
+
+    balance: {
+      type: Number,
+      default: 10000,
+    },
+
+    totalTrades: {
+      type: Number,
+      default: 0,
+    },
+
+  },
+  { timestamps: true }
+);
+
+// Hash password before save
 userSchema.pre("save", async function (next) {
   const user = this;
   if (!user.isModified("password")) {
-    next();
+    return next();
   }
 
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(user.password, salt);
     user.password = hashedPassword;
+    next();
   } catch (error) {
     next(error);
   }
 });
 
-userSchema.methods.generateToken = async function () {
+// Generate JWT
+userSchema.methods.generateToken = function () {
   try {
     return jwt.sign(
       {
@@ -44,20 +72,20 @@ userSchema.methods.generateToken = async function () {
         email: this.email,
         isAdmin: this.isAdmin,
       },
-      process.env.JWT_SECRETE_KEY,
-      {
-        expiresIn: "30d",
-      }
+      process.env.JWT_SECRET_KEY || process.env.JWT_SECRETE_KEY, // safe fallback
+      { expiresIn: "30d" }
     );
   } catch (error) {
     console.log("Error while generating token", error);
+    return null;
   }
 };
 
-userSchema.methods.comparePassword = async function (pasword) {
-  return await bcrypt.compare(pasword, this.password);
+// Compare password
+userSchema.methods.comparePassword = async function (password) {
+  return await bcrypt.compare(password, this.password);
 };
 
-const User = new mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;

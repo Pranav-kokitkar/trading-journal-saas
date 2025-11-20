@@ -4,7 +4,6 @@ import { TradeHistory } from "./components/Pages/TradeHistory/TradeHistory";
 import { AddNotes } from "./components/Pages/AddNotes/AddNotes";
 import { Trade } from "./components/Pages/Trade/Trade";
 import { Layout } from "./components/Layout/Layout";
-import { AccountProvider } from "./context/AccountContext";
 import { MyAccount } from "./components/Pages/MyAccount/MyAccount";
 import { Dashboard } from "./components/Pages/Dashboard/Dashboard";
 import { PerformanceProvider } from "./context/PerformanceContext";
@@ -88,11 +87,9 @@ const router = createBrowserRouter(
 
 function App() {
   return (
-    <AccountProvider>
       <PerformanceProvider>
         <RouterProvider router={router} />
       </PerformanceProvider>
-    </AccountProvider>
   );
 }
 

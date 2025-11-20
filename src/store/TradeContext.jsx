@@ -12,7 +12,7 @@ export const TradeProvider = ({ children }) => {
       "TradeProvider: AccountContext is undefined. Make sure <AccountProvider> wraps <TradeProvider>."
     );
   }
-  const { accountDetails, setAccountDetails } = accountCtx || {};
+  const { accountDetails, updateAccount } = accountCtx || {};
 
   const [trades, setTrades] = useState([]);
   const [trade, setTrade] = useState({
@@ -125,11 +125,20 @@ export const TradeProvider = ({ children }) => {
         await getAllTrades();
 
         // Update account details after successful add
-        setAccountDetails((prev = {}) => ({
-          ...prev,
-          balance: normalizedTrade.balanceAfterTrade,
-          totaltrades: (prev.totaltrades || 0) + 1,
-        }));
+        try {
+          if (typeof updateAccount === "function") {
+            await updateAccount({
+              pnl: Number(normalizedTrade.pnl || 0),
+              deltaTrades: 1,
+            });
+
+          } else {
+            console.warn("updateAccount is not a function on AccountContext");
+          }
+        } catch (err) {
+          // non-fatal: trade was added, but account-sync failed — log and allow retry
+          console.error("Failed to update account after AddTrade:", err);
+        }
 
         // reset local trade state
         setTrade({
@@ -177,7 +186,7 @@ export const TradeProvider = ({ children }) => {
   ) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/trades/${id}/close`,
+        `http://localhost:3000/api/trades/${id}`,
         {
           method: "PATCH",
           headers: {

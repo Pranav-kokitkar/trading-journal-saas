@@ -5,6 +5,7 @@ const cors = require("cors");
 const authRoute = require("./routers/Auth-router");
 const tradeRoute = require("./routers/Trade-router");
 const notesRoute = require("./routers/Notes-router");
+const accountRoute = require("./routers/Account-router");
 const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
@@ -22,7 +23,8 @@ app.use(express.json());
 
 app.use("/api/auth/", authRoute);
 app.use("/api/trades/", tradeRoute);
-app.use("/notes", notesRoute);
+app.use("/api/account", accountRoute);
+app.use("/api/notes", notesRoute);
 app.use(errorMiddleware);
 
 PORT = 3000;
