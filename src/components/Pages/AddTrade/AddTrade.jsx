@@ -11,6 +11,7 @@ import { calculateTradeValues } from "../../../utils/tradeUtils";
 import { useAuth } from "../../../store/Auth";
 import { useTrades } from "../../../store/TradeContext"; // renamed to useTrades in TradeContext
 import { PerformanceContext } from "../../../context/PerformanceContext";
+import { toast } from "react-toastify";
 
 export const AddTrade = () => {
   const { authorizationToken } = useAuth();
@@ -157,8 +158,17 @@ export const AddTrade = () => {
       await addTradeFromContext(normalizedTrade);
       refreshPerformance();
     } catch (err) {
-      console.error("Failed to add trade:", err);
-      alert("Failed to add trade — check console for details.");
+      toast.error("Failed to add trade", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 

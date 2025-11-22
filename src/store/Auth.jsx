@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logoutUser = () => {
+    if (!window.confirm("Delete this Note This cannot be undone.")) return;
     localStorage.removeItem("token");
     setToken("");
     setUser(null);

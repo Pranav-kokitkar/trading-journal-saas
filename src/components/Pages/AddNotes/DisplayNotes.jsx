@@ -1,6 +1,6 @@
 import styles from "./DisplayNotes.module.css";
 import { useAuth } from "../../../store/Auth";
-
+import { toast } from "react-toastify";
 export const DisplayNotes = ({ notes, getAllNotes }) => {
   const { authorizationToken } = useAuth();
 
@@ -15,9 +15,27 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
       });
       if (response.ok) {
         await getAllNotes();
-        console.log("note deleted");
+        toast.success("Note deleted", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       } else {
-        console.log("failed to delete");
+        toast.error("Failed to delet note", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       }
     } catch (error) {
       console.log(error);

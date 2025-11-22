@@ -2,6 +2,7 @@
 import { useAuth } from "./Auth";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { AccountContext } from "../context/AccountContext";
+import { toast } from "react-toastify";
 
 export const TradeContext = createContext();
 
@@ -102,7 +103,16 @@ export const TradeProvider = ({ children }) => {
       }
 
       if (response.ok) {
-        console.log("trade added to db", data);
+        toast.success("Trade added succesfully", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
 
         // Refresh trades list after new trade added
         await getAllTrades();
@@ -145,9 +155,17 @@ export const TradeProvider = ({ children }) => {
           tradeNotes: "",
         });
 
-        alert("Trade added successfully");
       } else {
-        console.warn("Failed to add trade. Server response:", data);
+        toast.error("Failed to add trade", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
         const message =
           data?.message || "Failed to add trade — check console for details";
         alert(message);
@@ -199,8 +217,28 @@ export const TradeProvider = ({ children }) => {
       console.log("closeTradeByID response:", response.status, data);
       await getAllTrades();
 
-      if (!response.ok) {
-        // if 409, optionally fetch fresh trade (handled upstream if you want)
+      if(response.ok){
+        toast.success("Trdae close sucessfully", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }else {
+        toast.error("Failed to close tarde", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
         const errMsg = data?.message || `HTTP ${response.status}`;
         throw new Error(errMsg);
       }
@@ -237,6 +275,16 @@ export const TradeProvider = ({ children }) => {
         },
       });
       if (response.ok) {
+        toast.success("Trade deleted", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
         try {
           if (typeof updateAccount === "function") {
             const pnlToAdjust = -parseFloat(pnl || 0) || 0;
@@ -247,7 +295,16 @@ export const TradeProvider = ({ children }) => {
           console.error("updateAccount failed on delete", err);
         }
       } else {
-        console.log("unable to delete");
+        toast.error("Failed to delete trade", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       }
     } catch (err) {
       console.error("Failed to delete trade:", err);

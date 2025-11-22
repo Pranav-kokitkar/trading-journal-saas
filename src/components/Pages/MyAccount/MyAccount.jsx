@@ -107,7 +107,7 @@ export const MyAccount = () => {
 
   const handleLogout = () => {
     logoutUser();
-    navigate("/");
+    navigate("/app/dashboard");
   };
 
   return (

@@ -45,7 +45,16 @@ export const Register = () => {
 
       if (response.ok) {
         storeTokenInLS(res_data.token);
-        console.log("register sucess");
+        toast.success("register sucess", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         setUser({
           name: "",
           email: "",

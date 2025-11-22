@@ -38,6 +38,16 @@ export const Login = () => {
       if (response.ok) {
         storeTokenInLS(res_data.token);
         navigate("/app/dashboard");
+        toast.success("login successful", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
         setUser({
           name: "",
           email: "",
