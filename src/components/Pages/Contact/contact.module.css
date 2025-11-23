@@ -1,0 +1,208 @@
+:root {
+  --bg: #0f1724;
+  --card: #0b1220;
+  --muted: #c3cad5;
+  --accent: #f6b93b;
+  --accent2: #ffd98a;
+  --radius: 12px;
+}
+
+/* Page container */
+.container {
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--bg) 0%, #071226 100%);
+  color: white;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+/* Hero / content area */
+.hero {
+  text-align: center;
+  max-width: 860px;
+  margin: 48px auto;
+}
+
+.title {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.title span {
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  margin-bottom: 22px;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* form */
+.form {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.01),
+    rgba(0, 0, 0, 0.02)
+  );
+  padding: 22px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  width: 100%;
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.6);
+}
+
+.row {
+  display: flex;
+  gap: 12px;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.input,
+.textarea {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+.textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.err {
+  color: #ffc7c7;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* upload row */
+.uploadRow {
+  align-items: center;
+  margin-top: 6px;
+}
+
+.uploadimage {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.uploadLabel {
+  color: var(--muted);
+  font-weight: 700;
+  height: 100%;
+}
+
+.fileInput {
+  display: none;
+}
+
+.uploadBtn {
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: #071226;
+  font-weight: 800;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.removeBtn {
+  margin-left: 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* CTA row matches HomePage style (centered CTAs there) */
+.ctaRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.primaryBtn {
+  padding: 12px 20px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  color: #071226;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.secondaryBtn {
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Footer */
+.footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 18px 0;
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+  .hero {
+    margin: 28px 12px;
+  }
+  .row {
+    flex-direction: column;
+  }
+  .uploadRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .hint {
+    text-align: left;
+  }
+  .ctaRow {
+    flex-direction: column-reverse;
+  }
+}

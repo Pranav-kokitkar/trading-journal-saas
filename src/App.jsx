@@ -12,6 +12,7 @@ import { Login } from "./components/Pages/Authorization/Login";
 import { HomePage } from "./components/Pages/Homepage/HomePage";
 import { ErrorPage } from "./components/Pages/Error/ErrorPage";
 import { ProtectedRoute } from "./components/Pages/Authorization/ProtectedRoute";
+import { Contact } from "./components/Pages/Contact/Contact";
 
 const router = createBrowserRouter(
   [
@@ -33,7 +34,11 @@ const router = createBrowserRouter(
       element: <Login />,
       errorElement: <ErrorPage />,
     },
-
+    {
+      path: "contact",
+      element: <Contact />,
+      errorElement: <ErrorPage />,
+    },
     // Protected App Routes
     {
       path: "/app",
@@ -67,6 +72,12 @@ const router = createBrowserRouter(
         {
           path: "my-account",
           element: <MyAccount />,
+          errorElement: <ErrorPage />,
+        },
+        ,
+        {
+          path: "contact",
+          element: <Contact />,
           errorElement: <ErrorPage />,
         },
 

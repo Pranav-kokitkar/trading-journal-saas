@@ -1,18 +1,13 @@
 import React from "react";
 import styles from "./Homepage.module.css";
 import { Link } from "react-router-dom";
+import { Navbar } from "../../Layout/Navbar";
+import { Footer } from "../../Layout/Footer";
 
 export const HomePage =()=> {
   return (
     <div className={styles.container}>
-      <header className={styles.nav}>
-        <div className={styles.logoBox}>TJ</div>
-        <nav className={styles.links}>
-          <Link to="/register" className={styles.navBtn}>
-            Get Started
-          </Link>
-        </nav>
-      </header>
+      <Navbar/>
 
       <main className={styles.hero}>
         <h1 className={styles.title}>
@@ -34,9 +29,7 @@ export const HomePage =()=> {
         </div>
       </main>
 
-      <footer className={styles.footer}>
-        © 2025 Trading Journal. All rights reserved.
-      </footer>
+      <Footer/>
     </div>
   );
 }

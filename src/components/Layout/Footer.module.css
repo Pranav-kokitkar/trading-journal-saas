@@ -1,0 +1,11 @@
+:root {
+  --muted: #c3cad5;
+}
+
+.footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 18px 0;
+}
