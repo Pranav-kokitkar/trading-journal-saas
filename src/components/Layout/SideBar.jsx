@@ -23,7 +23,7 @@ export const Sidebar = () => {
       {/* Navigation Menu */}
       <nav className={styles.nav}>
         <ul>
-          <li className={styles.active}>
+          <li >
             <NavLink className={getNavLinkClass} to="/app/dashboard">
               Dashboard
             </NavLink>
@@ -41,6 +41,11 @@ export const Sidebar = () => {
           <li>
             <NavLink className={getNavLinkClass} to="/app/add-notes">
               Add Notes
+            </NavLink>
+          </li>
+          <li>
+            <NavLink className={getNavLinkClass} to="/app/contact">
+            Contact
             </NavLink>
           </li>
         </ul>

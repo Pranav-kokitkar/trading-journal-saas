@@ -20,6 +20,21 @@
   padding: 0 16px 20px 16px;
 }
 
+/* Text gets highlighted when active */
+.active {
+  color: #ffd98a !important; /* gold accent text */
+  transform: translateX(4px);
+  transition: all 0.2s ease-out;
+  border-radius: 8px;
+}
+
+/* .navlink {
+  color: #ffffff;
+  text-decoration: none;
+  width: 100%;
+  display: block;
+  font-weight: 600;
+} */
 /* keep same font family container */
 .logoText {
   font-family: Arial, sans-serif;
@@ -38,7 +53,7 @@
 .logoText p {
   margin: 0;
   font-size: 12px;
-  color: #9aa4b2; /* muted theme color */
+  color: #9aa4b2;
 }
 
 /* nav list structure preserved exactly */
@@ -75,13 +90,6 @@
 /* active keeps same class name but themed color (no structural change) */
 
 /* navlink stays as text link; keep structure unchanged */
-.navlink {
-  color: #ffffff;
-  text-decoration: none;
-  width: 100%;
-  display: block;
-  font-weight: 600;
-}
 
 /* user area layout preserved */
 .user {

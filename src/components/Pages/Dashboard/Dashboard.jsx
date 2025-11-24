@@ -42,7 +42,9 @@ export const Dashboard = () => {
         performance={performance}
       />
 
-      <h2 className={styles.tradingperformanceh2}>Trading Performance</h2>
+      <h1 >
+        Trading <span className={styles.span}>Performance</span>{" "}
+      </h1>
       <div className={styles.tradingperformance}>
         <div className={styles.chartCard}>
           <h3>Equity Curve</h3>
@@ -76,7 +78,9 @@ export const Dashboard = () => {
 const TradingDashboard = ({ accountDetails, performance }) => {
   return (
     <div>
-      <h2>Trading Dashboard</h2>
+      <h1>
+        Trading <span className={styles.span}>Dashboard</span>
+      </h1>
       <div className={styles.tradingdata}>
         {/* Left side */}
         <div className={styles.tradingdatal}>

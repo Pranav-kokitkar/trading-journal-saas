@@ -11,7 +11,6 @@
 
 /* Page wrapper (keeps same layout behavior) */
 .addnotescontainer {
-  background: linear-gradient(180deg, var(--bg), #071226);
   min-height: 100vh;
   display: flex;
   flex-direction: column;

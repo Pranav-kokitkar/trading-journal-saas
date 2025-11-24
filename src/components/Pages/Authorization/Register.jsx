@@ -1,7 +1,7 @@
 // src/pages/Register.jsx
 import React, { useRef, useState } from "react";
 import styles from "./Auth.module.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
 
@@ -14,6 +14,7 @@ export const Register = () => {
   const navigate = useNavigate();
   const confirmPasswordRef = useRef();
   const { storeTokenInLS } = useAuth();
+  const {isLoggedIn} = useAuth();
 
   const handleChange = async (e) => {
     let name = e.target.name;
@@ -68,6 +69,10 @@ export const Register = () => {
       console.log("error while register",error);
     }
   };
+
+  if(isLoggedIn){
+    return <Navigate to="/app/dashboard" replace />;
+  }
 
   return (
     <div className={styles.container}>

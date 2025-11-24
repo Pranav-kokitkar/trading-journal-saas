@@ -1,7 +1,7 @@
 // src/pages/Login.jsx
 import React, { useState } from "react";
 import styles from "./Auth.module.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
 
@@ -12,6 +12,7 @@ export const Login = () => {
   });
 
   const { storeTokenInLS } = useAuth();
+  const {isLoggedIn} = useAuth();
 
   const navigate = useNavigate();
 
@@ -62,6 +63,10 @@ export const Login = () => {
       console.log("error while login", error);
     }
   };
+
+  if(isLoggedIn){
+    return <Navigate to="/app/dashboard" replace/>
+  }
 
   return (
     <div className={styles.container}>

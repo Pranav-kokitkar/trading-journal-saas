@@ -11,14 +11,27 @@
 
 /* Reset */
 h2,
+h1,
 h3 {
   margin: 0;
   padding: 0;
 }
 
+h1 {
+  font-size: 35px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 10px;
+}
+
+.span {
+  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
 /* ============= MAIN PAGE ============= */
 .dashboard {
-  background: linear-gradient(180deg, var(--bg), #071226);
   min-height: 100vh;
   padding: 1rem 6rem;
   color: #e6eef6;
@@ -140,6 +153,7 @@ h3 {
   column-gap: 40px;
   row-gap: 140px;
   margin: auto;
+  margin-top: 80px;
 }
 
 .chartCard {

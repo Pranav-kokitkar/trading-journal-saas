@@ -3,6 +3,7 @@ import styles from "./contact.module.css";
 import { Link } from "react-router-dom";
 import { Navbar } from "../../Layout/Navbar";
 import { Footer } from "../../Layout/Footer";
+import { useAuth } from "../../../store/Auth";
 
 export const Contact= () => {
   const [form, setForm] = useState({
@@ -14,6 +15,7 @@ export const Contact= () => {
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
   const fileRef = useRef();
+  const {isLoggedIn} = useAuth();
 
   const validate = () => {
     const e = {};
@@ -65,8 +67,8 @@ export const Contact= () => {
   };
 
   return (
-    <div className={styles.container}>
-      <Navbar/>
+    <div className={`${styles.container} ${!isLoggedIn && styles.containerbg}`}>
+      {!isLoggedIn ? <Navbar /> : ""}
 
       <main className={styles.hero}>
         <h1 className={styles.title}>
@@ -181,7 +183,7 @@ export const Contact= () => {
         </form>
       </main>
 
-      <Footer/>
+      {!isLoggedIn ? <Footer /> : ""}
     </div>
   );
 };

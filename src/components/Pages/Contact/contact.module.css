@@ -10,11 +10,15 @@
 /* Page container */
 .container {
   min-height: 100vh;
-  background: linear-gradient(180deg, var(--bg) 0%, #071226 100%);
+
   color: white;
   padding: 24px;
   display: flex;
   flex-direction: column;
+}
+
+.containerbg {
+  background: linear-gradient(180deg, var(--bg) 0%, #071226 100%);
 }
 /* Hero / content area */
 .hero {
