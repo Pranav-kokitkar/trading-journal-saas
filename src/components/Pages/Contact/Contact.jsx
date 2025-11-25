@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import styles from "./contact.module.css";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Navbar } from "../../Layout/Navbar";
 import { Footer } from "../../Layout/Footer";
 import { useAuth } from "../../../store/Auth";
@@ -14,8 +14,21 @@ export const Contact= () => {
   });
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
+  const [userData, setUserData] = useState(true)
   const fileRef = useRef();
   const {isLoggedIn} = useAuth();
+  const {user} = useAuth();
+
+  if(isLoggedIn){
+    if(userData && user){
+      setForm((prev) => ({
+        ...prev, 
+        name: user.name || prevForm.name, 
+        email: user.email || prevForm.email, 
+      }));
+      setUserData(false);
+    }
+  }
 
   const validate = () => {
     const e = {};
@@ -90,6 +103,7 @@ export const Contact= () => {
                 onChange={handleChange}
                 className={styles.input}
                 placeholder="Your name"
+                readOnly={isLoggedIn}
               />
               {errors.name && <div className={styles.err}>{errors.name}</div>}
             </label>
@@ -102,6 +116,7 @@ export const Contact= () => {
                 onChange={handleChange}
                 className={styles.input}
                 placeholder="you@domain.com"
+                readOnly={isLoggedIn}
               />
               {errors.email && <div className={styles.err}>{errors.email}</div>}
             </label>
