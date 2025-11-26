@@ -10,13 +10,12 @@ const contactSchema = new Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
     trim: true,
   },
   subject: { type: String, required: true, maxLength: 100 },
   message: { type: String, required: true },
 });
 
-const Contact = new model("contact", contactSchema);
+const Contact = mongoose.model("contact", contactSchema);
 
 module.exports = Contact;
