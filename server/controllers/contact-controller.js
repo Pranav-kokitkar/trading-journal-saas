@@ -6,10 +6,11 @@ const contactForm = async (req, res) => {
     await Contact.create({ name, email, subject, message });
     res.status(200).json({ message: "submitted" });
   } catch (error) {
-    console.log(error);
-    return res
-      .status(400)
-      .json({ message: "error from server while submitting contact" });
+    console.log("CONTACT ERROR:", error);
+    return res.status(400).json({
+      message: "error from server while submitting contact",
+      error: error.message,
+    });
   }
 };
 

@@ -1,11 +1,12 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "./contact.module.css";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Navbar } from "../../Layout/Navbar";
 import { Footer } from "../../Layout/Footer";
 import { useAuth } from "../../../store/Auth";
+import { toast } from "react-toastify";
 
-export const Contact= () => {
+export const Contact = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -14,21 +15,22 @@ export const Contact= () => {
   });
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
-  const [userData, setUserData] = useState(true)
+  const [userData, setUserData] = useState(true);
   const fileRef = useRef();
-  const {isLoggedIn} = useAuth();
-  const {user} = useAuth();
 
-  if(isLoggedIn){
-    if(userData && user){
+  const { isLoggedIn, user } = useAuth();
+
+  // ✅ Prefill form from user once when logged in
+  useEffect(() => {
+    if (isLoggedIn && user && userData) {
       setForm((prev) => ({
-        ...prev, 
-        name: user.name || prevForm.name, 
-        email: user.email || prevForm.email, 
+        ...prev,
+        name: user.name || prev.name,
+        email: user.email || prev.email,
       }));
       setUserData(false);
     }
-  }
+  }, [isLoggedIn, user, userData]);
 
   const validate = () => {
     const e = {};
@@ -57,26 +59,54 @@ export const Contact= () => {
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const handleSubmit = (ev) => {
+  const handleSubmit = async (ev) => {
     ev.preventDefault();
-    const v = validate();
-    setErrors(v);
-    if (Object.keys(v).length) return;
 
-    // Build payload (replace with API call)
-    const payload = {
-      ...form,
-      screenshot: file ? file.name : null,
-      ts: new Date().toISOString(),
-    };
-
-    console.log("Contact submit:", payload);
-    alert("Thanks — your message has been submitted. (check console)");
-
-    // reset
-    setForm({ name: "", email: "", subject: "", message: "" });
-    removeFile();
+    // ✅ Run validation before submit
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
     setErrors({});
+
+    try {
+      const response = await fetch(`http://localhost:3000/api/contact/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      if (response.ok) {
+        toast.success("submitted", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+
+        setForm({
+          name: isLoggedIn && user?.name ? user.name : "",
+          email: isLoggedIn && user?.email ? user.email : "",
+          subject: "",
+          message: "",
+        });
+
+        setErrors({});
+        setFile(null);
+        if (fileRef.current) fileRef.current.value = "";
+      } else {
+        toast.error("Failed to submit");
+      }
+    } catch (error) {
+      console.log("Contact error", error);
+    }
   };
 
   return (
