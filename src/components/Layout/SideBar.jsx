@@ -16,7 +16,7 @@ export const Sidebar = () => {
       <div className={styles.logo}>
         <div className={styles.logoText}>
           <h3>Log My Trade</h3>
-          <p>Professional Trading journal software</p>
+          <p>Professional Trading journal  </p>
         </div>
       </div>
 
@@ -40,7 +40,7 @@ export const Sidebar = () => {
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/app/add-notes">
-              Add Notes
+              Notes
             </NavLink>
           </li>
           <li>

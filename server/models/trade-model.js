@@ -32,6 +32,10 @@ const tradeSchema = new mongoose.Schema({
   dateTime: { type: Date, required: true },
   tradeNotes: { type: String, default: "" },
   tradeStatus: { type: String, default: "" },
+  screenshots: {
+    type: [String],
+    default: [],
+  },
 });
 
 const Trade = new mongoose.model("Trade", tradeSchema);

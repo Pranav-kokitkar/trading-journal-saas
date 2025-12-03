@@ -167,6 +167,20 @@
   color: #fff;
 }
 
+.notesHeader {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.notebtn {
+  padding: 1px 10px;
+  border-radius: 7px;
+  border: 2px solid #f6b93b;
+  background: none;
+  color: #f6b93b;
+}
+
 /* Screenshot */
 .tradeScreenshot {
   background: linear-gradient(
@@ -177,12 +191,30 @@
   border-radius: 10px;
   min-height: 200px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column; /* stack label + images */
+  align-items: flex-start; /* left align content */
+  justify-content: flex-start;
+  padding: 1rem 1.25rem; /* inner spacing */
+  gap: 2.25rem; /* space between label and list */
   color: var(--muted);
   font-size: 0.95rem;
   margin-bottom: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.screenshotList {
+  display: flex;
+  flex-wrap: wrap; /* allow multiple screenshots to wrap */
+  gap: 2rem;
+  width: 100%; /* take full card width */
+}
+
+.screenshotList img {
+  width: 400px; /* default width on larger screens */
+  max-width: 100%; /* never overflow container */
+  height: auto;
+  border-radius: 4px;
+  object-fit: cover;
 }
 
 /* Buttons row */
@@ -254,6 +286,24 @@
 
   .tradeBtns button {
     width: 100%;
+  }
+
+  /* ✅ make screenshot block nicer on mobile */
+  .tradeScreenshot {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  /* Responsive tweaks for screenshots */
+
+  .screenshotList {
+    justify-content: flex-start;
+  }
+
+  .screenshotList img {
+    width: 100%; /* image fills card width on tablet/mobile */
+    max-width: 100%;
   }
 }
 
@@ -407,6 +457,18 @@
 .cancelBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 26px rgba(2, 6, 23, 0.12);
+}
+
+.editTextArea {
+  width: 100%;
+  background: #0d111700;
+  border: 1px solid #3b3f46;
+  color: #fff;
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  min-height: 140px;
+  resize: vertical;
 }
 
 /* Animation */

@@ -15,9 +15,9 @@ import { toast } from "react-toastify";
 
 export const AddTrade = () => {
   const { authorizationToken } = useAuth();
-  const { AddTrade: addTradeFromContext } = useTrades(); 
+  const { AddTrade: addTradeFromContext } = useTrades();
 
-  const {refreshPerformance} = useContext(PerformanceContext);
+  const { refreshPerformance } = useContext(PerformanceContext);
 
   // get accountDetails from AccountContext (this was missing)
   const { accountDetails } = useContext(AccountContext) || {};
@@ -43,6 +43,9 @@ export const AddTrade = () => {
     dateNtime: "",
     tradeNotes: "",
   });
+
+  // ✅ NEW: hold up to 2 screenshot files selected in the UI
+  const [screenshots, setScreenshots] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -155,7 +158,8 @@ export const AddTrade = () => {
     }
 
     try {
-      await addTradeFromContext(normalizedTrade);
+      // ✅ PASS screenshots to context so it can send them with the request
+      await addTradeFromContext(normalizedTrade, screenshots);
       refreshPerformance();
     } catch (err) {
       toast.error("Failed to add trade", {
@@ -186,7 +190,13 @@ export const AddTrade = () => {
           }
         />
         <TradeCalculator trade={trade} setTrade={setTrade} />
-        <TradeInfo trade={trade} handleChange={handleChange} />
+        {/* ✅ now passes screenshot state + setter down */}
+        <TradeInfo
+          trade={trade}
+          handleChange={handleChange}
+          screenshots={screenshots}
+          setScreenshots={setScreenshots}
+        />
         <Buttons setTrade={setTrade} />
       </form>
     </section>

@@ -1,9 +1,10 @@
 // src/pages/Login.jsx
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
+import { PerformanceContext } from "../../../context/PerformanceContext";
 
 export const Login = () => {
   const [user, setUser] = useState({
@@ -13,6 +14,7 @@ export const Login = () => {
 
   const { storeTokenInLS } = useAuth();
   const {isLoggedIn} = useAuth();
+  const { refreshPerformance } = useContext(PerformanceContext);
 
   const navigate = useNavigate();
 
@@ -65,6 +67,7 @@ export const Login = () => {
   };
 
   if(isLoggedIn){
+    refreshPerformance();
     return <Navigate to="/app/dashboard" replace/>
   }
 

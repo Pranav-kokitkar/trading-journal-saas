@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Trade = require("../models/trade-model");
+const cloudinary = require("../config/cloudinary");
 
 const AddTrade = async (req, res, next) => {
   try {
@@ -36,6 +37,44 @@ const AddTrade = async (req, res, next) => {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    // ✅ NEW: handle exitedPrice coming as JSON string from FormData
+    let parsedExitedPrice = exitedPrice;
+    if (typeof parsedExitedPrice === "string") {
+      try {
+        parsedExitedPrice = JSON.parse(parsedExitedPrice);
+      } catch (e) {
+        parsedExitedPrice = [];
+      }
+    }
+
+    // ⬇️ HANDLE UP TO 2 SCREENSHOT FILES (from upload.array("screenshots", 2))
+    const files = Array.isArray(req.files) ? req.files : [];
+    const screenshotUrls = [];
+
+    for (const file of files) {
+      try {
+        const result = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            {
+              folder: "trading-journal/trades", // folder in Cloudinary
+            },
+            (error, uploadResult) => {
+              if (error) return reject(error);
+              resolve(uploadResult);
+            }
+          );
+
+          uploadStream.end(file.buffer);
+        });
+
+        if (result && result.secure_url) {
+          screenshotUrls.push(result.secure_url);
+        }
+      } catch (err) {
+        console.error("Cloudinary upload error (trade screenshot):", err);
+      }
+    }
+
     const tradeToSave = {
       userId,
       marketType,
@@ -45,12 +84,15 @@ const AddTrade = async (req, res, next) => {
       stoplossPrice: Number(stoplossPrice),
       takeProfitPrice:
         takeProfitPrice == null ? undefined : Number(takeProfitPrice),
-      exitedPrice: Array.isArray(exitedPrice)
-        ? exitedPrice.map((e) => ({
+
+      // ✅ CHANGED: use parsedExitedPrice instead of raw exitedPrice
+      exitedPrice: Array.isArray(parsedExitedPrice)
+        ? parsedExitedPrice.map((e) => ({
             price: Number(e.price),
             volume: Number(e.volume),
           }))
         : [],
+
       rr: rr == null ? 0 : Number(rr),
       pnl: pnl == null ? 0 : Number(pnl),
       tradeResult: tradeResult || "",
@@ -59,9 +101,13 @@ const AddTrade = async (req, res, next) => {
       balanceAfterTrade:
         balanceAfterTrade == null ? 0 : Number(balanceAfterTrade),
       tradeNumber: tradeNumber == null ? 0 : Number(tradeNumber),
+
+      // array of screenshot URLs (0–2)
+      screenshots: screenshotUrls,
+
       dateTime: dateTime ? new Date(dateTime) : new Date(),
       tradeNotes: tradeNotes || "",
-      tradeStatus: (tradeStatus || "").toString().trim(), // <-- include it
+      tradeStatus: (tradeStatus || "").toString().trim(),
     };
 
     const savedTrade = await Trade.create(tradeToSave);
@@ -101,7 +147,6 @@ const getTradeByID = async (req, res, next) => {
 
 const closeTradeByID = async (req, res, next) => {
   try {
-    // DEBUG: helps identify why Postman returned {"message":{}}
     console.log("CLOSE TRADE called:", {
       params: req.params,
       body: req.body,
@@ -116,15 +161,7 @@ const closeTradeByID = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid trade id" });
     }
 
-    // Expect body to include final fields from frontend
-    const {
-      exitedPrice,
-      pnl,
-      rr,
-      tradeResult,
-      balanceAfterTrade,
-      // note: no exitReason expected per your schema
-    } = req.body;
+    const { exitedPrice, pnl, rr, tradeResult, balanceAfterTrade } = req.body;
 
     if (!Array.isArray(exitedPrice) || exitedPrice.length === 0) {
       return res
@@ -132,7 +169,6 @@ const closeTradeByID = async (req, res, next) => {
         .json({ message: "exitedPrice must be a non-empty array" });
     }
 
-    // Validate each exit level
     for (const lvl of exitedPrice) {
       if (typeof lvl !== "object") {
         return res.status(400).json({
@@ -148,20 +184,17 @@ const closeTradeByID = async (req, res, next) => {
       }
     }
 
-    // Optional percent-volume check (only if you store percentages)
     const totalVolume = exitedPrice.reduce(
       (s, l) => s + Number(l.volume || 0),
       0
     );
     if (Math.abs(totalVolume - 100) > 0.01 && totalVolume !== 0) {
-      // allow totalVolume===0 if you use absolute volumes instead of percent
       return res.status(400).json({
         message:
           "Sum of exit volumes should equal 100 if volumes are percentages.",
       });
     }
 
-    // Validate numeric fields if provided
     if (pnl !== undefined && !isFinite(Number(pnl))) {
       return res.status(400).json({ message: "pnl must be a valid number" });
     }
@@ -177,7 +210,6 @@ const closeTradeByID = async (req, res, next) => {
         .json({ message: "balanceAfterTrade must be a valid number" });
     }
 
-    // Ensure trade exists and belongs to user
     const trade = await Trade.findById(tradeId).lean();
     if (!trade) return res.status(404).json({ message: "Trade not found" });
 
@@ -187,7 +219,6 @@ const closeTradeByID = async (req, res, next) => {
         .json({ message: "Not allowed to close this trade" });
     }
 
-    // Only allow close if current tradeStatus is "live"
     const rawStatus = (trade.tradeStatus || trade.status || "")
       .toString()
       .toLowerCase()
@@ -198,7 +229,6 @@ const closeTradeByID = async (req, res, next) => {
       });
     }
 
-    // Prepare update object
     const update = {
       exitedPrice: exitedPrice.map((lvl) => ({
         price: Number(lvl.price),
@@ -216,7 +246,6 @@ const closeTradeByID = async (req, res, next) => {
       exitTime: new Date().toISOString(),
     };
 
-    // Atomic conditional update: only update if status still live and owner matches
     const filter = { _id: tradeId, userId: userId, tradeStatus: "live" };
     const opts = { new: true, returnDocument: "after" };
     const updated = await Trade.findOneAndUpdate(filter, update, opts).lean();
@@ -247,10 +276,22 @@ const deleteTradeById = async (req, res, next) => {
   }
 };
 
+const updateTradeNotesById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const tardeNotes = req.body;
+    const response = await Trade.updateOne({ _id: id }, { $set: tardeNotes });
+    res.status(200).json({ message: "update success" });
+  } catch (error) {
+    res.status(400).json({ message: "failed to update notes" });
+  }
+};
+
 module.exports = {
   AddTrade,
   getAllTrades,
   getTradeByID,
   closeTradeByID,
   deleteTradeById,
+  updateTradeNotesById,
 };

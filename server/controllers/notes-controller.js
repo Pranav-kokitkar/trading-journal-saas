@@ -18,7 +18,7 @@ const getAllNotes = async (req, res) => {
 
     const notes = await Notes.find({ userId });
 
-     return res.status(200).json(notes);
+    return res.status(200).json(notes);
   } catch (error) {
     return res.status(500).json({ message: "Failed to get notes from server" });
   }
@@ -34,4 +34,18 @@ const deleteNoteByID = async (req, res) => {
   }
 };
 
-module.exports = { addNotes, getAllNotes, deleteNoteByID };
+const editNoteByID = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updatedNote = req.body;
+    const updateNote = await Notes.updateOne(
+      { _id: id },
+      { $set: updatedNote }
+    );
+    res.status(200).json(updateNote);
+  } catch (error) {
+    res.status(400).json({ message: "Failed to edit" });
+  }
+};
+
+module.exports = { addNotes, getAllNotes, deleteNoteByID, editNoteByID };

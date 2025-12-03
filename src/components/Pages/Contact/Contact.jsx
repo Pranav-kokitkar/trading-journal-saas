@@ -71,12 +71,21 @@ export const Contact = () => {
     setErrors({});
 
     try {
+      // Use FormData instead of JSON to send text + file
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("email", form.email);
+      formData.append("subject", form.subject);
+      formData.append("message", form.message);
+
+      // "screenshot" must match upload.single("screenshot") in router
+      if (file) {
+        formData.append("screenshot", file);
+      }
+
       const response = await fetch(`http://localhost:3000/api/contact/`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(form),
+        body: formData, // ❗ NO "Content-Type" header here – browser will set it
       });
 
       if (response.ok) {
@@ -102,12 +111,22 @@ export const Contact = () => {
         setFile(null);
         if (fileRef.current) fileRef.current.value = "";
       } else {
-        toast.error("Failed to submit");
+        toast.error("Failed to submit", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       }
     } catch (error) {
       console.log("Contact error", error);
     }
   };
+
 
   return (
     <div className={`${styles.container} ${!isLoggedIn && styles.containerbg}`}>
@@ -195,7 +214,7 @@ export const Contact = () => {
                 id="contact-screenshot"
               />
               <label htmlFor="contact-screenshot" className={styles.uploadBtn}>
-                {file ? "Replace screenshot" : "Upload screenshot"}
+                {file ? "Replace " : "Upload "}
               </label>
 
               {file && (

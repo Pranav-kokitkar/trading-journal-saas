@@ -14,6 +14,7 @@ const contactSchema = new Schema({
   },
   subject: { type: String, required: true },
   message: { type: String, required: true },
+  screenshotUrl: { type: String },
   submittedAt: { type: Date, default: Date.now },
 });
 

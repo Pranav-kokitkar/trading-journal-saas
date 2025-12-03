@@ -84,97 +84,120 @@ export const TradeProvider = ({ children }) => {
     }
   }
 
-  const AddTrade = async (normalizedTrade) => {
-    try {
-      const response = await fetch("http://localhost:3000/api/trades", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authorizationToken,
-        },
-        body: JSON.stringify(normalizedTrade),
-      });
-
-      let data = {};
+    const AddTrade = async (normalizedTrade, screenshots = []) => {
       try {
-        data = await response.json();
-      } catch (err) {
-        // ignore parse error
-      }
+        // ✅ Build FormData instead of raw JSON
+        const formData = new FormData();
 
-      if (response.ok) {
-        toast.success("Trade added succesfully", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
+        // Append all normalizedTrade fields
+        Object.entries(normalizedTrade).forEach(([key, value]) => {
+          if (value === undefined || value === null) return;
+
+          if (Array.isArray(value)) {
+            // e.g. exitedPrice -> send as JSON string
+            formData.append(key, JSON.stringify(value));
+          } else {
+            formData.append(key, value);
+          }
         });
 
-        // Refresh trades list after new trade added
-        await getAllTrades();
-
-        // Update account details after successful add
-        try {
-          if (typeof updateAccount === "function") {
-            await updateAccount({
-              pnl: Number(normalizedTrade.pnl || 0),
-              deltaTrades: 1,
-            });
-          } else {
-            console.warn("updateAccount is not a function on AccountContext");
-          }
-        } catch (err) {
-          // non-fatal: trade was added, but account-sync failed — log and allow retry
-          console.error("Failed to update account after AddTrade:", err);
+        // Append up to 2 screenshot files (field name: "screenshots")
+        if (Array.isArray(screenshots)) {
+          screenshots.slice(0, 2).forEach((file) => {
+            if (file) {
+              formData.append("screenshots", file);
+            }
+          });
         }
 
-        // reset local trade state
-        setTrade({
-          id: "",
-          marketType: "",
-          symbol: "",
-          tradedirection: "",
-          entryPrice: "",
-          stoplossPrice: "",
-          riskType: "",
-          takeProfitPrice: "",
-          tradeStatus: "",
-          exitedPrice: [{ price: "", volume: "" }],
-          rr: "",
-          pnl: "",
-          tradeResult: "",
-          riskamount: "",
-          riskPercent: "",
-          balanceAfterTrade: "",
-          tradeNumber: "",
-          dateNtime: "",
-          tradeNotes: "",
+        const response = await fetch("http://localhost:3000/api/trades", {
+          method: "POST",
+          headers: {
+            // ❗️NO "Content-Type" here – browser sets multipart boundary
+            Authorization: authorizationToken,
+          },
+          body: formData,
         });
 
-      } else {
-        toast.error("Failed to add trade", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-        const message =
-          data?.message || "Failed to add trade — check console for details";
-        alert(message);
+        let data = {};
+        try {
+          data = await response.json();
+        } catch (err) {
+          // ignore parse error
+        }
+
+        if (response.ok) {
+          toast.success("Trade added succesfully", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+
+          // Refresh trades list after new trade added
+          await getAllTrades();
+
+          // Update account details after successful add
+          try {
+            if (typeof updateAccount === "function") {
+              await updateAccount({
+                pnl: Number(normalizedTrade.pnl || 0),
+                deltaTrades: 1,
+              });
+            } else {
+              console.warn("updateAccount is not a function on AccountContext");
+            }
+          } catch (err) {
+            console.error("Failed to update account after AddTrade:", err);
+          }
+
+          // reset local trade state
+          setTrade({
+            id: "",
+            marketType: "",
+            symbol: "",
+            tradedirection: "",
+            entryPrice: "",
+            stoplossPrice: "",
+            riskType: "",
+            takeProfitPrice: "",
+            tradeStatus: "",
+            exitedPrice: [{ price: "", volume: "" }],
+            rr: "",
+            pnl: "",
+            tradeResult: "",
+            riskamount: "",
+            riskPercent: "",
+            balanceAfterTrade: "",
+            tradeNumber: "",
+            dateNtime: "",
+            tradeNotes: "",
+          });
+        } else {
+          toast.error("Failed to add trade", {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+          const message =
+            data?.message || "Failed to add trade — check console for details";
+          alert(message);
+        }
+      } catch (error) {
+        console.error("add trade to db error", error);
+        alert("Network or unexpected error — see console");
       }
-    } catch (error) {
-      console.error("add trade to db error", error);
-      alert("Network or unexpected error — see console");
-    }
-  };
+    };
+
 
   const closeTradeByID = async (
     id,

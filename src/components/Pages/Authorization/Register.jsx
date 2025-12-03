@@ -1,9 +1,10 @@
 // src/pages/Register.jsx
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
+import { PerformanceContext } from "../../../context/PerformanceContext";
 
 export const Register = () => {
   const [user, setUser] = useState({
@@ -15,6 +16,7 @@ export const Register = () => {
   const confirmPasswordRef = useRef();
   const { storeTokenInLS } = useAuth();
   const {isLoggedIn} = useAuth();
+  const {refreshPerformance} = useContext(PerformanceContext)
 
   const handleChange = async (e) => {
     let name = e.target.name;
@@ -71,6 +73,7 @@ export const Register = () => {
   };
 
   if(isLoggedIn){
+    refreshPerformance();
     return <Navigate to="/app/dashboard" replace />;
   }
 

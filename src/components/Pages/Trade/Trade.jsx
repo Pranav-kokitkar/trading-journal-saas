@@ -8,13 +8,13 @@ import { AccountContext } from "../../../context/AccountContext";
 import { PerformanceContext } from "../../../context/PerformanceContext";
 import { TradeContext, useTrades } from "../../../store/TradeContext";
 import { useAuth } from "../../../store/Auth";
+import { toast } from "react-toastify";
 
 export const Trade = () => {
   // use updateAccount instead of setAccountDetails so backend receives pnl in body
   const { accountDetails, updateAccount } = useContext(AccountContext);
   const { refreshPerformance } = useContext(PerformanceContext);
-  const {deleteTradeByID} = useContext(TradeContext);
-
+  const { deleteTradeByID } = useContext(TradeContext);
 
   const { id } = useParams();
   const navigate = useNavigate();
@@ -22,6 +22,8 @@ export const Trade = () => {
   // get trades
   const { trades = [], refreshTrades, closeTradeByID } = useTrades() || {};
 
+  const [isEditingNote, setIsEditingNote] = useState(false);
+  const [updatedNote, setUpdatedNote] = useState("");
   const [closeTrade, setCloseTrade] = useState(false);
   const [isMultipleTP, setIsMultipleTP] = useState(false);
   const [exitLevels, setExitLevels] = useState([]);
@@ -29,6 +31,9 @@ export const Trade = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [triedRefresh, setTriedRefresh] = useState(false);
+
+  // ✅ NEW: local state to hold trade fetched directly by ID (for refresh / deep link)
+  const [fetchedTrade, setFetchedTrade] = useState(null);
 
   const { authorizationToken } = useAuth();
 
@@ -42,7 +47,10 @@ export const Trade = () => {
   };
 
   // Try to find trade in context
-  const trade = findTradeById(trades, id);
+  const contextTrade = findTradeById(trades, id);
+
+  // ✅ Use trade from context if available, otherwise fall back to fetchedTrade
+  const trade = contextTrade || fetchedTrade;
 
   // keep tradeStatus synced when we have trade
   useEffect(() => {
@@ -51,10 +59,42 @@ export const Trade = () => {
     }
   }, [trade]);
 
+  // ✅ NEW: if trade is not in context, fetch it directly from backend by ID
+  useEffect(() => {
+    const fetchSingleTrade = async () => {
+      // if we already have it from context or no token, skip
+      if (contextTrade || !authorizationToken) return;
+
+      try {
+        setIsLoading(true);
+        const res = await fetch(`http://localhost:3000/api/trades/${id}`, {
+          method: "GET",
+          headers: {
+            Authorization: authorizationToken,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setFetchedTrade(data);
+        } else {
+          console.error("Failed to fetch trade by id:", res.status);
+        }
+      } catch (err) {
+        console.error("Error fetching trade by id:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSingleTrade();
+  }, [id, contextTrade, authorizationToken]);
+
   // If trade is missing, attempt one guarded refresh of the context trades (context-first approach)
   useEffect(() => {
     let mounted = true;
     const tryRefresh = async () => {
+      // if we already have a trade (from context or fetch) or we already tried, or no refresh function
       if (trade || triedRefresh || typeof refreshTrades !== "function") return;
       try {
         setIsLoading(true);
@@ -72,10 +112,10 @@ export const Trade = () => {
     return () => {
       mounted = false;
     };
-    // only re-run if id changes or refreshTrades identity changes
+    // only re-run if id changes or refreshTrades identity changes, or trade/triedRefresh changes
   }, [id, trade, triedRefresh, refreshTrades]);
 
-  if (isLoading) return <p>Loading trade…</p>;
+  if (isLoading && !trade) return <p>Loading trade…</p>;
   if (!trade) return <p>Trade not found</p>;
 
   // --- Exit Handlers ---
@@ -166,15 +206,16 @@ export const Trade = () => {
         throw new Error("Server did not return updated trade.");
       }
 
+      // Optional: keep local fetchedTrade in sync if we fetched it directly
+      setFetchedTrade(closedTrade);
+
       // 3) refresh local lists & performance (server is source of truth)
       await refreshTrades();
 
-      // 4) update account on server by sending pnl in body so backend can adjust account
       // 4) update account on server by sending pnl (do NOT change totalTrades when closing)
       try {
         if (typeof updateAccount === "function") {
           await updateAccount({ pnl });
-
         }
       } catch (err) {
         console.error("updateAccount failed", err);
@@ -199,6 +240,60 @@ export const Trade = () => {
     await deleteTradeByID(id, trade.pnl);
     navigate("/app/trade-history");
     refreshPerformance();
+  };
+
+  const handleEdit = () => {
+    setIsEditingNote(true);
+    if (trade.tradeNotes) {
+      setUpdatedNote(trade.tradeNotes);
+    } else {
+      setUpdatedNote("");
+    }
+  };
+
+  const SaveNote = async (id) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/trades/${id}/note`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorizationToken,
+          },
+          body: JSON.stringify({
+            tradeNotes: updatedNote,
+          }),
+        }
+      );
+      if (response.ok) {
+        setIsEditingNote(false);
+        refreshTrades();
+        toast.success("Note Updated", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      } else {
+        toast.error("Failed to update note", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   // Colors
@@ -275,13 +370,66 @@ export const Trade = () => {
 
         {/* Notes */}
         <div className={styles.tradeDescription}>
-          <h4>Trade Notes</h4>
-          <p>{trade.tradeNotes}</p>
+          <div className={styles.notesHeader}>
+            <h4>Trade Notes</h4>
+            {!isEditingNote ? (
+              <button onClick={handleEdit} className={styles.notebtn}>
+                {trade.tradeNotes ? "Edit" : "Add"}
+              </button>
+            ) : (
+              <button
+                onClick={() => SaveNote(trade._id)}
+                className={styles.notebtn}
+              >
+                Save
+              </button>
+            )}
+          </div>
+
+          <div>
+            {isEditingNote ? (
+              <textarea
+                name="tradeNotes"
+                value={updatedNote}
+                onChange={(e) => setUpdatedNote(e.target.value)}
+                className={styles.editTextArea}
+              />
+            ) : (
+              <p>
+                {trade.tradeNotes ? (
+                  trade.tradeNotes
+                ) : (
+                  <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+                    No notes added
+                  </p>
+                )}
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Screenshot */}
         <div className={styles.tradeScreenshot}>
           <p>Screenshot / Chart Placeholder</p>
+
+          {Array.isArray(trade.screenshots) && trade.screenshots.length > 0 && (
+            <div className={styles.screenshotList}>
+              {trade.screenshots.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`Trade screenshot ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
+          {(!Array.isArray(trade.screenshots) ||
+            trade.screenshots.length === 0) && (
+            <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+              No screenshots added
+            </p>
+          )}
         </div>
 
         {/* Buttons */}
