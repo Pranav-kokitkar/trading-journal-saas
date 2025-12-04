@@ -1,0 +1,121 @@
+/* CreateAccModal.module.css */
+
+.createAccModal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(3, 7, 18, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+
+.container {
+  width: 100%;
+  max-width: 420px;
+
+  background: #0c1324;
+  border-radius: 14px;
+  padding: 1.7rem 1.4rem;
+
+  border: 1px solid rgba(212, 175, 55, 0.22); /* softer gold */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+
+  animation: modalPopIn 0.25s ease-out;
+}
+
+/* Heading */
+.container h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  text-align: center;
+  color: #c7a72c; /* muted gold */
+  margin-bottom: 1.2rem;
+}
+
+/* Field groups */
+.nameconatiner,
+.capitalcontainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+/* Labels */
+.nameconatiner label,
+.capitalcontainer label {
+  font-size: 0.87rem;
+  font-weight: 500;
+  color: #e2e8f0; /* soft grey */
+}
+
+/* Inputs */
+.nameconatiner input,
+.capitalcontainer input {
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+
+  background: #1b2236;
+  color: #f8fafc;
+  font-size: 0.89rem;
+  outline: none;
+  transition: 0.15s ease;
+}
+
+.nameconatiner input:focus,
+.capitalcontainer input:focus {
+  border-color: #c7a72c; /* minimal gold */
+  background: #1e2538;
+  box-shadow: 0 0 0 1px rgba(199, 167, 44, 0.22);
+}
+
+/* Button */
+.container button {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 0.65rem 0;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+
+  background: #c7a72c; /* muted gold */
+  color: #0c1324;
+  letter-spacing: 0.015em;
+
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.container button:hover {
+  background: #b09028; /* slightly darker gold */
+}
+
+.container button:active {
+  transform: scale(0.98);
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+  .container {
+    margin: 0 1rem;
+    padding: 1.5rem 1.1rem;
+  }
+}
+
+/* Entry animation */
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

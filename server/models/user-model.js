@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 10000,
     },
+    activeAccountId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Account",
+      default: null,
+    },
 
     balance: {
       type: Number,
@@ -41,7 +46,6 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-
   },
   { timestamps: true }
 );

@@ -1,0 +1,145 @@
+// src/components/CreateAccModal/CreateAccModal.jsx
+import { useContext, useState } from "react";
+import styles from "./CreateAccModal.module.css";
+import { useAuth } from "../../store/Auth";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../context/UserContext";
+
+export const CreateAccModal = () => {
+  const { authorizationToken } = useAuth();
+  const { userDetails, setUserDetails } = useContext(UserContext);
+
+  const [form, setForm] = useState({
+    name: "",
+    initialCapital: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  const userId = userDetails?._id; // user document from /api/user
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = async () => {
+    try {
+      setError("");
+
+      if (!userId) {
+        setError("User not loaded. Please try again.");
+        return;
+      }
+
+      if (!form.name.trim()) {
+        setError("Please enter an account name.");
+        return;
+      }
+
+      if (!form.initialCapital) {
+        setError("Please enter initial capital.");
+        return;
+      }
+
+      const initialCapitalNumber = Number(form.initialCapital);
+      if (Number.isNaN(initialCapitalNumber) || initialCapitalNumber <= 0) {
+        setError("Initial capital must be a positive number.");
+        return;
+      }
+
+      const payload = {
+        userId,
+        name: form.name.trim(),
+        initialCapital: initialCapitalNumber,
+        // backend will auto-set currentBalance = initialCapital
+      };
+
+      setLoading(true);
+
+      const response = await fetch("http://localhost:3000/api/account", {
+        method: "POST",
+        headers: {
+          Authorization: authorizationToken,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Failed to create account");
+      }
+
+      // 🔥 EXPECTED: backend returns { account, user }
+      const { user } = data;
+
+      if (user) {
+        // user now includes activeAccountId
+        setUserDetails(user);
+      }
+
+      setForm({ name: "", initialCapital: "" });
+
+      if (response.ok) {
+        navigate("/app/dashboard");
+      }
+    } catch (err) {
+      console.error("Error while saving account:", err);
+      setError(err.message || "Something went wrong while creating account.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.createAccModal}>
+      <div className={styles.container}>
+        <h3>Create Account</h3>
+
+        <div className={styles.nameconatiner}>
+          <label>Enter Name For Your Account</label>
+          <input
+            type="text"
+            placeholder="Enter Name for Account"
+            onChange={handleChange}
+            name="name"
+            value={form.name}
+          />
+        </div>
+
+        <div className={styles.capitalcontainer}>
+          <label>Enter Capital Amount for Your Account</label>
+          <input
+            type="number"
+            placeholder="Enter Capital for Account"
+            onChange={handleChange}
+            name="initialCapital"
+            value={form.initialCapital}
+            min="0"
+          />
+        </div>
+
+        {error && <p className={styles.error}>{error}</p>}
+
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.saveButton}
+            onClick={handleSave}
+            disabled={loading}
+          >
+            {loading ? "Saving..." : "Save"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};

@@ -1,73 +1,81 @@
-// controllers/account-controller.js
+// controllers/account-create-controller.js
+const Account = require("../models/account-model");
 const User = require("../models/user-model");
 
-const getAccount = async (req, res) => {
+// POST /api/account
+const createAccount = async (req, res) => {
   try {
-    const userId = req.userID;
+    // trust the token for userId, not the body
+    const userIdFromToken = req.userID;
+    const { userId: userIdFromBody, name, initialCapital } = req.body;
+
+    const userId = userIdFromToken || userIdFromBody;
+
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user id missing" });
     }
 
-    const user = await User.findById(userId).select(
-      "name email initialCapital balance totalTrades"
-    );
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    if (!name || name.trim() === "") {
+      return res.status(400).json({ message: "Account name is required" });
     }
 
-    return res.status(200).json(user);
-  } catch (error) {
-    console.error("getAccount error:", error);
-    return res.status(500).json({
-      message: "Failed to fetch account details from server",
-      error: error.message || "Unknown error",
+    if (initialCapital === undefined || initialCapital === null) {
+      return res.status(400).json({ message: "initialCapital is required" });
+    }
+
+    const capitalNum = Number(initialCapital);
+    if (!Number.isFinite(capitalNum) || capitalNum <= 0) {
+      return res.status(400).json({
+        message: "initialCapital must be a positive number",
+      });
+    }
+
+    // 1) Create the account; currentBalance will auto = initialCapital via schema default
+    const account = await Account.create({
+      userId,
+      name: name.trim(),
+      initialCapital: capitalNum,
+      // no currentBalance here → default runs
     });
-  }
-};
 
-const updateAccount = async (req, res, next) => {
-  try {
-    const userId = req.userID;
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized: user id missing" });
-    }
-
-    const { pnl, deltaTrades } = req.body;
-
-    if (pnl === undefined || typeof pnl !== "number") {
-      return res.status(400).json({ message: "pnl must be a number" });
-    }
-
-    // validate deltaTrades if provided
-    if (deltaTrades !== undefined && typeof deltaTrades !== "number") {
-      return res.status(400).json({ message: "deltaTrades must be a number" });
-    }
-
-    // Use deltaTrades if provided, otherwise default to 0
-    const incObj = {
-      balance: pnl,
-      totalTrades: deltaTrades ?? 0,
-    };
-
-    // Update only balance + totalTrades
+    // 2) Set this account as active for the user
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { $inc: incObj },
+      { activeAccountId: account._id },
       { new: true }
-    ).select("initialCapital balance totalTrades");
+    ).select("name email initialCapital balance totalTrades activeAccountId");
 
-    return res.status(200).json({
-      message: "Account updated successfully",
-      account: updatedUser,
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .json({ message: "User not found for this account" });
+    }
+
+    // 3) Return both account + updated user
+    return res.status(201).json({
+      message: "Account created successfully",
+      account,
+      user: updatedUser,
     });
   } catch (error) {
-    console.log("updateAcoount error:", error);
+    console.error("createAccount error:", error);
     return res.status(500).json({
-      message: "failed to update account details",
+      message: "Failed to create account",
       error: error.message || "Unknown error",
     });
   }
 };
 
-module.exports = { getAccount, updateAccount };
+const getAccounts = async (req, res) => {
+  try {
+    const userId = req.userID || (req.user && req.user._id);
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const response = await Account.find({ userId });
+    res.status(200).json(response);
+  } catch (error) {
+    res.status(400).json({ message: "error while gettign accounts" });
+  }
+};
+
+module.exports = { createAccount, getAccounts };
