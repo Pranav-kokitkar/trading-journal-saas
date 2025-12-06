@@ -25,6 +25,7 @@ const AddTrade = async (req, res, next) => {
       dateTime,
       tradeNotes,
       tradeStatus,
+      accountId,
     } = req.body;
 
     if (
@@ -35,6 +36,9 @@ const AddTrade = async (req, res, next) => {
       stoplossPrice == null
     ) {
       return res.status(400).json({ message: "Missing required fields" });
+    }
+    if (!accountId || !mongoose.Types.ObjectId.isValid(accountId)) {
+      return res.status(400).json({ message: "Valid accountId is required" });
     }
 
     // ✅ NEW: handle exitedPrice coming as JSON string from FormData
@@ -77,6 +81,7 @@ const AddTrade = async (req, res, next) => {
 
     const tradeToSave = {
       userId,
+      accountId: new mongoose.Types.ObjectId(accountId),
       marketType,
       symbol,
       tradeDirection,

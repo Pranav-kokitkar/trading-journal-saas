@@ -8,11 +8,10 @@ import { PerformanceContext } from "../../../context/PerformanceContext";
 import { TradeContext, useTrades } from "../../../store/TradeContext";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
-import { UserContext } from "../../../context/UserContext";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const Trade = () => {
-  const { userDetails, updateUser } = useContext(UserContext);
-  const { refreshPerformance } = useContext(PerformanceContext);
+  const { accountDetails, updateAccount } = useContext(AccountContext);
   const { deleteTradeByID } = useContext(TradeContext);
 
   const { id } = useParams();
@@ -158,7 +157,7 @@ export const Trade = () => {
       const updatedTrade = calculateTradeOnExit({
         trade,
         exitLevels,
-        accountBalance: userDetails?.balance ?? 0,
+        accountBalance: accountDetails?.currentBalance ?? 0,
       });
 
       if (!updatedTrade) {
@@ -178,7 +177,7 @@ export const Trade = () => {
       const rr = Number(updatedTrade.rr || 0);
       const tradeResult = updatedTrade.tradeResult || "breakeven";
       const balanceAfterTrade = Number(
-        updatedTrade.balanceAfterTrade || userDetails?.balance + pnl || 0
+        updatedTrade.balanceAfterTrade || accountDetails?.currentBalance + pnl || 0
       );
 
       console.log("CALC INPUTS", {
@@ -213,16 +212,15 @@ export const Trade = () => {
 
       // 4) update account on server by sending pnl (do NOT change totalTrades when closing)
       try {
-        if (typeof updateUser === "function") {
-          await updateUser({ pnl });
+        if (typeof updateAccount === "function") {
+          await updateAccount({ pnl });
         }
       } catch (err) {
-        console.error("updateUser failed", err);
+        console.error("updateAccount failed", err);
         // we continue — server trade was closed; account sync can be retried
       }
 
       // refresh analytics/charts
-      if (typeof refreshPerformance === "function") refreshPerformance();
 
       // close modal & stay on same page (trade will now be closed)
       setCloseTrade(false);
@@ -238,7 +236,6 @@ export const Trade = () => {
   const handleDelete = async (id) => {
     await deleteTradeByID(id, trade.pnl);
     navigate("/app/trade-history");
-    refreshPerformance();
   };
 
   const handleEdit = () => {
@@ -394,15 +391,15 @@ export const Trade = () => {
                 className={styles.editTextArea}
               />
             ) : (
-              <p>
+              <div>
                 {trade.tradeNotes ? (
-                  trade.tradeNotes
+                  <p>{trade.tradeNotes}</p>
                 ) : (
                   <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
                     No notes added
                   </p>
                 )}
-              </p>
+              </div>
             )}
           </div>
         </div>

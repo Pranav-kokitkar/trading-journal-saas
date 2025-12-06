@@ -1,15 +1,15 @@
 import styles from "./addtrade.module.css";
 import { InputField } from "../../InputField";
 import { useContext } from "react";
-import { UserContext } from "../../../context/UserContext";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const AddPrice = ({ trade, handleChange }) => {
-  const {userDetails, setUserDetails} = useContext(UserContext);
+  const { accountDetails } = useContext(AccountContext);
   return (
     <div className={styles.card}>
       <h3>Price & Risk Management</h3>
       <p style={{ fontSize: "0.8rem", color: "gray", paddingBottom: "1rem" }}>
-        Account Balance: ${userDetails?.balance}
+        Account Balance: ${accountDetails?.currentBalance}
       </p>
 
       <div className={styles.row}>

@@ -1,11 +1,11 @@
 import { useContext, useEffect } from "react";
 import styles from "./addtrade.module.css";
-import { UserContext } from "../../../context/UserContext";
 import { calculateTradeValues } from "../../../utils/tradeUtils";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const TradeCalculator = ({ trade, setTrade }) => {
-  const { userDetails } = useContext(UserContext);
-  const accountBalance = userDetails?.balance || 0;
+   const { accountDetails } = useContext(AccountContext);
+  const accountBalance = accountDetails?.currentBalance || 0;
 
   const {
     rr,

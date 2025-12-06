@@ -1,5 +1,5 @@
 // src/components/Pages/Dashboard/Dashboard.jsx
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import styles from "./dashboard.module.css";
 import EquityCurveChart from "./EquityCurveChart";
 import WinLossChart from "./WinLossChart";
@@ -14,77 +14,80 @@ import { FiActivity, FiTrendingUp, FiTarget } from "react-icons/fi";
 import { FaTrophy, FaPercentage } from "react-icons/fa";
 import { CreateAccModal } from "../../Layout/CreateAccModal";
 import { UserContext } from "../../../context/UserContext";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const Dashboard = () => {
   const { userDetails } = useContext(UserContext);
   const { performance } = useContext(PerformanceContext);
+  const {accountDetails} = useContext(AccountContext);
+  const [IsCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Read trades from TradeContext (fallback to empty array)
   const { trades = [] } = useTrades() || {};
+  const { accountTrades = [] } = useTrades() || {};
 
   // Accept both "closed" and "exited" as finished trades (case-insensitive)
   const finishedStatuses = new Set(["closed", "exited"]);
 
   // Filter closed/exited trades only for charts and performance-sensitive visuals
-  const closedTrades = Array.isArray(trades)
-    ? trades.filter((t) =>
+  const closedTrades = Array.isArray(accountTrades)
+    ? accountTrades.filter((t) =>
         finishedStatuses.has(String(t.tradeStatus || "").toLowerCase())
       )
     : [];
 
-    console.log("performnce",performance);
-    console.log("calosed tardes",closedTrades)
+  useEffect(() => {
+    if (userDetails && userDetails.activeAccountId == null) {
+      setIsCreateModalOpen(true);
+    }
+  }, [userDetails]);
 
-
-  if(!userDetails){
-    return <p>loading...</p> 
+  if (!userDetails) {
+    return <p>loading...</p>;
   }
 
-  if (userDetails && userDetails.activeAccountId==null){
-    return <CreateAccModal/>
-  }
+  return (
+    <section className={styles.dashboard}>
+      <TradingDashboard accountDetails={accountDetails} performance={performance} />
 
-    return (
-      <section className={styles.dashboard}>
-        <TradingDashboard
-          userDetails={userDetails}
-          performance={performance}
-        />
-
-        <h1>
-          Trading <span className={styles.span}>Performance</span>{" "}
-        </h1>
-        <div className={styles.tradingperformance}>
-          <div className={styles.chartCard}>
-            <h3>Equity Curve</h3>
-            <EquityCurveChart trades={closedTrades} />
-          </div>
-
-          <div className={styles.chartCard}>
-            <h3>Win / Loss</h3>
-            <WinLossChart trades={closedTrades} />
-          </div>
-
-          <div className={styles.chartCard}>
-            <h3>PnL Per Trade</h3>
-            <PnLChart trades={closedTrades} />
-          </div>
-
-          <div className={styles.chartCard}>
-            <h3>Risk Overview</h3>
-            <RiskChart trades={closedTrades} />
-          </div>
-
-          <div className={styles.chartCard}>
-            <h3>Direction Success</h3>
-            <DirectionChart trades={closedTrades} />
-          </div>
+      <h1>
+        Trading <span className={styles.span}>Performance</span>{" "}
+      </h1>
+      <div className={styles.tradingperformance}>
+        <div className={styles.chartCard}>
+          <h3>Equity Curve</h3>
+          <EquityCurveChart trades={closedTrades} />
         </div>
-      </section>
-    );
+
+        <div className={styles.chartCard}>
+          <h3>Win / Loss</h3>
+          <WinLossChart trades={closedTrades} />
+        </div>
+
+        <div className={styles.chartCard}>
+          <h3>PnL Per Trade</h3>
+          <PnLChart trades={closedTrades} />
+        </div>
+
+        <div className={styles.chartCard}>
+          <h3>Risk Overview</h3>
+          <RiskChart trades={closedTrades} />
+        </div>
+
+        <div className={styles.chartCard}>
+          <h3>Direction Success</h3>
+          <DirectionChart trades={closedTrades} />
+        </div>
+      </div>
+
+      {IsCreateModalOpen && (
+        <CreateAccModal onClose={() => setIsCreateModalOpen(false)} />
+      )}
+    </section>
+  );
 };
 
-const TradingDashboard = ({ userDetails, performance }) => {
+const TradingDashboard = ({ accountDetails, performance }) => {
   return (
     <div>
       <h1>
@@ -176,10 +179,10 @@ const TradingDashboard = ({ userDetails, performance }) => {
 
           <h2>Quick Stats</h2>
           <h3>
-            Initial Capital: <span>${userDetails?.initialCapital}</span>
+            Initial Capital: <span>${accountDetails?.initialCapital}</span>
           </h3>
           <h3>
-            Current Balance: <span>${userDetails?.balance}</span>
+            Current Balance: <span>${accountDetails?.currentBalance}</span>
           </h3>
         </div>
       </div>

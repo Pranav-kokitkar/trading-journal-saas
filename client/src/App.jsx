@@ -6,7 +6,6 @@ import { Trade } from "./components/Pages/Trade/Trade";
 import { Layout } from "./components/Layout/Layout";
 import { MyAccount } from "./components/Pages/MyAccount/MyAccount";
 import { Dashboard } from "./components/Pages/Dashboard/Dashboard";
-import { PerformanceProvider } from "./context/PerformanceContext";
 import { Register } from "./components/Pages/Authorization/Register";
 import { Login } from "./components/Pages/Authorization/Login";
 import { HomePage } from "./components/Pages/Homepage/HomePage";

@@ -27,7 +27,7 @@ const WinLossChart = ({ trades }) => {
   return (
     <div className={styles.chartcontainer}>
       <div className={styles.chart} style={{ width: "100%", height: 320 }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={320}>
           <PieChart>
             <Pie
               data={data}

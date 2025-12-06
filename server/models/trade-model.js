@@ -7,14 +7,18 @@ const exitedPriceSchema = new mongoose.Schema({
 
 const tradeSchema = new mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId, // references User
+    type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-
+  accountId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Account",
+    required: true,
+  },
   marketType: { type: String, required: true },
   symbol: { type: String, required: true },
-  tradeDirection: { type: String, required: true }, // long/short
+  tradeDirection: { type: String, required: true },
   entryPrice: { type: Number, required: true },
   stoplossPrice: { type: Number, required: true },
   takeProfitPrice: { type: Number },
@@ -23,7 +27,7 @@ const tradeSchema = new mongoose.Schema({
 
   rr: { type: Number, default: 0 },
   pnl: { type: Number, default: 0 },
-  tradeResult: { type: String, default: "" }, // win/loss/breakeven
+  tradeResult: { type: String, default: "" },
   riskAmount: { type: Number, default: 0 },
   riskPercent: { type: Number, default: 0 },
   balanceAfterTrade: { type: Number, default: 0 },

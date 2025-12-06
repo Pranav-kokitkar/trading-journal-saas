@@ -26,25 +26,10 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
-    // --- Account details & stats (new fields) ---
-    initialCapital: {
-      type: Number,
-      default: 10000,
-    },
     activeAccountId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Account",
       default: null,
-    },
-
-    balance: {
-      type: Number,
-      default: 10000,
-    },
-
-    totalTrades: {
-      type: Number,
-      default: 0,
     },
   },
   { timestamps: true }

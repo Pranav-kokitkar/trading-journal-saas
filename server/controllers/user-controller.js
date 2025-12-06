@@ -56,7 +56,7 @@ const updateUser = async (req, res, next) => {
 
     return res.status(200).json({
       message: "Account updated successfully",
-      account: updatedUser, // this is actually the user doc
+      account: updatedUser,
     });
   } catch (error) {
     console.log("updateAcoount error:", error);
@@ -67,4 +67,40 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-module.exports = { getUser, updateUser };
+const setActiveAccount = async (req, res) => {
+  try {
+    const userId = req.userID;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user id missing" });
+    }
+
+    const { activeAccountId } = req.body;
+
+    if (!activeAccountId) {
+      return res.status(400).json({ message: "activeAccountId is required" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { activeAccountId },
+      { new: true }
+    ).select("name email initialCapital balance totalTrades activeAccountId");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "Active account updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("setActiveAccount error:", error);
+    return res.status(500).json({
+      message: "Failed to update active account",
+      error: error.message || "Unknown error",
+    });
+  }
+};
+
+module.exports = { getUser, updateUser, setActiveAccount };

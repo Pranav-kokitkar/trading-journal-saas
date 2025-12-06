@@ -4,80 +4,29 @@ import { useAuth } from "../../../store/Auth";
 import styles from "./myaccount.module.css";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../../context/UserContext";
+import { AccountContext } from "../../../context/AccountContext";
+import { CreateAccModal } from "../../Layout/CreateAccModal";
+import { SelectAccount } from "./SelectAccount";
 
 export const MyAccount = () => {
-  const { userDetails, setUserDetails, updateUser, getUser } =
-    useContext(UserContext);
+  const { getUser } =useContext(UserContext);
   const [darkTheme, setDarkTheme] = useState(true);
-
   const { logoutUser } = useAuth();
+  const { accounts, accountDetails } = useContext(AccountContext);
+  const [IsCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  // Initialize tempCapital from userDetails when it becomes available
   const [tempCapital, setTempCapital] = useState("");
 
   useEffect(() => {
-    if (
-      userDetails &&
-      typeof userDetails.initialCapital !== "undefined"
-    ) {
-      setTempCapital(Number(userDetails.initialCapital));
+    if (accountDetails && typeof accountDetails.initialCapital !== "undefined") {
+      setTempCapital(Number(accountDetails.initialCapital));
     }
-  }, [userDetails]);
+  }, [accountDetails]);
 
   const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     setTempCapital(e.target.value === "" ? "" : Number(e.target.value)); // local numeric state or empty
-  };
-
-  const changeAccountBalance = async () => {
-    // ensure we have userDetails
-    if (!userDetails) {
-      alert("Account not loaded yet. Try again in a moment.");
-      return;
-    }
-
-    // validate input
-    const newInitial = Number(tempCapital);
-    if (Number.isNaN(newInitial) || newInitial < 0) {
-      alert("Please enter a valid non-negative number for initial capital.");
-      return;
-    }
-
-    if (
-      !window.confirm(
-        `Save new initial capital of $${newInitial}? This will set current balance to $${newInitial}.`
-      )
-    ) {
-      return;
-    }
-
-    const prevBalance = Number(userDetails.balance ?? 0);
-    const pnlDelta = Number(newInitial) - prevBalance; // amount to add/subtract to current balance
-
-    try {
-      // Persist balance change to backend by sending pnl delta
-      // updateUser accepts either a number or { pnl: number } per your contract
-      await updateUser(pnlDelta);
-
-      // Now update initialCapital locally (backend doesn't expose an endpoint for initialCapital)
-      const updated = {
-        ...userDetails,
-        initialCapital: newInitial,
-        balance: Number(prevBalance + pnlDelta), // should equal newInitial
-      };
-      setUserDetails(updated);
-
-      // Persist local snapshot in localStorage for reload behavior
-      localStorage.setItem("userDetails", JSON.stringify(updated));
-
-      alert("Account updated ✅");
-    } catch (err) {
-      console.error("Failed to update account balance:", err);
-      alert(
-        "Failed to update account on server. Check console and try again. No local changes were saved."
-      );
-    }
   };
 
   const handleReset = () => {
@@ -89,10 +38,10 @@ export const MyAccount = () => {
       return;
 
     localStorage.removeItem("trades");
-    localStorage.removeItem("userDetails");
+    localStorage.removeItem("accountDetails");
 
     // Clear local account state and re-fetch from server (if available)
-    setUserDetails(undefined);
+    setaccountDetails(undefined);
     try {
       // try to re-fetch from server if getUser is available
       if (typeof getUser === "function") getUser();
@@ -110,12 +59,21 @@ export const MyAccount = () => {
     navigate("/app/dashboard");
   };
 
+  const createAcc = () => {
+    setIsCreateModalOpen(true);
+  };
+
   return (
     <section className={styles.myaccount}>
+      {IsCreateModalOpen && (
+        <CreateAccModal onClose={() => setIsCreateModalOpen(false)} />
+      )}
       <div className={styles.myaccountpageheading}>
         <h2>My Account</h2>
         <p>Manage your account and data</p>
       </div>
+
+      <SelectAccount accounts={accounts} createAcc={createAcc} />
 
       {/* ✅ Account Overview */}
       <div className={styles.accountdatacontainer}>
@@ -123,44 +81,19 @@ export const MyAccount = () => {
         <div className={styles.accountdata}>
           <div className={styles.accountbox}>
             <p>Initial Capital</p>
-            <h3>${userDetails?.initialCapital ?? "—"}</h3>
+            <h3>${accountDetails?.initialCapital ?? "—"}</h3>
           </div>
           <div className={styles.accountbox}>
             <p>Current Balance</p>
-            <h3>${userDetails?.balance ?? "—"}</h3>
+            <h3>${accountDetails?.currentBalance ?? "—"}</h3>
           </div>
           <div className={styles.accountbox}>
             <p>Total Trades</p>
             <h3>
-              {userDetails?.totalTrades ?? userDetails?.totaltrades ?? 0}
+              {accountDetails?.totalTrades ?? accountDetails?.totaltrades ?? 0}
             </h3>
           </div>
         </div>
-      </div>
-
-      {/* ✅ Update Capital */}
-      <div className={styles.updatecapitalcontainer}>
-        <h3>Update Capital</h3>
-        <div className={styles.inlineform}>
-          <input
-            type="number"
-            placeholder="Enter Initial Capital"
-            name="initialCapital"
-            value={tempCapital === "" ? "" : tempCapital}
-            onChange={handleInputChange}
-            min="0"
-          />
-          <button
-            onClick={changeAccountBalance}
-            disabled={tempCapital === "" || Number.isNaN(Number(tempCapital))}
-          >
-            Save
-          </button>
-        </div>
-        <p className={styles.warning}>
-          ⚠ Updating capital will reset your current balance to the new amount.
-          This will not affect your trading history.
-        </p>
       </div>
 
       {/* ✅ Export Data */}

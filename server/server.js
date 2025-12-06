@@ -24,7 +24,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 app.use("/api/auth/", authRoute);
-app.use("/api/trades/", tradeRoute);
+app.use("/api/trades", tradeRoute);
 app.use("/api/user", userRoute);
 app.use("/api/notes", notesRoute);
 app.use("/api/contact", contactRoute);

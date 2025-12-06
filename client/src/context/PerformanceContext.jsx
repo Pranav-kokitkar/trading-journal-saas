@@ -1,5 +1,5 @@
 // src/context/PerformanceContext.jsx
-import React, { createContext, useEffect, useMemo } from "react";
+import React, { createContext, useMemo } from "react";
 import { calculatePerformance } from "../utils/Performance";
 import { useTrades } from "../store/TradeContext";
 
@@ -27,41 +27,25 @@ const emptyPerformance = {
 };
 
 export const PerformanceProvider = ({ children }) => {
-  // read trades from TradeContext (assumes TradeProvider is mounted above this)
-  const { trades } = useTrades();
+  const { accountTrades } = useTrades();
 
-  // ✅ derive performance directly from current trades, no extra state
+  // derive performance directly from trades
   const performance = useMemo(() => {
     try {
-      const safeTrades = Array.isArray(trades) ? [...trades] : [];
+      const safeTrades = Array.isArray(accountTrades) ? accountTrades : [];
       if (safeTrades.length > 0) {
         return calculatePerformance(safeTrades);
       }
       return emptyPerformance;
-    } catch (e) {
-      console.error("PerformanceProvider calculation error:", e);
+    } catch (err) {
+      console.error("Performance calculation error:", err);
       return emptyPerformance;
     }
-  }, [trades]);
+  }, [accountTrades]);
 
-  // still persist, but we don't read from localStorage anymore
-  useEffect(() => {
-    try {
-      localStorage.setItem("performance", JSON.stringify(performance));
-    } catch (e) {
-      console.error("Failed to persist performance:", e);
-    }
-  }, [performance]);
-
-  // Manual refresh is basically a no-op now, kept for compatibility
-  const refreshPerformance = () => {
-    console.log(
-      "refreshPerformance called — performance is already derived from latest trades."
-    );
-  };
 
   return (
-    <PerformanceContext.Provider value={{ performance, refreshPerformance }}>
+    <PerformanceContext.Provider value={{ performance}}>
       {children}
     </PerformanceContext.Provider>
   );

@@ -1,4 +1,3 @@
-// src/components/.../AddTrade.jsx
 import styles from "./addtrade.module.css";
 import { TradeStatus } from "./TradeStatus";
 import { TradeDetails } from "./TradeDetails";
@@ -9,28 +8,26 @@ import { useContext, useState } from "react";
 import { UserContext } from "../../../context/UserContext";
 import { calculateTradeValues } from "../../../utils/tradeUtils";
 import { useAuth } from "../../../store/Auth";
-import { useTrades } from "../../../store/TradeContext"; // renamed to useTrades in TradeContext
+import { useTrades } from "../../../store/TradeContext";
 import { PerformanceContext } from "../../../context/PerformanceContext";
 import { toast } from "react-toastify";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const AddTrade = () => {
   const { authorizationToken } = useAuth();
   const { AddTrade: addTradeFromContext } = useTrades();
 
-  const { refreshPerformance } = useContext(PerformanceContext);
-
-  // get userDetails from UserContext (this was missing)
-  const { userDetails } = useContext(UserContext) || {};
+  const { accountDetails } = useContext(AccountContext);
 
   const [trade, setTrade] = useState({
     id: "",
     marketType: "",
-    symbol: "",
+    symbol: "EUR/USD",
     tradedirection: "",
-    entryPrice: "",
-    stoplossPrice: "",
+    entryPrice: "1.33179",
+    stoplossPrice: "1.33120",
     riskType: "",
-    takeProfitPrice: "",
+    takeProfitPrice: "1.33319",
     tradeStatus: "live",
     exitedPrice: [{ price: "", volume: "" }],
     rr: "",
@@ -55,6 +52,12 @@ export const AddTrade = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const accountId = accountDetails?._id;
+    if (!accountId) {
+      alert("Please select an account before adding a trade.");
+      return;
+    }
+
     if (!authorizationToken || !authorizationToken.startsWith("Bearer ")) {
       alert("You are not authenticated. Please log in.");
       return;
@@ -69,9 +72,9 @@ export const AddTrade = () => {
       return;
     }
 
-    // Protect against userDetails missing
-    const prevBalance = Number(userDetails?.balance || 0);
-    const prevTotalTrades = Number(userDetails?.totaltrades || 0);
+    // Protect against accountDetails missing
+    const prevBalance = Number(accountDetails?.currentBalance || 0);
+    const prevTotalTrades = Number(accountDetails?.totalTrades || 0);
 
     const { pnl, rr, riskamount } = calculateTradeValues({
       trade,
@@ -137,6 +140,7 @@ export const AddTrade = () => {
       dateTime: isoDate,
       tradeNotes: trade.tradeNotes || "",
       tradeStatus: normalizedStatus,
+      accountId,
     };
 
     if (
@@ -158,9 +162,7 @@ export const AddTrade = () => {
     }
 
     try {
-      // ✅ PASS screenshots to context so it can send them with the request
       await addTradeFromContext(normalizedTrade, screenshots);
-      refreshPerformance();
     } catch (err) {
       toast.error("Failed to add trade", {
         position: "top-right",

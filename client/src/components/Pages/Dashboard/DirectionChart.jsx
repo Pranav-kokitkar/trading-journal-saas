@@ -96,7 +96,7 @@ const DirectionChart = ({ trades }) => {
   return (
     <div className={styles.chartcontainer}>
       <div className={styles.chart} style={{ width: "100%", height: 320 }}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height={320}>
           <BarChart
             data={data}
             margin={{ top: 20, right: 20, left: 20, bottom: 10 }}

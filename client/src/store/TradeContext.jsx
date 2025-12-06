@@ -3,6 +3,7 @@ import { useAuth } from "./Auth";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { UserContext } from "../context/UserContext";
 import { toast } from "react-toastify";
+import { AccountContext } from "../context/AccountContext";
 
 export const TradeContext = createContext();
 
@@ -14,8 +15,10 @@ export const TradeProvider = ({ children }) => {
     );
   }
   const { updateUser } = userCtx || {};
+  const {updateAccount, accountDetails} = useContext(AccountContext);
 
   const [trades, setTrades] = useState([]);
+  const [ accountTrades, setAccountTrades ] = useState([]);
   const [trade, setTrade] = useState({
     id: "",
     marketType: "",
@@ -38,27 +41,31 @@ export const TradeProvider = ({ children }) => {
     tradeNotes: "",
   });
 
-  const { authorizationToken } = useAuth();
+  const { authorizationToken, isLoggedIn } = useAuth();
 
   const mountedRef = useRef(true);
 
   useEffect(() => {
     mountedRef.current = true;
-    // initial fetch when we have a token (or on mount if token already present)
-    if (authorizationToken) {
-      getAllTrades();
+    if (!isLoggedIn) {
+      return;
     }
+    getAllTrades();
     return () => {
       mountedRef.current = false;
     };
-    // only re-run when auth token changes
   }, [authorizationToken]);
 
   async function getAllTrades() {
+
+    if (!isLoggedIn) {
+      console.log("getAllTrades: user not logged in, skipping fetch");
+      return;
+    }
+    
     if (!authorizationToken) {
       return;
     }
-
 
     try {
       const response = await fetch(`http://localhost:3000/api/trades/`, {
@@ -110,10 +117,9 @@ export const TradeProvider = ({ children }) => {
           });
         }
 
-        const response = await fetch("http://localhost:3000/api/trades", {
+        const response = await fetch(`http://localhost:3000/api/trades/`, {
           method: "POST",
           headers: {
-            // ❗️NO "Content-Type" here – browser sets multipart boundary
             Authorization: authorizationToken,
           },
           body: formData,
@@ -143,13 +149,13 @@ export const TradeProvider = ({ children }) => {
 
           // Update account details after successful add
           try {
-            if (typeof updateUser === "function") {
-              await updateUser({
+            if (typeof updateAccount === "function") {
+              await updateAccount({
                 pnl: Number(normalizedTrade.pnl || 0),
                 deltaTrades: 1,
               });
             } else {
-              console.warn("updateUser is not a function on UserContext");
+              console.warn("updateAccount is not a function on UserContext");
             }
           } catch (err) {
             console.error("Failed to update account after AddTrade:", err);
@@ -309,13 +315,13 @@ export const TradeProvider = ({ children }) => {
           theme: "dark",
         });
         try {
-          if (typeof updateUser === "function") {
+          if (typeof updateAccount === "function") {
             const pnlToAdjust = -parseFloat(pnl || 0) || 0;
-            await updateUser({ pnl: pnlToAdjust, deltaTrades: -1 });
+            await updateAccount({ pnl: pnlToAdjust, deltaTrades: -1 });
             await getAllTrades();
           }
         } catch (err) {
-          console.error("updateUser failed on delete", err);
+          console.error("updateAccount failed on delete", err);
         }
       } else {
         toast.error("Failed to delete trade", {
@@ -335,6 +341,20 @@ export const TradeProvider = ({ children }) => {
     }
   };
 
+useEffect(() => {
+  if (!accountDetails?._id) {
+    setAccountTrades([]);
+    return;
+  }
+
+  const filtered = trades.filter((t) => {
+    if (!t.accountId) return false;
+    return String(t.accountId) === String(accountDetails._id);
+  });
+
+  setAccountTrades(filtered);
+}, [trades, accountDetails]);
+
   return (
     <TradeContext.Provider
       value={{
@@ -345,6 +365,7 @@ export const TradeProvider = ({ children }) => {
         refreshTrades: getAllTrades,
         closeTradeByID,
         deleteTradeByID,
+        accountTrades,
       }}
     >
       {children}

@@ -2,10 +2,10 @@
 import { useContext, useState } from "react";
 import styles from "./CreateAccModal.module.css";
 import { useAuth } from "../../store/Auth";
-import { useNavigate } from "react-router-dom";
 import { UserContext } from "../../context/UserContext";
+import { AccountContext } from "../../context/AccountContext";
 
-export const CreateAccModal = () => {
+export const CreateAccModal = ({onClose}) => {
   const { authorizationToken } = useAuth();
   const { userDetails, setUserDetails } = useContext(UserContext);
 
@@ -17,7 +17,9 @@ export const CreateAccModal = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const navigate = useNavigate();
+  const { getAllAccounts, getActiveAccount } =
+    useContext(AccountContext);
+
 
   const userId = userDetails?._id; // user document from /api/user
 
@@ -89,7 +91,9 @@ export const CreateAccModal = () => {
       setForm({ name: "", initialCapital: "" });
 
       if (response.ok) {
-        navigate("/app/dashboard");
+        onClose();
+        getActiveAccount();
+        getAllAccounts();
       }
     } catch (err) {
       console.error("Error while saving account:", err);

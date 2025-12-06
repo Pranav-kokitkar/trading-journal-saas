@@ -14,7 +14,6 @@ export const Login = () => {
 
   const { storeTokenInLS } = useAuth();
   const {isLoggedIn} = useAuth();
-  const { refreshPerformance } = useContext(PerformanceContext);
 
   const navigate = useNavigate();
 
@@ -67,7 +66,6 @@ export const Login = () => {
   };
 
   if(isLoggedIn){
-    refreshPerformance();
     return <Navigate to="/app/dashboard" replace/>
   }
 

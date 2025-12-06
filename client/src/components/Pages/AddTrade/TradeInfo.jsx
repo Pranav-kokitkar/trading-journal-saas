@@ -1,5 +1,4 @@
 import styles from "./addtrade.module.css";
-import { InputField } from "../../InputField";
 
 export const TradeInfo = ({
   trade,

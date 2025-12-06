@@ -16,7 +16,6 @@ export const Register = () => {
   const confirmPasswordRef = useRef();
   const { storeTokenInLS } = useAuth();
   const {isLoggedIn} = useAuth();
-  const {refreshPerformance} = useContext(PerformanceContext)
 
   const handleChange = async (e) => {
     let name = e.target.name;
@@ -73,7 +72,6 @@ export const Register = () => {
   };
 
   if(isLoggedIn){
-    refreshPerformance();
     return <Navigate to="/app/dashboard" replace />;
   }
 
