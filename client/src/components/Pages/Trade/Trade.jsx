@@ -65,12 +65,15 @@ export const Trade = () => {
 
       try {
         setIsLoading(true);
-        const res = await fetch(`http://localhost:3000/api/trades/${id}`, {
-          method: "GET",
-          headers: {
-            Authorization: authorizationToken,
-          },
-        });
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/trades/${id}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: authorizationToken,
+            },
+          }
+        );
 
         if (res.ok) {
           const data = await res.json();
@@ -250,7 +253,7 @@ export const Trade = () => {
   const SaveNote = async (id) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/trades/${id}/note`,
+        `${import.meta.env.VITE_API_URL}/api/trades/${id}/note`,
         {
           method: "PATCH",
           headers: {

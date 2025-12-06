@@ -16,11 +16,11 @@ export const SelectAccount = ({ accounts, createAcc }) => {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/user/active-account",
+        `${import.meta.env.VITE_API_URL}/api/user/active-account`,
         {
           method: "PATCH",
           headers: {
-            Authorization: authorizationToken, 
+            Authorization: authorizationToken,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ activeAccountId }),

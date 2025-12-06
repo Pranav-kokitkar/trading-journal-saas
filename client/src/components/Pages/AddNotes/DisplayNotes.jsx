@@ -26,12 +26,15 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
     if (!window.confirm("Delete this Note This cannot be undone.")) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: authorizationToken,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: authorizationToken,
+          },
+        }
+      );
 
       if (response.ok) {
         await getAllNotes();
@@ -62,14 +65,17 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
 
   const updateNote = async (id, updatedNote) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/notes/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authorizationToken,
-        },
-        body: JSON.stringify(updatedNote),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorizationToken,
+          },
+          body: JSON.stringify(updatedNote),
+        }
+      );
 
       if (response.ok) {
         await getAllNotes();

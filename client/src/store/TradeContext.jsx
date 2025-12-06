@@ -68,12 +68,15 @@ export const TradeProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:3000/api/trades/`, {
-        method: "GET",
-        headers: {
-          Authorization: authorizationToken,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/trades/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: authorizationToken,
+          },
+        }
+      );
       const res_data = await response.json();
       if (response.ok) {
         if (mountedRef.current) {
@@ -117,13 +120,16 @@ export const TradeProvider = ({ children }) => {
           });
         }
 
-        const response = await fetch(`http://localhost:3000/api/trades/`, {
-          method: "POST",
-          headers: {
-            Authorization: authorizationToken,
-          },
-          body: formData,
-        });
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/trades/`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: authorizationToken,
+            },
+            body: formData,
+          }
+        );
 
         let data = {};
         try {
@@ -214,23 +220,26 @@ export const TradeProvider = ({ children }) => {
     balanceAfterTrade
   ) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/trades/${id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          // ensure "Bearer " prefix if your token is raw
-          Authorization: authorizationToken?.startsWith("Bearer ")
-            ? authorizationToken
-            : `Bearer ${authorizationToken}`,
-        },
-        body: JSON.stringify({
-          exitedPrice,
-          pnl,
-          rr,
-          tradeResult,
-          balanceAfterTrade,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/trades/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            // ensure "Bearer " prefix if your token is raw
+            Authorization: authorizationToken?.startsWith("Bearer ")
+              ? authorizationToken
+              : `Bearer ${authorizationToken}`,
+          },
+          body: JSON.stringify({
+            exitedPrice,
+            pnl,
+            rr,
+            tradeResult,
+            balanceAfterTrade,
+          }),
+        }
+      );
 
       // parse response safely
       let data;
@@ -297,12 +306,15 @@ export const TradeProvider = ({ children }) => {
     if (!window.confirm("Delete this trade? This cannot be undone.")) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/trades/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: authorizationToken,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/trades/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: authorizationToken,
+          },
+        }
+      );
       if (response.ok) {
         toast.success("Trade deleted", {
           position: "top-right",

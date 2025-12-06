@@ -65,14 +65,17 @@ export const CreateAccModal = ({onClose}) => {
 
       setLoading(true);
 
-      const response = await fetch("http://localhost:3000/api/account", {
-        method: "POST",
-        headers: {
-          Authorization: authorizationToken,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/account`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: authorizationToken,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await response.json().catch(() => null);
 

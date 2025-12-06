@@ -83,10 +83,13 @@ export const Contact = () => {
         formData.append("screenshot", file);
       }
 
-      const response = await fetch(`http://localhost:3000/api/contact/`, {
-        method: "POST",
-        body: formData, // ❗ NO "Content-Type" header here – browser will set it
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/contact/`,
+        {
+          method: "POST",
+          body: formData, // ❗ NO "Content-Type" header here – browser will set it
+        }
+      );
 
       if (response.ok) {
         toast.success("submitted", {

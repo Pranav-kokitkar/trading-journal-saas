@@ -13,13 +13,16 @@ export const AccountProvider = ({children})=>{
     
     const getAllAccounts = async()=>{
         try {
-            const response = await fetch(`http://localhost:3000/api/account/`,{
-                method:"GET",
-                headers:{
-                    "Content-Type":"application/json",
-                    Authorization:authorizationToken
+            const response = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/account/`,
+              {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: authorizationToken,
                 },
-            });
+              }
+            );
             const res_data = await response.json();
             if(response.ok){
                 // console.log(res_data);
@@ -35,11 +38,12 @@ export const AccountProvider = ({children})=>{
     const getActiveAccount = async()=>{
         try {
             const response = await fetch(
-              `http://localhost:3000/api/account/active-account`,{
-                method:"GET",
-                headers:{
-                    Authorization:authorizationToken
-                }
+              `${import.meta.env.VITE_API_URL}/api/account/active-account`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: authorizationToken,
+                },
               }
             );
             const res_data = await response.json()
@@ -87,7 +91,7 @@ export const AccountProvider = ({children})=>{
         }
 
         const response = await fetch(
-          "http://localhost:3000/api/account/",
+          `${import.meta.env.VITE_API_URL}/api/account/`,
           {
             method: "PATCH",
             headers: {

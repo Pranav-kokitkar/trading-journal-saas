@@ -13,12 +13,15 @@ export const UserProvider = ({ children }) => {
     try {
       if (!authorizationToken) return;
 
-      const response = await fetch(`http://localhost:3000/api/user/`, {
-        method: "GET",
-        headers: {
-          Authorization: authorizationToken,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/user/`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: authorizationToken,
+          },
+        }
+      );
 
       const res_data = await response.json();
 
