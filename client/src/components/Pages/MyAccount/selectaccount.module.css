@@ -1,0 +1,96 @@
+/* Main container */
+.selectaccountcontainer {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.015),
+    rgba(255, 255, 255, 0.01)
+  );
+  padding: 1.4rem 1.2rem;
+  border-radius: 14px;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  width: 100%;
+}
+
+.currentacc {
+  display: flex;
+  gap: 1rem;
+}
+
+.name {
+  margin: 0px;
+}
+
+.selectaccountcontainer p {
+  font-size: 0.9rem;
+  color: #e2e8f0;
+  letter-spacing: 0.01em;
+}
+
+/* Label above select */
+.selectaccountcontainer label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+/* Dropdown styling */
+.selectaccountcontainer select {
+  background: #1a2033;
+  color: #f8fafc;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+
+  padding: 0.55rem 0.7rem;
+  font-size: 0.88rem;
+
+  outline: none;
+  transition: 0.15s ease;
+}
+
+/* On hover & focus */
+.selectaccountcontainer select:hover,
+.selectaccountcontainer select:focus {
+  background: #1e2538;
+  border-color: #c7a72c;
+}
+
+/* Create Account Button Row */
+.createAcccontainer {
+  display: flex;
+  margin-top: 0.5rem;
+}
+
+/* Button */
+.createAccBtn {
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: none;
+  background: #c7a72c;
+  color: #0c1324;
+  cursor: pointer;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.createAccBtn:hover {
+  background: #b09028;
+}
+
+.createAccBtn:active {
+  transform: scale(0.97);
+}
+
+/* Mobile tweak */
+@media (max-width: 480px) {
+  .selectaccountcontainer {
+    max-width: 100%;
+    padding: 1.2rem 1rem;
+  }
+}

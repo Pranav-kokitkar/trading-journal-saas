@@ -16,6 +16,9 @@ export const Register = () => {
   const confirmPasswordRef = useRef();
   const { storeTokenInLS } = useAuth();
   const {isLoggedIn} = useAuth();
+  
+    const {refreshTrades} = useContext(TradeContext);
+    const {getAllAccounts} = useContext(AccountContext);
 
   const handleChange = async (e) => {
     let name = e.target.name;
@@ -50,6 +53,8 @@ export const Register = () => {
 
       if (response.ok) {
         storeTokenInLS(res_data.token);
+        refreshTrades();
+        getAllAccounts();
         toast.success("register sucess", {
           position: "top-right",
           autoClose: 3000,

@@ -26,13 +26,28 @@
   animation: modalPopIn 0.25s ease-out;
 }
 
+.headers {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+
+.headers button {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  color: #fff;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
 /* Heading */
 .container h3 {
   font-size: 1.15rem;
   font-weight: 600;
   text-align: center;
   color: #c7a72c; /* muted gold */
-  margin-bottom: 1.2rem;
 }
 
 /* Field groups */
@@ -74,7 +89,7 @@
 }
 
 /* Button */
-.container button {
+.saveButton {
   width: 100%;
   margin-top: 0.5rem;
   padding: 0.65rem 0;
@@ -93,7 +108,7 @@
 }
 
 .container button:hover {
-  background: #b09028; /* slightly darker gold */
+  background: #b09028;
 }
 
 .container button:active {

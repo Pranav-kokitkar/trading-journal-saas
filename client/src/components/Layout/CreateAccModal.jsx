@@ -109,7 +109,10 @@ export const CreateAccModal = ({onClose}) => {
   return (
     <div className={styles.createAccModal}>
       <div className={styles.container}>
-        <h3>Create Account</h3>
+        <div className={styles.headers}>
+          <h3>Create Account</h3>
+          <button onClick={onClose}>✕</button>
+        </div>
 
         <div className={styles.nameconatiner}>
           <label>Enter Name For Your Account</label>

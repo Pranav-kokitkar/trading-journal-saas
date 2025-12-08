@@ -146,8 +146,12 @@ export const MyAccount = () => {
 
       {/* ✅ Help & About */}
       <div className={styles.sectionbox}>
-        <h3>Help & About</h3>
-        <p>Learn more about using this trading journal.</p>
+        <h3>About</h3>
+        <p>
+          This Trading Journal helps traders stay organized and make informed
+          decisions. Log entries, review performance analytics, and grow as a
+          trader — all in one place.
+        </p>
       </div>
     </section>
   );

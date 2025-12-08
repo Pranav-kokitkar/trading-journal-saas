@@ -105,13 +105,13 @@
 /* upload row */
 .uploadRow {
   align-items: center;
-  margin-top: 6px;
+  padding: 10px, 0px;
 }
 
 .uploadimage {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 5px;
   align-items: center;
   justify-content: center;
 }
@@ -131,7 +131,7 @@
   padding: 6px 10px;
   border-radius: 10px;
   color: #071226;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   text-decoration: none;
 }
@@ -155,7 +155,8 @@
 /* CTA row matches HomePage style (centered CTAs there) */
 .ctaRow {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   gap: 12px;
   margin-top: 8px;
 }

@@ -205,9 +205,7 @@ export const Contact = () => {
 
           <div className={styles.uploadRow}>
             <div className={styles.uploadimage}>
-              <div className={styles.uploadLabel}>
-                Upload screenshot (optional)
-              </div>
+              
               <input
                 ref={fileRef}
                 type="file"
@@ -217,7 +215,7 @@ export const Contact = () => {
                 id="contact-screenshot"
               />
               <label htmlFor="contact-screenshot" className={styles.uploadBtn}>
-                {file ? "Replace " : "Upload "}
+                {file ? "Replace " : "Upload screenshot (optional) "}
               </label>
 
               {file && (
@@ -239,10 +237,6 @@ export const Contact = () => {
           </div>
 
           <div className={styles.ctaRow}>
-            <Link to="/" className={styles.secondaryBtn}>
-              Back
-            </Link>
-
             <button type="submit" className={styles.primaryBtn}>
               Send Message
             </button>

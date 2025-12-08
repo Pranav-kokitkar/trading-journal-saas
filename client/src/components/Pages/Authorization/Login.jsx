@@ -5,6 +5,8 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
 import { PerformanceContext } from "../../../context/PerformanceContext";
+import { TradeContext } from "../../../store/TradeContext";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const Login = () => {
   const [user, setUser] = useState({
@@ -14,6 +16,8 @@ export const Login = () => {
 
   const { storeTokenInLS } = useAuth();
   const {isLoggedIn} = useAuth();
+  const {refreshTrades} = useContext(TradeContext);
+  const {getAllAccounts} = useContext(AccountContext);
 
   const navigate = useNavigate();
 
@@ -42,6 +46,8 @@ export const Login = () => {
       const res_data = await response.json();
       if (response.ok) {
         storeTokenInLS(res_data.token);
+        refreshTrades();
+        getAllAccounts();
         navigate("/app/dashboard");
         toast.success("login successful", {
           position: "top-right",
