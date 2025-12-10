@@ -5,28 +5,36 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
   const authorizationToken = `Bearer ${token}`;
-  let isLoggedIn = !!token
+  const isLoggedIn = !!token;
 
-  const storeTokenInLS = (token) => {
-    localStorage.setItem("token", token);
-    setToken(token);
+  const storeTokenInLS = (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
     console.log("token stored in ls");
   };
 
   const logoutUser = () => {
-    if (!window.confirm("Delete this Note This cannot be undone.")) return;
     localStorage.removeItem("token");
     setToken("");
     setUser(null);
+    setIsAdmin(false);
     console.log("logout successful");
   };
 
   const userAuthentication = async () => {
+    setIsAuthLoading(true);
+
     if (!token) {
       console.log("No token found, skipping user fetch");
+      setUser(null);
+      setIsAdmin(false);
+      setIsAuthLoading(false);
       return;
     }
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/auth/user`,
@@ -34,25 +42,37 @@ export const AuthProvider = ({ children }) => {
           method: "GET",
           headers: {
             Authorization: authorizationToken,
+            "Content-Type": "application/json",
           },
         }
       );
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.userData);
-        console.log(data);
+        setUser(data.userData || null);
+        setIsAdmin(Boolean(data.userData?.isAdmin));
+        console.log("Fetched user:", data);
+        setIsAuthLoading(false);
       } else {
-        console.log("error while fetching user data");
+        console.log("Error while fetching user data (non-OK). Clearing auth.");
+        localStorage.removeItem("token");
+        setToken("");
+        setUser(null);
+        setIsAdmin(false);
+        setIsAuthLoading(false);
       }
     } catch (error) {
-      console.log("error while fetching user data", error);
+      console.log("Error while fetching user data", error);
+      localStorage.removeItem("token");
+      setToken("");
+      setUser(null);
+      setIsAdmin(false);
+      setIsAuthLoading(false);
     }
   };
 
-  // Run when token changes
   useEffect(() => {
-      userAuthentication();
+    userAuthentication();
   }, [token]);
 
   return (
@@ -64,6 +84,9 @@ export const AuthProvider = ({ children }) => {
         user,
         authorizationToken,
         userAuthentication,
+        isAdmin,
+        isAuthLoading,
+        token,
       }}
     >
       {children}

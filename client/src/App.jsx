@@ -13,8 +13,13 @@ import { ErrorPage } from "./components/Pages/Error/ErrorPage";
 import { ProtectedRoute } from "./components/Pages/Authorization/ProtectedRoute";
 import { Contact } from "./components/Pages/Contact/Contact";
 
+import {AdminProtectedRoute} from "./components/Admin/authorization/AdminProtectedRoute";
+import { AdminLayout } from "./components/Admin/adminLayout/AdminLayout";
+import {AdminDashboard }from "./components/Admin/adminDashboard/AdminDashboard";
+import {AdminUser} from "./components/Admin/adminUsers/AdminUsers";
+
+
 const router = createBrowserRouter([
-  // Public Routes
   {
     path: "/",
     element: <HomePage />,
@@ -77,15 +82,32 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
 
-      // Default child → /app/dashboard
       { index: true, element: <Dashboard /> },
     ],
   },
 
-  // Catch all
   {
-    path: "*",
-    element: <ErrorPage />,
+    path: "/admin",
+    element: (
+      <AdminProtectedRoute>
+        <AdminLayout />
+      </AdminProtectedRoute>
+    ),
+    children: [
+      {
+        path: "dashboard",
+        element: <AdminDashboard />,
+      },
+      {
+        path: "users",
+        element: <AdminUser />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+    ],
   },
 ]);
 

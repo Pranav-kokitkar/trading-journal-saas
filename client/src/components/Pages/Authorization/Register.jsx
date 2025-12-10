@@ -4,7 +4,8 @@ import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
-import { PerformanceContext } from "../../../context/PerformanceContext";
+import { TradeContext } from "../../../store/TradeContext";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const Register = () => {
   const [user, setUser] = useState({

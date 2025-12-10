@@ -1,4 +1,4 @@
-// controllers/account-controller.js  (this is really user-controller)
+
 const User = require("../models/user-model");
 
 const getUser = async (req, res) => {

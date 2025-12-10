@@ -20,6 +20,7 @@ const authMiddleware = async (req, res, next) => {
     req.user = userData;
     req.token = jwttoken;
     req.userID = userData._id;
+    req.isAdmin = userData.isAdmin;
     next();
   } catch (error) {
     return res.status(400).json({ message: "Unauthorized token" });

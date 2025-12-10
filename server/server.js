@@ -8,6 +8,7 @@ const notesRoute = require("./routers/Notes-router");
 const userRoute = require("./routers/User-router");
 const contactRoute = require("./routers/Contact-router");
 const accountRoute = require("./routers/Account-router");
+const adminRoute = require("./routers/Admin-router");
 const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
@@ -29,6 +30,7 @@ app.use("/api/user", userRoute);
 app.use("/api/notes", notesRoute);
 app.use("/api/contact", contactRoute);
 app.use("/api/account", accountRoute);
+app.use("/api/admin", adminRoute);
 app.use(errorMiddleware);
 
 PORT = process.env.PORT || 5000;
