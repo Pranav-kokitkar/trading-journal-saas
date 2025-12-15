@@ -1,0 +1,172 @@
+/* === Modal Overlay === */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(3, 6, 12, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* === Modal Content === */
+.modalContent {
+  background: #121721;
+  width: 480px;
+  max-width: 92%;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  animation: fadeIn 0.22s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+}
+
+/* === Close Button === */
+.modalCloseButton {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  color: #fff;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.modalCloseButton:hover {
+  color: #ff4d4d;
+}
+
+/* === Field Rows === */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  color: #9aa4b2;
+}
+
+.field p {
+  font-size: 14px;
+  color: #e6eaf2;
+  margin: 0;
+}
+
+/* === Inputs === */
+.editTitleInput {
+  background: #0d1117;
+  border: 1px solid #3b3f46;
+  color: #ffffff;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.editTitleInput:focus {
+  outline: none;
+  border-color: #2c72ff;
+}
+
+/* Checkbox alignment */
+.field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2c72ff;
+  cursor: pointer;
+}
+
+/* === Actions === */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* === Buttons === */
+.editButton {
+  background: #2c72ff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.editButton:hover {
+  background: #1e5be0;
+  transform: scale(1.05);
+}
+
+.saveButton {
+  background: #1db954;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.saveButton:hover {
+  background: #18a64b;
+  transform: scale(1.05);
+}
+
+.cancelButton {
+  background: #555;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.cancelButton:hover {
+  background: #666;
+  transform: scale(1.05);
+}
+
+.deleteButton {
+  background: #d64040;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  font-size: 14px;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.deleteButton:hover {
+  background: #b33030;
+  transform: scale(1.05);
+}
+
+/* === Animation === */
+@keyframes fadeIn {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

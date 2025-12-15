@@ -1,0 +1,166 @@
+/* ===============================
+   Admin Users Panel Styles
+================================ */
+
+.adminUsers {
+  min-height: 100vh;
+  padding: 2rem;
+  color: #e5e7eb;
+}
+
+/* ===============================
+   Header stats
+================================ */
+
+.adminUsersHeaders {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.totalUserscontainer,
+.totalAdmincontainer {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.192);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.totalUserscontainer h3,
+.totalAdmincontainer h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #c7d2fe;
+}
+
+.totalUserscontainer p,
+.totalAdmincontainer p {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+/* ===============================
+   Section title
+================================ */
+
+.adminUsers h2 {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+/* ===============================
+   Users grid
+================================ */
+
+.usersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+/* ===============================
+   User card
+================================ */
+
+.usersCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
+  padding: 1.25rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+}
+
+/* ===============================
+   User info (left side)
+================================ */
+
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.userInfo p:first-child {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.userInfo p:last-child {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  width: fit-content;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+}
+
+/* Admin role badge */
+.admin {
+  background: rgba(34, 197, 94, 0.15) !important;
+  color: #22c55e !important;
+}
+
+/* ===============================
+   Edit button
+================================ */
+
+.editBtn {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.editBtn:hover {
+  background: #1d4ed8;
+  transform: scale(1.05);
+}
+
+/* ===============================
+   Loading
+================================ */
+
+.loading {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 4rem 0;
+  color: #94a3b8;
+}
+
+/* ===============================
+   Responsive
+================================ */
+
+@media (max-width: 640px) {
+  .adminUsers {
+    padding: 1.25rem;
+  }
+
+  .usersCard {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .editBtn {
+    align-self: flex-end;
+  }
+}

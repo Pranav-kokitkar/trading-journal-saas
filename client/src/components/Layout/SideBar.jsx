@@ -4,7 +4,7 @@ import { useAuth } from "../../store/Auth";
 
 export const Sidebar = () => {
 
-  const {user} = useAuth();
+  const {user, isAdmin} = useAuth();
 
   const getNavLinkClass = ({ isActive }) => {
     return isActive ? `${styles.navlink} ${styles.active}` : `${styles.navlink}`; 
@@ -47,6 +47,11 @@ export const Sidebar = () => {
             <NavLink className={getNavLinkClass} to="/app/contact">
             Contact
             </NavLink>
+          </li>
+          <li>
+            {isAdmin?<NavLink className={getNavLinkClass} to="/admin">
+            Admin
+            </NavLink>:""}
           </li>
         </ul>
       </nav>

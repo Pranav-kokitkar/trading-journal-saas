@@ -17,6 +17,7 @@ import {AdminProtectedRoute} from "./components/Admin/authorization/AdminProtect
 import { AdminLayout } from "./components/Admin/adminLayout/AdminLayout";
 import {AdminDashboard }from "./components/Admin/adminDashboard/AdminDashboard";
 import {AdminUser} from "./components/Admin/adminUsers/AdminUsers";
+import { AdminContacts } from "./components/Admin/adminContacts/AdminContacts";
 
 
 const router = createBrowserRouter([
@@ -101,6 +102,11 @@ const router = createBrowserRouter([
       {
         path: "users",
         element: <AdminUser />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path:"contacts",
+        element:<AdminContacts/>,
         errorElement: <ErrorPage />,
       },
       {
