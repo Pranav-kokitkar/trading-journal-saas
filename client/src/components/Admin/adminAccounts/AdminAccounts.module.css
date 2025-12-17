@@ -1,0 +1,123 @@
+.page {
+  padding: 24px;
+  background-color: var(--bg);
+  min-height: 100vh;
+}
+
+/* ---------- LOADING / EMPTY ---------- */
+
+.loading,
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 16px;
+}
+
+/* ---------- STATS ---------- */
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.statCard {
+  background-color: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  border: 1px solid rgba(246, 185, 59, 0.15);
+}
+
+.statCard span {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.statCard h3 {
+  margin: 6px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ---------- CARDS GRID ---------- */
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+/* ---------- ACCOUNT CARD ---------- */
+
+.accountCard {
+  background-color: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.25s ease;
+}
+
+.accountCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- CARD HEADER ---------- */
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.accountName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+}
+
+/* ---------- STATUS BADGE ---------- */
+
+.status {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.active {
+  background-color: rgba(246, 185, 59, 0.15);
+  color: var(--accent);
+}
+
+.archived {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+}
+
+.disabled {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* ---------- CARD BODY ---------- */
+
+.cardBody {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.cardBody strong {
+  color: #ffffff;
+  font-weight: 500;
+}

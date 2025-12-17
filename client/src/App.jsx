@@ -17,7 +17,12 @@ import {AdminProtectedRoute} from "./components/Admin/authorization/AdminProtect
 import { AdminLayout } from "./components/Admin/adminLayout/AdminLayout";
 import {AdminDashboard }from "./components/Admin/adminDashboard/AdminDashboard";
 import {AdminUser} from "./components/Admin/adminUsers/AdminUsers";
+import { AdminAccounts } from "./components/Admin/adminAccounts/AdminAccounts";
+import { AdminUsersProvider } from "./components/Admin/store/AdminUserContext";
 import { AdminContacts } from "./components/Admin/adminContacts/AdminContacts";
+import { AdminContactsProvider } from "./components/Admin/store/AdminContactsContext";
+import { AdminAccountsProvider } from "./components/Admin/store/AdminAccountsContext";
+import { AdminAccountDetails } from "./components/Admin/adminAccounts/AdminAccountDetails";
 
 
 const router = createBrowserRouter([
@@ -91,7 +96,13 @@ const router = createBrowserRouter([
     path: "/admin",
     element: (
       <AdminProtectedRoute>
+        <AdminUsersProvider>
+          <AdminAccountsProvider>
+          <AdminContactsProvider>
         <AdminLayout />
+        </AdminContactsProvider>
+        </AdminAccountsProvider>
+        </AdminUsersProvider>
       </AdminProtectedRoute>
     ),
     children: [
@@ -104,10 +115,16 @@ const router = createBrowserRouter([
         element: <AdminUser />,
         errorElement: <ErrorPage />,
       },
+      {path:"contacts",element:<AdminContacts/>,
+        errorElement:<ErrorPage/>,
+      },
       {
-        path:"contacts",
-        element:<AdminContacts/>,
+        path:"accounts",
+        element:<AdminAccounts/>,
         errorElement: <ErrorPage />,
+      },
+      {
+        path:"accounts/:id", element: <AdminAccountDetails/>, errorElement:<ErrorPage/>
       },
       {
         index: true,

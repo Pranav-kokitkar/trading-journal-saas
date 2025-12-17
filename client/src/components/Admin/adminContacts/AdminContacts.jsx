@@ -1,70 +1,10 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../../../store/Auth";
 import styles from "./AdminContacts.module.css";
 import { AdminContactModal } from "./AdminContactModal";
+import { useAdminContacts } from "../store/AdminContactsContext";
 
 export const AdminContacts = () => {
-  const [contacts, setContacts] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [contactModal, setContactModal] = useState(false);
-  const [selectedContact, setSelectedContact] = useState(null);
-
-  const { authorizationToken } = useAuth();
-
-  const getAllContacts = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/contact`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: authorizationToken,
-          },
-        }
-      );
-      const res_data = await response.json();
-      if (response.ok) {
-        setContacts(res_data);
-        setLoading(false);
-      } else {
-        console.log("failed to get contacts");
-        setLoading(false);
-      }
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    }
-  };
-
-  const deleteContact = async (id) => {
-    try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/contact/${id}`,{
-            method:"DELETE",
-            headers:{
-                Authorization:authorizationToken
-            }
-        });
-        if(!response.ok){
-            return console.log("failed to delete constsct")
-        }
-        setContacts((prev) => prev.filter((c) => c._id !== id));
-        console.log('deleted')
-    } catch (error) {
-        console.log(error);
-    }
-  }
-
-  useEffect(() => {
-    if (authorizationToken) {
-      getAllContacts();
-    }
-  }, [authorizationToken]);
-
-  const showContact = (c) => {
-    setContactModal(true);
-    setSelectedContact(c);
-  };
+  
+  const {contacts, loading, contactModal,selectedContact, deleteContact, showContact, onClose}= useAdminContacts();
 
   if (loading) {
     return <p className={styles.empty}>Loading...</p>;
@@ -75,10 +15,7 @@ export const AdminContacts = () => {
       {contactModal && selectedContact && (
         <AdminContactModal
           contact={selectedContact}
-          onClose={() => {
-            setSelectedContact(null);
-            setContactModal(false);
-          }}
+          onClose={onClose}
         />
       )}
       <div className={styles.header}>
