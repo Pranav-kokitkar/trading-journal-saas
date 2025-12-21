@@ -1,6 +1,7 @@
 import styles from "./adminusers.module.css";
 import { UserEditModal } from "./UserEditModal";
 import { useAdminUsers } from "../store/AdminUserContext";
+import { Pagination } from "../../Pagination";
 
 export const AdminUser = () => {
   const {
@@ -12,6 +13,11 @@ export const AdminUser = () => {
     closeUserModal,
     deleteUser,
     updateUser,
+    page,
+    setPage,
+    totalPages,
+    totalUsers,
+    adminUsers,
   } = useAdminUsers();
 
   if (loading) return <p>Loading...</p>;
@@ -32,12 +38,12 @@ export const AdminUser = () => {
       <div className={styles.adminUsersHeaders}>
         <div className={styles.totalUserscontainer}>
           <h3>Total Users:</h3>
-          <p>{users.length}</p>
+          <p>{totalUsers}</p>
         </div>
 
         <div className={styles.totalAdmincontainer}>
           <h3>Admin Users:</h3>
-          <p>{users.filter((u) => u.isAdmin).length}</p>
+          <p>{adminUsers}</p>
         </div>
       </div>
 
@@ -45,6 +51,7 @@ export const AdminUser = () => {
         <h2>Users :</h2>
         <DisplayUsers users={users} onEdit={openUserModal} />
       </div>
+      <Pagination onPageChange={setPage} page={page} totalPages={totalPages}/>
     </section>
   );
 };

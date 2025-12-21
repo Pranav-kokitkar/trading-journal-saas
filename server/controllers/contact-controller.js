@@ -37,7 +37,7 @@ const contactForm = async (req, res) => {
       email,
       subject,
       message,
-      screenshotUrl, // will be "" if no file uploaded
+      screenshotUrl, 
     });
 
     res.status(200).json({

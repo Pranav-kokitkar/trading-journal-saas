@@ -40,6 +40,9 @@ export const AdminSidebar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink className={getNavLinkClass} to="/admin/trades">Trades</NavLink>
+          </li>
+          <li>
             <NavLink className={getNavLinkClass} to="/admin/contacts">
               Contacts
             </NavLink>

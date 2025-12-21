@@ -1,20 +1,85 @@
 /* AdminContacts.module.css */
 
-/* Reuse same root tokens (DO NOT duplicate :root if global) */
+/* =========================
+   Layout
+========================= */
 
 .container {
   min-height: 100vh;
-  padding: 20px;
+  padding: 24px;
   color: white;
+  background: var(--background);
 }
 
-/* Header */
+/* =========================
+   Header + Stats
+========================= */
+
 .header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 38px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
 }
+
+/* =========================
+   Stat Cards
+========================= */
+
+.statCard {
+  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+  padding: 20px 22px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  transition: border-color 0.2s ease, transform 0.15s ease;
+}
+
+.statCard:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Label (top text) */
+.statLabel {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+/* Value (main number) */
+.statValue {
+  font-size: 28px;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+}
+
+/* =========================
+   Status Variants
+========================= */
+
+.openStat .statValue {
+  color: #fbbf24;
+}
+
+.progressStat .statValue {
+  color: #60a5fa;
+}
+
+.resolvedStat .statValue {
+  color: #34d399;
+}
+
+/* =========================
+   Title / Count
+========================= */
 
 .title {
   font-size: 22px;
@@ -25,36 +90,49 @@
   color: var(--muted);
 }
 
-/* Contacts list */
+/* =========================
+   Contacts List
+========================= */
+
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
+  gap: 16px;
 }
 
-/* Contact card */
+/* =========================
+   Contact Card
+========================= */
+
 .card {
   background: var(--card);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 14px;
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
+
+  transition: border-color 0.2s ease;
 }
 
-/* Subject = primary signal */
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Subject */
 .subject {
   font-size: 17px;
   font-weight: 800;
   color: var(--accent);
 }
 
-/* Email = secondary */
+/* Email */
 .email {
   font-size: 14px;
   color: white;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 /* Meta info */
@@ -63,53 +141,94 @@
   color: var(--muted);
 }
 
-/* Actions */
+/* =========================
+   Status Badge
+========================= */
+
+.status {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+
+  border: 1px solid transparent;
+  pointer-events: none;
+}
+
+/* OPEN */
+.open {
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+/* IN PROGRESS */
+.in_progress {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.25);
+}
+
+/* RESOLVED */
+.resolved {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.12);
+  border-color: rgba(52, 211, 153, 0.25);
+}
+
+/* =========================
+   Actions
+========================= */
+
 .actions {
   margin-top: 10px;
   display: flex;
   gap: 10px;
 }
 
-/* View button */
 .viewBtn {
   flex: 1;
-  padding: 8px;
+  padding: 9px;
   font-size: 12px;
   font-weight: 700;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
   color: white;
   cursor: pointer;
-}
-
-/* Delete button */
-.deleteBtn {
-  flex: 1;
-  padding: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  border-radius: 8px;
-  border: none;
-  background: rgba(255, 80, 80, 0.12);
-  color: #ff9b9b;
-  cursor: pointer;
-}
-
-/* Hover feedback (subtle) */
-.card:hover {
-  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .viewBtn:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
+/* Delete */
+.deleteBtn {
+  flex: 1;
+  padding: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255, 80, 80, 0.12);
+  color: #ff9b9b;
+  cursor: pointer;
+}
+
 .deleteBtn:hover {
   background: rgba(255, 80, 80, 0.2);
 }
 
-/* Empty state */
+/* =========================
+   Empty State
+========================= */
+
 .empty {
   text-align: center;
   color: var(--muted);

@@ -23,6 +23,9 @@ import { AdminContacts } from "./components/Admin/adminContacts/AdminContacts";
 import { AdminContactsProvider } from "./components/Admin/store/AdminContactsContext";
 import { AdminAccountsProvider } from "./components/Admin/store/AdminAccountsContext";
 import { AdminAccountDetails } from "./components/Admin/adminAccounts/AdminAccountDetails";
+import { AdminTrades } from "./components/Admin/adminTrades/AdminTrades";
+import { AdminTradesProvider } from "./components/Admin/store/AdminTradesContext";
+import { AdminTradeDetails } from "./components/Admin/adminTrades/AdminTradeDetails";
 
 
 const router = createBrowserRouter([
@@ -98,10 +101,12 @@ const router = createBrowserRouter([
       <AdminProtectedRoute>
         <AdminUsersProvider>
           <AdminAccountsProvider>
-          <AdminContactsProvider>
-        <AdminLayout />
-        </AdminContactsProvider>
-        </AdminAccountsProvider>
+            <AdminTradesProvider>
+            <AdminContactsProvider>
+             <AdminLayout />
+            </AdminContactsProvider>
+            </AdminTradesProvider>
+           </AdminAccountsProvider>
         </AdminUsersProvider>
       </AdminProtectedRoute>
     ),
@@ -123,6 +128,9 @@ const router = createBrowserRouter([
         element:<AdminAccounts/>,
         errorElement: <ErrorPage />,
       },
+      
+      {path:"trades",element:<AdminTrades/>, errorElement:<ErrorPage/>},
+      {path:"trades/:id",element:<AdminTradeDetails/>, errorElement:<ErrorPage/>},
       {
         path:"accounts/:id", element: <AdminAccountDetails/>, errorElement:<ErrorPage/>
       },

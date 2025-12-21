@@ -2,12 +2,30 @@ const User = require("../../models/user-model");
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
-    res.status(200).json(users);
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
+    const skip = (page - 1) * limit;
+
+    const users = await User.find().skip(skip).limit(limit);
+    const totalUsers = await User.countDocuments();
+    const adminUsers = await User.countDocuments({ isAdmin: true });
+
+    res.status(200).json({
+      users,
+      stats: {
+        totalUsers,
+        adminUsers,
+      },
+      pagination: {
+        page,
+        limit,
+        totalPages: Math.ceil(totalUsers / limit),
+      },
+    });
   } catch (error) {
     res
       .status(400)
-      .json({ message: "server error to get all users", err: error });
+      .json({ message: "server error to get all users", err: error.message });
   }
 };
 

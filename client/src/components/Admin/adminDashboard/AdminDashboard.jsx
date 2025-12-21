@@ -1,7 +1,7 @@
-export const AdminDashboard =()=>{
-    return(
-        <div>
-            <h2>hello</h2>
-        </div>
-    )
+import React from 'react'
+
+export const AdminDashboard = () => {
+  return (
+    <div>AdminDashboard</div>
+  )
 }

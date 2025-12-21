@@ -4,8 +4,30 @@ const Trade = require("../../models/trade-model");
 
 const getAllAccounts = async (req, res) => {
   try {
-    const accounts = await Account.find();
-    res.status(200).json(accounts);
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 2;
+    const skip = (page - 1) * limit;
+
+    const accounts = await Account.find().skip(skip).limit(limit);
+    const totalAccounts = await Account.countDocuments();
+    const activeAccounts = await Account.countDocuments({ status: "active" });
+    const disabledAccounts = await Account.countDocuments({
+      status: "disabled",
+    });
+
+    res.status(200).json({
+      accounts,
+      stats: {
+        totalAccounts,
+        activeAccounts,
+        disabledAccounts,
+      },
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalAccounts / limit),
+        limit,
+      },
+    });
   } catch (error) {
     res.status(500).json({
       message: "Server error while getting accounts",
@@ -36,7 +58,6 @@ const getAccountByID = async (req, res) => {
     });
   }
 };
-
 
 const editAccountDetails = async (req, res) => {
   try {
@@ -93,26 +114,42 @@ const editAccountDetails = async (req, res) => {
   }
 };
 
-const getTradesByAccountId = async(req,res)=>{
-    try {
-        const accountId  = req.params.id;
+const getTradesByAccountId = async (req, res) => {
+  try {
+    const accountId = req.params.id;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-        if(!mongoose.Types.ObjectId.isValid(accountId)){
-            return res.status(400).json({message:"Invalid Account Id"})
-        }
-
-        const Trades = await Trade.find({accountId}).sort({dateTime:-1});
-
-        res.status(200).json(Trades)
-
-    } catch (err) {
-        res.status(400).json({message:"error from backend whil getting tardes by account id", error:err.message})
+    if (!mongoose.Types.ObjectId.isValid(accountId)) {
+      return res.status(400).json({ message: "Invalid Account Id" });
     }
-}
+
+    const Trades = await Trade.find({ accountId })
+      .sort({ dateTime: -1 })
+      .skip(skip)
+      .limit(limit);
+    const Totaltrades = await Trade.countDocuments({ accountId });
+
+    res.status(200).json({
+      Trades,
+      pagination: {
+        page,
+        limit,
+        totalPages: Math.ceil(Totaltrades / limit),
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: "error from backend whil getting tardes by account id",
+      error: err.message,
+    });
+  }
+};
 
 module.exports = {
   getAllAccounts,
   getAccountByID,
   editAccountDetails,
-  getTradesByAccountId
+  getTradesByAccountId,
 };

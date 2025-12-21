@@ -1,12 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { useAdminAccounts } from "../store/AdminAccountsContext";
 import styles from "./AdminAccounts.module.css";
+import { Pagination } from "../../Pagination";
 
 export const AdminAccounts = () => {
-  const { accounts, totalAccounts, loading } = useAdminAccounts();
-
-  const activeAccounts = accounts.filter(a => a.status === "active").length;
-  const disabledAccounts = accounts.filter(a => a.status === "disabled").length;
+  const {
+    accounts,
+    totalAccounts,
+    loading,
+    loadingAccounts,
+    page,
+    setPage,
+    totalPages,
+    activeAccounts,
+    disabledAccounts,
+  } = useAdminAccounts();
 
   if (loading) {
     return <p className={styles.loading}>Loading accounts...</p>;
@@ -30,13 +38,17 @@ export const AdminAccounts = () => {
         </div>
       </div>
 
-      {/* Accounts */}
-      <DisplayAccounts accounts={accounts} />
+      {loadingAccounts ? (
+        <p className={styles.loading}>Loading accounts...</p>
+      ) : (
+        <DisplayAccounts accounts={accounts} />
+      )}
+      <Pagination onPageChange={setPage} page={page} totalPages={totalPages} />
     </section>
   );
 };
 
-const DisplayAccounts = ({ accounts }) => {
+const DisplayAccounts = ({ accounts, setPage, page, totalAccounts, limit }) => {
   const navigate = useNavigate();
 
   if (!accounts || accounts.length === 0) {
@@ -45,7 +57,7 @@ const DisplayAccounts = ({ accounts }) => {
 
   return (
     <div className={styles.cardsGrid}>
-      {accounts.map(a => (
+      {accounts.map((a) => (
         <div
           key={a._id}
           className={styles.accountCard}
@@ -59,9 +71,16 @@ const DisplayAccounts = ({ accounts }) => {
           </div>
 
           <div className={styles.cardBody}>
-            <p><strong>Balance:</strong> ₹{a.currentBalance.toFixed(2)}</p>
-            <p><strong>Total Trades:</strong> {a.totalTrades}</p>
-            <p><strong>Created:</strong> {new Date(a.createdAt).toLocaleDateString()}</p>
+            <p>
+              <strong>Balance:</strong> ₹{a.currentBalance.toFixed(2)}
+            </p>
+            <p>
+              <strong>Total Trades:</strong> {a.totalTrades}
+            </p>
+            <p>
+              <strong>Created:</strong>{" "}
+              {new Date(a.createdAt).toLocaleDateString()}
+            </p>
           </div>
         </div>
       ))}
