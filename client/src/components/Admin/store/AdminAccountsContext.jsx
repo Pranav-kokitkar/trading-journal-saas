@@ -6,7 +6,7 @@ const AdminAccountsContext = createContext();
 export const AdminAccountsProvider = ({ children }) => {
   const { authorizationToken } = useAuth();
   const [accounts, setAccounts] = useState([]);
-  const [limit , setLimit] = useState(3);
+  const [limit, setLimit] = useState(3);
   const [totalAccounts, setTotalAccounts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingAccounts, setLoadingAccounts] = useState(true);
@@ -14,6 +14,9 @@ export const AdminAccountsProvider = ({ children }) => {
 
   const [activeAccounts, setActiveAccounts] = useState(0);
   const [disabledAccounts, setDisabledAccounts] = useState(0);
+
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
 
   const [page, setPage] = useState(1);
 
@@ -25,17 +28,24 @@ export const AdminAccountsProvider = ({ children }) => {
         setLoadingAccounts(true);
       }
 
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/admin/account?page=${page}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: authorizationToken,
-          },
-        }
-      );
+      let url = `${
+        import.meta.env.VITE_API_URL
+      }/api/admin/account?page=${page}&limit=${limit}`;
+
+      if (search) {
+        url += `&search=${search}`;
+      }
+
+      if (status) {
+        url += `&status=${status}`;
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: authorizationToken,
+        },
+      });
 
       const data = await response.json();
 
@@ -56,6 +66,14 @@ export const AdminAccountsProvider = ({ children }) => {
     }
   };
 
+    //  RESET FILTERS
+
+  const resetFilters = () => {
+    setSearch("");
+    setStatus("all");
+    setPage(1);
+  };
+
   useEffect(() => {
     if (authorizationToken) {
       getAllAccounts({ initial: true });
@@ -66,7 +84,7 @@ export const AdminAccountsProvider = ({ children }) => {
     if (authorizationToken) {
       getAllAccounts({ initial: false });
     }
-  }, [page]);
+  }, [page, authorizationToken, search, status]);
 
   return (
     <AdminAccountsContext.Provider
@@ -80,7 +98,10 @@ export const AdminAccountsProvider = ({ children }) => {
         setPage,
         totalPages,
         activeAccounts,
-        disabledAccounts
+        disabledAccounts,
+        setSearch,
+        setStatus,
+        resetFilters,
       }}
     >
       {children}

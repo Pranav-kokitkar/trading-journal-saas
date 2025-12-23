@@ -13,10 +13,10 @@ import { ErrorPage } from "./components/Pages/Error/ErrorPage";
 import { ProtectedRoute } from "./components/Pages/Authorization/ProtectedRoute";
 import { Contact } from "./components/Pages/Contact/Contact";
 
-import {AdminProtectedRoute} from "./components/Admin/authorization/AdminProtectedRoute";
+import { AdminProtectedRoute } from "./components/Admin/authorization/AdminProtectedRoute";
 import { AdminLayout } from "./components/Admin/adminLayout/AdminLayout";
-import {AdminDashboard }from "./components/Admin/adminDashboard/AdminDashboard";
-import {AdminUser} from "./components/Admin/adminUsers/AdminUsers";
+import { AdminDashboard } from "./components/Admin/adminDashboard/AdminDashboard";
+import { AdminUser } from "./components/Admin/adminUsers/AdminUsers";
 import { AdminAccounts } from "./components/Admin/adminAccounts/AdminAccounts";
 import { AdminUsersProvider } from "./components/Admin/store/AdminUserContext";
 import { AdminContacts } from "./components/Admin/adminContacts/AdminContacts";
@@ -26,7 +26,7 @@ import { AdminAccountDetails } from "./components/Admin/adminAccounts/AdminAccou
 import { AdminTrades } from "./components/Admin/adminTrades/AdminTrades";
 import { AdminTradesProvider } from "./components/Admin/store/AdminTradesContext";
 import { AdminTradeDetails } from "./components/Admin/adminTrades/AdminTradeDetails";
-
+import { AdminUserDetails } from "./components/Admin/adminUsers/AdminUserDetails";
 
 const router = createBrowserRouter([
   {
@@ -102,11 +102,11 @@ const router = createBrowserRouter([
         <AdminUsersProvider>
           <AdminAccountsProvider>
             <AdminTradesProvider>
-            <AdminContactsProvider>
-             <AdminLayout />
-            </AdminContactsProvider>
+              <AdminContactsProvider>
+                <AdminLayout />
+              </AdminContactsProvider>
             </AdminTradesProvider>
-           </AdminAccountsProvider>
+          </AdminAccountsProvider>
         </AdminUsersProvider>
       </AdminProtectedRoute>
     ),
@@ -120,19 +120,31 @@ const router = createBrowserRouter([
         element: <AdminUser />,
         errorElement: <ErrorPage />,
       },
-      {path:"contacts",element:<AdminContacts/>,
-        errorElement:<ErrorPage/>,
+      {
+        path:"user/:id",
+        element: <AdminUserDetails/>,
+        errorElement: <ErrorPage/>
       },
       {
-        path:"accounts",
-        element:<AdminAccounts/>,
+        path: "contacts",
+        element: <AdminContacts />,
         errorElement: <ErrorPage />,
       },
-      
-      {path:"trades",element:<AdminTrades/>, errorElement:<ErrorPage/>},
-      {path:"trades/:id",element:<AdminTradeDetails/>, errorElement:<ErrorPage/>},
       {
-        path:"accounts/:id", element: <AdminAccountDetails/>, errorElement:<ErrorPage/>
+        path: "accounts",
+        element: <AdminAccounts />,
+        errorElement: <ErrorPage />,
+      },
+      { path: "trades", element: <AdminTrades />, errorElement: <ErrorPage /> },
+      {
+        path: "trades/:id",
+        element: <AdminTradeDetails />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "accounts/:id",
+        element: <AdminAccountDetails />,
+        errorElement: <ErrorPage />,
       },
       {
         index: true,

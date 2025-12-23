@@ -9,7 +9,7 @@
   z-index: 1000;
 }
 
-/* Modal container */
+/* Modal */
 .modal {
   background: var(--card);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -27,7 +27,6 @@
 .header {
   padding: 16px 18px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
@@ -70,7 +69,6 @@
 .value {
   font-size: 13px;
   color: white;
-  word-break: break-word;
 }
 
 /* Message */
@@ -91,33 +89,91 @@
 }
 
 /* Screenshot */
-.screenshot {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .screenshot img {
   width: 100%;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-/* Footer */
-.footer {
-  padding: 14px 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+/* STATUS ROW */
+.statusRow {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.closeAction {
-  padding: 10px 18px;
+/* ✅ Styled Select */
+.statusSelect {
+  flex: 1;
+  padding: 10px 36px 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+
+.statusSelect:hover {
+  border-color: var(--accent);
+}
+
+.statusSelect:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+}
+
+/* Save Button */
+.saveBtn {
+  padding: 10px 16px;
   font-size: 13px;
   font-weight: 700;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
   color: #071226;
+  white-space: nowrap;
+}
+
+/* Dropdown options */
+.statusSelect option {
+  background-color: #0b1220; /* dark background */
+  color: #ffffff; /* white text */
+}
+
+/* Selected option (important for some browsers) */
+.statusSelect option:checked {
+  background-color: var(--accent);
+  color: #071226;
+}
+
+/* Hovered option (Firefox support) */
+.statusSelect option:hover {
+  background-color: rgba(99, 102, 241, 0.25);
+  color: #ffffff;
+}
+
+/* ✅ RESPONSIVE */
+@media (max-width: 520px) {
+  .modal {
+    max-width: 94%;
+  }
+
+  .statusRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .saveBtn {
+    width: 100%;
+  }
 }

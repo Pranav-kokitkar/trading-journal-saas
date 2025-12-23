@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
 import styles from "./adminusermodal.module.css";
 
-export const UserEditModal = ({ user, onDelete, onUpdate, onClose }) => {
+export const UserEditModal = ({
+  userDetails,
+  onDelete,
+  onUpdate,
+  onClose,
+  getUserData,
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [updatedUser, setUpdatedUser] = useState({
     name: "",
@@ -10,12 +16,14 @@ export const UserEditModal = ({ user, onDelete, onUpdate, onClose }) => {
   });
 
   useEffect(() => {
-    setUpdatedUser({
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-    });
-  }, [user]);
+    if (userDetails) {
+      setUpdatedUser({
+        name: userDetails.name,
+        email: userDetails.email,
+        isAdmin: userDetails.isAdmin,
+      });
+    }
+  }, [userDetails]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -27,14 +35,15 @@ export const UserEditModal = ({ user, onDelete, onUpdate, onClose }) => {
 
   const handleSave = () => {
     onUpdate(updatedUser);
+    getUserData();
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setUpdatedUser({
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
+      name: userDetails.name,
+      email: userDetails.email,
+      isAdmin: userDetails.isAdmin,
     });
     setIsEditing(false);
   };
@@ -42,6 +51,7 @@ export const UserEditModal = ({ user, onDelete, onUpdate, onClose }) => {
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
+        {/* Name */}
         <div className={styles.field}>
           <label>Name</label>
           {isEditing ? (
@@ -49,13 +59,14 @@ export const UserEditModal = ({ user, onDelete, onUpdate, onClose }) => {
               name="name"
               value={updatedUser.name}
               onChange={handleChange}
-              className={styles.editTitleInput}
+              className={styles.input}
             />
           ) : (
-            <p>{user.name}</p>
+            <p>{userDetails.name}</p>
           )}
         </div>
 
+        {/* Email */}
         <div className={styles.field}>
           <label>Email</label>
           {isEditing ? (
@@ -63,14 +74,15 @@ export const UserEditModal = ({ user, onDelete, onUpdate, onClose }) => {
               name="email"
               value={updatedUser.email}
               onChange={handleChange}
-              className={styles.editTitleInput}
+              className={styles.input}
             />
           ) : (
-            <p>{user.email}</p>
+            <p>{userDetails.email}</p>
           )}
         </div>
 
-        <div className={styles.field}>
+        {/* Admin */}
+        <div className={styles.fieldRow}>
           <label>Admin</label>
           {isEditing ? (
             <input
@@ -80,17 +92,24 @@ export const UserEditModal = ({ user, onDelete, onUpdate, onClose }) => {
               onChange={handleChange}
             />
           ) : (
-            <p>{user.isAdmin ? "Yes" : "No"}</p>
+            <span
+              className={`${styles.badge} ${
+                userDetails.isAdmin ? styles.admin : styles.user
+              }`}
+            >
+              {userDetails.isAdmin ? "Yes" : "No"}
+            </span>
           )}
         </div>
 
+        {/* Actions */}
         <div className={styles.actions}>
           {isEditing ? (
             <>
-              <button onClick={handleSave} className={styles.saveButton}>
+              <button onClick={handleSave} className={styles.saveBtn}>
                 Save
               </button>
-              <button onClick={handleCancel} className={styles.cancelButton}>
+              <button onClick={handleCancel} className={styles.cancelBtn}>
                 Cancel
               </button>
             </>
@@ -98,24 +117,25 @@ export const UserEditModal = ({ user, onDelete, onUpdate, onClose }) => {
             <>
               <button
                 onClick={() => setIsEditing(true)}
-                className={styles.editButton}
+                className={styles.editBtn}
               >
                 Edit
               </button>
               <button
-                onClick={() => onDelete(user._id)}
-                className={styles.deleteButton}
+                onClick={() => onDelete(userDetails._id)}
+                className={styles.deleteBtn}
               >
                 Delete
               </button>
             </>
           )}
         </div>
-      </div>
 
-      <button className={styles.modalCloseButton} onClick={onClose}>
-        ✕
-      </button>
+        {/* Close */}
+        <button className={styles.closeBtn} onClick={onClose}>
+          ✕
+        </button>
+      </div>
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useAdminAccounts } from "../store/AdminAccountsContext";
 import styles from "./AdminAccounts.module.css";
 import { Pagination } from "../../Pagination";
+import { useEffect, useState } from "react";
 
 export const AdminAccounts = () => {
   const {
@@ -14,7 +15,27 @@ export const AdminAccounts = () => {
     totalPages,
     activeAccounts,
     disabledAccounts,
+    setSearch,
+    setStatus,
+    resetFilters,
   } = useAdminAccounts();
+
+  const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const handleChange = (e) => setSearchInput(e.target.value);
+
+  const handleStatusChange = (e) => {
+    setStatus(e.target.value);
+    setPage(1);
+  };
 
   if (loading) {
     return <p className={styles.loading}>Loading accounts...</p>;
@@ -38,17 +59,39 @@ export const AdminAccounts = () => {
         </div>
       </div>
 
+      {/* Filters */}
+      <div className={styles.filters}>
+        <input
+          placeholder="Search by name or email"
+          onChange={handleChange}
+          value={searchInput}
+          className={styles.searchInput}
+        />
+
+        <select onChange={handleStatusChange} className={styles.statusFilter}>
+          <option value="all">All</option>
+          <option value="active">Active</option>
+          <option value="disabled">Disabled</option>
+        </select>
+
+        <button onClick={resetFilters} className={styles.resetBtn}>
+          Reset
+        </button>
+      </div>
+
+      {/* Accounts */}
       {loadingAccounts ? (
         <p className={styles.loading}>Loading accounts...</p>
       ) : (
         <DisplayAccounts accounts={accounts} />
       )}
+
       <Pagination onPageChange={setPage} page={page} totalPages={totalPages} />
     </section>
   );
 };
 
-const DisplayAccounts = ({ accounts, setPage, page, totalAccounts, limit }) => {
+const DisplayAccounts = ({ accounts }) => {
   const navigate = useNavigate();
 
   if (!accounts || accounts.length === 0) {
@@ -72,14 +115,16 @@ const DisplayAccounts = ({ accounts, setPage, page, totalAccounts, limit }) => {
 
           <div className={styles.cardBody}>
             <p>
-              <strong>Balance:</strong> ₹{a.currentBalance.toFixed(2)}
+              <span>Balance</span>
+              <strong>₹{a.currentBalance.toFixed(2)}</strong>
             </p>
             <p>
-              <strong>Total Trades:</strong> {a.totalTrades}
+              <span>Total Trades</span>
+              <strong>{a.totalTrades}</strong>
             </p>
             <p>
-              <strong>Created:</strong>{" "}
-              {new Date(a.createdAt).toLocaleDateString()}
+              <span>Created</span>
+              <strong>{new Date(a.createdAt).toLocaleDateString()}</strong>
             </p>
           </div>
         </div>

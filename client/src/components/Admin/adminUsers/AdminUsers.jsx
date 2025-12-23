@@ -2,6 +2,8 @@ import styles from "./adminusers.module.css";
 import { UserEditModal } from "./UserEditModal";
 import { useAdminUsers } from "../store/AdminUserContext";
 import { Pagination } from "../../Pagination";
+import { AdminDisplayUsers } from "./AdminDisplayUsers";
+import { useState, useEffect } from "react";
 
 export const AdminUser = () => {
   const {
@@ -18,9 +20,26 @@ export const AdminUser = () => {
     totalPages,
     totalUsers,
     adminUsers,
+    setSearch,
+    role,
+    setRole,
+    resetFilters,
   } = useAdminUsers();
 
-  if (loading) return <p>Loading...</p>;
+  const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(1);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  if (loading) {
+    return <p className={styles.loading}>Loading users...</p>;
+  }
 
   return (
     <section className={styles.adminUsers}>
@@ -29,47 +48,63 @@ export const AdminUser = () => {
           user={selectedUser}
           onClose={closeUserModal}
           onDelete={() => deleteUser(selectedUser._id)}
-          onUpdate={(updatedData) =>
-            updateUser(selectedUser._id, updatedData)
-          }
+          onUpdate={(updatedData) => updateUser(selectedUser._id, updatedData)}
         />
       )}
 
-      <div className={styles.adminUsersHeaders}>
-        <div className={styles.totalUserscontainer}>
-          <h3>Total Users:</h3>
-          <p>{totalUsers}</p>
+      {/* ================= HEADER ================= */}
+      <header className={styles.header}>
+        <h2>Users Management</h2>
+        <p>Manage platform users and permissions</p>
+      </header>
+
+      {/* ================= STATS ================= */}
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <p>Total Users</p>
+          <h3>{totalUsers}</h3>
         </div>
 
-        <div className={styles.totalAdmincontainer}>
-          <h3>Admin Users:</h3>
-          <p>{adminUsers}</p>
+        <div className={styles.statCard}>
+          <p>Admin Users</p>
+          <h3>{adminUsers}</h3>
         </div>
       </div>
 
-      <div>
-        <h2>Users :</h2>
-        <DisplayUsers users={users} onEdit={openUserModal} />
+      {/* ================= FILTERS ================= */}
+      <div className={styles.filters}>
+        <input
+          placeholder="Search by name or email"
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
+          className={styles.searchInput}
+        />
+
+        <select
+          value={role}
+          onChange={(e) => {
+            setRole(e.target.value);
+            setPage(1);
+          }}
+          className={styles.roleFilter}
+        >
+          <option value="all">All Users</option>
+          <option value="admin">Admin Only</option>
+          <option value="user">Users Only</option>
+        </select>
+
+        <button onClick={resetFilters} className={styles.resetBtn}>
+          Reset
+        </button>
       </div>
-      <Pagination onPageChange={setPage} page={page} totalPages={totalPages}/>
+
+      {/* ================= USERS LIST ================= */}
+      <div className={styles.usersSection}>
+        <h3 className={styles.sectionTitle}>Users</h3>
+        <AdminDisplayUsers users={users} onEdit={openUserModal} />
+      </div>
+
+      <Pagination onPageChange={setPage} page={page} totalPages={totalPages} />
     </section>
-  );
-};
-
-const DisplayUsers = ({ users, onEdit }) => {
-  return (
-    <div className={styles.usersGrid}>
-      {users.map((u) => (
-        <div key={u._id} className={styles.usersCard}>
-          <div className={styles.userInfo}>
-            <p>{u.name}</p>
-            <p>{u.isAdmin ? "Admin" : "User"}</p>
-          </div>
-          <button className={styles.editBtn} onClick={() => onEdit(u)}>
-            Edit
-          </button>
-        </div>
-      ))}
-    </div>
   );
 };

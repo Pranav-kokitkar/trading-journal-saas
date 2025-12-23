@@ -22,10 +22,10 @@ const accountSchema = new Schema(
       default: 0,
     },
     status: {
-  type: String,
-  enum: ["active", "archived", "disabled"],
-  default: "active",
-},
+      type: String,
+      enum: ["active", "archived", "disabled"],
+      default: "active",
+    },
   },
   { timestamps: true }
 );

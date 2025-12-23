@@ -22,6 +22,10 @@ export const AdminAccountDetails = () => {
   const { authorizationToken } = useAuth();
   const navigate = useNavigate();
 
+  // const openTrade=(id)=>{
+  //   navigate(`/admin/trades/${t._id}`);
+  // }
+
   const getAccount = async () => {
     try {
       setLoading(true);
@@ -80,7 +84,7 @@ export const AdminAccountDetails = () => {
 
   const EditAccount = async (details) => {
     try {
-      const updatedDetails = details;
+      console.log(details);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/admin/account/${id}`,
         {
@@ -203,7 +207,7 @@ export const AdminAccountDetails = () => {
           <p className={styles.placeholder}>No trades found for this account</p>
         ) : (
           <>
-            <DisplayTrades trades={trades.Trades} />
+            <DisplayTrades trades={trades.Trades} navigate={navigate}/>
             <Pagination
               onPageChange={setPage}
               page={page}
@@ -220,11 +224,15 @@ export const AdminAccountDetails = () => {
   );
 };
 
-const DisplayTrades = ({ trades }) => {
+const DisplayTrades = ({ trades, openTrade, navigate }) => {
   return (
     <div className={styles.tradesGrid}>
       {trades.map((t) => (
-        <div key={t._id || t.tradeNumber} className={styles.tradeCard}>
+        <div
+          key={t._id || t.tradeNumber}
+          className={styles.tradeCard}
+          onClick={() => navigate(`/admin/trades/${t._id}`)}
+        >
           {/* Header */}
           <div className={styles.tradeHeader}>
             <div>

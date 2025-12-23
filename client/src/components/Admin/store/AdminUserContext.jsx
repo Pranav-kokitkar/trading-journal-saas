@@ -13,6 +13,9 @@ export const AdminUsersProvider = ({ children }) => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [adminUsers, setAdminUsers] = useState(0);
 
+  const [search, setSearch] = useState("");
+  const [role, setRole] = useState("all");
+
   /* ------------------ UI STATE ------------------ */
   const [loading, setLoading] = useState(true); // initial page load
   const [loadingUsers, setLoadingUsers] = useState(false); // pagination / refetch
@@ -32,17 +35,23 @@ export const AdminUsersProvider = ({ children }) => {
         setLoadingUsers(true);
       }
 
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/api/admin/users?page=${page}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: authorizationToken,
-          },
-        }
-      );
+      let url = `${
+        import.meta.env.VITE_API_URL
+      }/api/admin/users?page=${page}&limit=${limit}`;
+
+      if (search) {
+        url += `&search=${search}`;
+      }
+      if (role !== "all") {
+        url += `&role=${role}`;
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          Authorization: authorizationToken,
+        },
+      });
 
       const data = await response.json();
 
@@ -123,6 +132,12 @@ export const AdminUsersProvider = ({ children }) => {
     setIsUserModalOpen(false);
   };
 
+  const resetFilters = () => {
+    setSearch("");
+    setRole("all");
+    setPage(1);
+  };
+
   /* ------------------ EFFECTS ------------------ */
 
   // Initial load (runs once when token becomes available)
@@ -137,7 +152,7 @@ export const AdminUsersProvider = ({ children }) => {
     if (authorizationToken) {
       getAllUsers();
     }
-  }, [page, authorizationToken]);
+  }, [page,search,role, authorizationToken]);
 
   /* ------------------ CONTEXT VALUE ------------------ */
   return (
@@ -161,6 +176,11 @@ export const AdminUsersProvider = ({ children }) => {
         updateUser,
         openUserModal,
         closeUserModal,
+
+        setSearch,
+        role,
+        setRole,
+        resetFilters,
       }}
     >
       {children}

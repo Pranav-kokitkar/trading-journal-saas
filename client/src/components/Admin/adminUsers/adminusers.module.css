@@ -1,166 +1,235 @@
 /* ===============================
-   Admin Users Panel Styles
+   ROOT
 ================================ */
-
 .adminUsers {
   min-height: 100vh;
-  padding: 2rem;
-  color: #e5e7eb;
+  padding: 1.5rem;
+  color: #eaeaea;
 }
 
 /* ===============================
-   Header stats
+   HEADER
 ================================ */
+.header {
+  margin-bottom: 2rem;
+}
 
-.adminUsersHeaders {
+.header h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f5c56b;
+}
+
+.header p {
+  font-size: 0.9rem;
+  color: #9aa4b2;
+}
+
+/* ===============================
+   STATS
+================================ */
+.statsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+  gap: 1rem;
   margin-bottom: 2.5rem;
 }
 
-.totalUserscontainer,
-.totalAdmincontainer {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.192);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+.statCard {
+  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(245, 197, 107, 0.12);
 }
 
-.totalUserscontainer h3,
-.totalAdmincontainer h3 {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #c7d2fe;
+.statCard p {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9aa4b2;
+  margin-bottom: 0.35rem;
 }
 
-.totalUserscontainer p,
-.totalAdmincontainer p {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: #38bdf8;
-}
-
-/* ===============================
-   Section title
-================================ */
-
-.adminUsers h2 {
+.statCard h3 {
   font-size: 1.4rem;
-  margin-bottom: 1rem;
   font-weight: 600;
+  color: #f5c56b;
 }
 
 /* ===============================
-   Users grid
+   FILTERS
 ================================ */
+.filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
 
+.searchInput,
+.roleFilter {
+  background-color: #0f1a2f;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e5e7eb;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.searchInput::placeholder {
+  color: #9aa4b2;
+}
+
+.resetBtn {
+  background-color: transparent;
+  border: 1px solid rgba(245, 197, 107, 0.3);
+  color: #f5c56b;
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resetBtn:hover {
+  background-color: rgba(245, 197, 107, 0.1);
+}
+
+/* ===============================
+   USERS SECTION
+================================ */
+.usersSection {
+  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  border-radius: 14px;
+  padding: 1.4rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f5c56b;
+  margin-bottom: 1.2rem;
+}
+
+/* ===============================
+   USER CARD (used by AdminDisplayUsers)
+================================ */
+.usersCard {
+  background-color: #0f1a2f;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: all 0.25s ease;
+}
+
+.usersCard:hover {
+  border-color: rgba(245, 197, 107, 0.35);
+  transform: translateY(-2px);
+}
+
+/* ===============================
+   USERS GRID
+================================ */
 .usersGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
 }
 
 /* ===============================
-   User card
+   USER CARD
 ================================ */
-
 .usersCard {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
-  padding: 1.25rem;
+  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
 
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border 0.25s ease;
+.usersCard:hover {
+  border-color: rgba(245, 197, 107, 0.35);
+  transform: translateY(-2px);
 }
 
 /* ===============================
-   User info (left side)
+   USER INFO
 ================================ */
-
 .userInfo {
   display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
-.userInfo p:first-child {
-  font-size: 1.05rem;
+.userName {
+  font-size: 15px;
   font-weight: 600;
-}
-
-.userInfo p:last-child {
-  font-size: 0.8rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  width: fit-content;
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-}
-
-/* Admin role badge */
-.admin {
-  background: rgba(34, 197, 94, 0.15) !important;
-  color: #22c55e !important;
-}
-
-/* ===============================
-   Edit button
-================================ */
-
-.editBtn {
-  background: #2563eb;
   color: #ffffff;
-  border: none;
-  padding: 0.45rem 0.9rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 500;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.editBtn:hover {
-  background: #1d4ed8;
-  transform: scale(1.05);
 }
 
 /* ===============================
-   Loading
+   ROLE BADGE
 ================================ */
+.roleBadge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
 
+.admin {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.user {
+  background-color: rgba(245, 197, 107, 0.15);
+  color: #f5c56b;
+}
+
+/* ===============================
+   EMAIL
+================================ */
+.email {
+  font-size: 13px;
+  color: #9aa4b2;
+  margin-top: 4px;
+  word-break: break-all;
+}
+
+/* ===============================
+   LOADING
+================================ */
 .loading {
   text-align: center;
-  font-size: 1.2rem;
-  padding: 4rem 0;
-  color: #94a3b8;
+  font-size: 1rem;
+  padding: 3rem 0;
+  color: #f5c56b;
 }
 
 /* ===============================
-   Responsive
+   RESPONSIVE
 ================================ */
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+  }
 
-@media (max-width: 640px) {
   .adminUsers {
-    padding: 1.25rem;
+    padding: 1rem;
+  }
+
+  .usersGrid {
+    grid-template-columns: 1fr;
   }
 
   .usersCard {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
-
-  .editBtn {
-    align-self: flex-end;
+    padding: 14px;
   }
 }

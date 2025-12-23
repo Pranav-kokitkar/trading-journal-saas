@@ -1,7 +1,20 @@
+import { useState } from "react";
 import styles from "./AdminContactModal.module.css";
 
-export const AdminContactModal = ({ contact, onClose }) => {
+export const AdminContactModal = ({ contact, onClose, updateStatus }) => {
   if (!contact) return null;
+
+  const [updatedStatus, setUpdatedStatus] = useState({
+    status: contact.status,
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedStatus((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   return (
     <div className={styles.overlay}>
@@ -42,8 +55,30 @@ export const AdminContactModal = ({ contact, onClose }) => {
               <img src={contact.screenshotUrl} alt="Screenshot" />
             </div>
           )}
-        </div>
 
+          {/* Status Update */}
+          <div className={styles.statusRow}>
+            <span className={styles.label}>Status</span>
+
+            <select
+              className={styles.statusSelect}
+              name="status"
+              value={updatedStatus.status}
+              onChange={handleChange}
+            >
+              <option value="open">Open</option>
+              <option value="in_progress">In Progress</option>
+              <option value="resolved">Resolved</option>
+            </select>
+
+            <button
+              className={styles.saveBtn}
+              onClick={() => updateStatus(contact._id, updatedStatus)}
+            >
+              Save
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

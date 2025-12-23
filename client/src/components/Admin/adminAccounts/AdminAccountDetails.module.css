@@ -1,33 +1,36 @@
 .page {
-  padding: 24px;
-  background-color: var(--bg);
+  padding: 1.5rem;
   min-height: 100vh;
+  color: #eaeaea;
 }
 
-/* ---------- HEADER ---------- */
-
+/* Header */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 2rem;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .accountName {
-  font-size: 22px;
+  font-size: 1.35rem;
   font-weight: 600;
   color: #ffffff;
-  margin: 0 0 6px 0;
 }
 
-/* ---------- STATUS ---------- */
-
+/* Status */
 .status {
-  font-size: 15px;
-  padding: 5px 14px;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.9rem;
   border-radius: 999px;
   text-transform: capitalize;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .active {
@@ -45,79 +48,68 @@
   color: #ef4444;
 }
 
-/* ---------- SUMMARY GRID ---------- */
-
+/* Summary */
 .summaryGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
 }
 
 .summaryCard {
-  background-color: var(--card);
-  border-radius: var(--radius);
-  padding: 16px;
+  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  border-radius: 12px;
+  padding: 1rem;
   border: 1px solid rgba(246, 185, 59, 0.15);
 }
 
 .summaryCard span {
-  font-size: 12px;
+  font-size: 0.7rem;
   color: var(--muted);
 }
 
 .summaryCard h3 {
-  margin-top: 6px;
-  font-size: 20px;
+  margin-top: 0.35rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: var(--accent);
 }
 
-/* ---------- TRADES SECTION ---------- */
-
-.tradesSection {
-  background-color: var(--card);
-  border-radius: var(--radius);
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 32px;
-}
-
+/* Sections */
+.tradesSection,
 .performanceSection {
-  background-color: var(--card);
-  border-radius: var(--radius);
-  padding: 20px;
+  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  border-radius: 14px;
+  padding: 1.25rem;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 32px;
+  margin-bottom: 2.5rem;
 }
 
 .sectionTitle {
-  font-size: 16px;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #ffffff;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 }
 
 .placeholder {
-  font-size: 14px;
+  font-size: 0.85rem;
   color: var(--muted);
 }
 
-/* ---------- TRADES GRID ---------- */
-
+/* Trades grid */
 .tradesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
+  gap: 1.1rem;
 }
 
-/* ---------- TRADE CARD ---------- */
-
+/* Trade card */
 .tradeCard {
-  background-color: var(--card);
-  border-radius: var(--radius);
-  padding: 16px;
-  border: 1.5px solid rgba(255, 255, 255, 0.301);
+  background: #0f1a2f;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   transition: all 0.25s ease;
 }
 
@@ -126,36 +118,32 @@
   transform: translateY(-2px);
 }
 
-/* ---------- HEADER ---------- */
-
+/* Trade header */
 .tradeHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 12px;
+  margin-bottom: 0.6rem;
 }
 
 .symbol {
-  margin: 0;
-  font-size: 15px;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #ffffff;
 }
 
 .direction {
-  font-size: 11px;
+  font-size: 0.65rem;
   color: var(--muted);
   text-transform: uppercase;
 }
 
-/* ---------- RESULT BADGE ---------- */
-
+/* Result badge */
 .result {
-  font-size: 11px;
-  padding: 4px 10px;
+  font-size: 0.65rem;
+  padding: 0.3rem 0.7rem;
   border-radius: 999px;
-  font-weight: 500;
-  text-transform: capitalize;
+  font-weight: 600;
 }
 
 .win {
@@ -173,39 +161,34 @@
   color: var(--accent);
 }
 
-/* ---------- PRICE ROW ---------- */
-
+/* Price rows */
 .priceRow {
   display: flex;
   justify-content: space-between;
-  font-size: 13px;
+  font-size: 0.75rem;
   color: var(--muted);
-  margin-bottom: 6px;
+  margin-bottom: 0.3rem;
 }
 
-/* ---------- METRICS ---------- */
-
+/* Metrics */
 .metrics {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 12px;
-  font-size: 12px;
-  color: var(--muted);
+  gap: 0.6rem;
+  margin-top: 0.75rem;
 }
 
 .metrics span {
-  display: block;
-  font-size: 11px;
+  font-size: 0.65rem;
+  color: var(--muted);
 }
 
 .metrics strong {
-  font-size: 13px;
+  font-size: 0.8rem;
   color: #ffffff;
 }
 
-/* ---------- PNL COLORS ---------- */
-
+/* PnL */
 .pnlPositive {
   color: #22c55e;
 }
@@ -214,41 +197,24 @@
   color: #ef4444;
 }
 
-/* ---------- FOOTER ---------- */
-
+/* Footer */
 .tradeFooter {
   display: flex;
   justify-content: space-between;
-  margin-top: 14px;
-  font-size: 11px;
+  margin-top: 0.8rem;
+  font-size: 0.65rem;
   color: var(--muted);
 }
 
-/* ---------- HEADER ACTIONS ---------- */
-
-.leftActions,
-.rightActions {
-  display: flex;
-  align-items: center;
-}
-
-.center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* ---------- BACK BUTTON ---------- */
-
+/* Buttons */
 .backBtn {
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.25);
   color: var(--muted);
-  padding: 6px 12px;
+  padding: 0.4rem 0.75rem;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .backBtn:hover {
@@ -256,30 +222,22 @@
   border-color: var(--accent);
 }
 
-/* ---------- EDIT BUTTON ---------- */
-
 .editBtn {
   background-color: var(--accent);
   border: none;
   color: #111827;
-  padding: 7px 16px;
+  padding: 0.45rem 1rem;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.editBtn:hover {
-  background-color: var(--accent2);
-}
-
-/* ---------- RESPONSIVE FIX ---------- */
-
+/* Responsive */
 @media (max-width: 640px) {
   .header {
     flex-direction: column;
-    gap: 12px;
+    gap: 0.75rem;
   }
 
   .center {
@@ -289,5 +247,9 @@
   .leftActions,
   .rightActions {
     order: 2;
+  }
+
+  .tradesGrid {
+    grid-template-columns: 1fr;
   }
 }
