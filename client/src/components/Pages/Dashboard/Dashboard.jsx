@@ -9,10 +9,8 @@ import DirectionChart from "./DirectionChart";
 
 import { PerformanceContext } from "../../../context/PerformanceContext";
 import { useTrades } from "../../../store/TradeContext"; 
-
 import { FiActivity, FiTrendingUp, FiTarget } from "react-icons/fi";
 import { FaTrophy, FaPercentage } from "react-icons/fa";
-import { CreateAccModal } from "../../Layout/CreateAccModal";
 import { UserContext } from "../../../context/UserContext";
 import { AccountContext } from "../../../context/AccountContext";
 import { useAuth } from "../../../store/Auth";
@@ -21,13 +19,11 @@ export const Dashboard = () => {
   const { userDetails } = useContext(UserContext);
   const { performance } = useContext(PerformanceContext);
   const {accountDetails} = useContext(AccountContext);
-  const [IsCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Read trades from TradeContext (fallback to empty array)
   const { trades = [] } = useTrades() || {};
   const { accountTrades = [] } = useTrades() || {};
   const {isAdmin} = useAuth();
-  console.log(isAdmin);
 
   // Accept both "closed" and "exited" as finished trades (case-insensitive)
   const finishedStatuses = new Set(["closed", "exited"]);
@@ -39,11 +35,6 @@ export const Dashboard = () => {
       )
     : [];
 
-  useEffect(() => {
-    if (userDetails && userDetails.activeAccountId == null) {
-      setIsCreateModalOpen(true);
-    }
-  }, [userDetails]);
 
   if (!userDetails) {
     return <p>loading...</p>;
@@ -83,9 +74,7 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {IsCreateModalOpen && (
-        <CreateAccModal onClose={() => setIsCreateModalOpen(false)} />
-      )}
+      
     </section>
   );
 };

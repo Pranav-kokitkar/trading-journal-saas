@@ -19,7 +19,16 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      select: false,
+    },
+    plan: {
+      type: String,
+      enum: ["free", "pro"],
+      default: "free",
+    },
+
+    planExpiresAt: {
+      type: Date,
+      default: null,
     },
 
     isAdmin: {

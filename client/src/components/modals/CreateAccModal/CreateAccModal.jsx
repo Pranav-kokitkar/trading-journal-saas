@@ -1,9 +1,9 @@
 // src/components/CreateAccModal/CreateAccModal.jsx
 import { useContext, useState } from "react";
 import styles from "./CreateAccModal.module.css";
-import { useAuth } from "../../store/Auth";
-import { UserContext } from "../../context/UserContext";
-import { AccountContext } from "../../context/AccountContext";
+import { useAuth } from "../../../store/Auth";
+import { UserContext } from "../../../context/UserContext";
+import { AccountContext } from "../../../context/AccountContext";
 
 export const CreateAccModal = ({onClose}) => {
   const { authorizationToken } = useAuth();
@@ -21,7 +21,7 @@ export const CreateAccModal = ({onClose}) => {
     useContext(AccountContext);
 
 
-  const userId = userDetails?._id; // user document from /api/user
+  const userId = userDetails?._id;
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -1,4 +1,3 @@
-// src/pages/Register.jsx
 import React, { useContext, useRef, useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
@@ -16,10 +15,10 @@ export const Register = () => {
   const navigate = useNavigate();
   const confirmPasswordRef = useRef();
   const { storeTokenInLS } = useAuth();
-  const {isLoggedIn} = useAuth();
-  
-    const {refreshTrades} = useContext(TradeContext);
-    const {getAllAccounts} = useContext(AccountContext);
+  const { isLoggedIn } = useAuth();
+
+  const { refreshTrades } = useContext(TradeContext);
+  const { getAllAccounts } = useContext(AccountContext);
 
   const handleChange = async (e) => {
     let name = e.target.name;
@@ -35,7 +34,7 @@ export const Register = () => {
     const confirmPass = confirmPasswordRef.current.value;
 
     if (user.password !== confirmPass) {
-      alert("password does not match");
+      toast.error("Passwords do not match");
       return;
     }
     try {
@@ -50,13 +49,12 @@ export const Register = () => {
         }
       );
       const res_data = await response.json();
-      console.log(res_data.extraDetails);
 
       if (response.ok) {
         storeTokenInLS(res_data.token);
         refreshTrades();
         getAllAccounts();
-        toast.success("register sucess", {
+        toast.success("Registration successful", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -73,92 +71,107 @@ export const Register = () => {
         });
         navigate("/app/dashboard");
       } else {
-        toast.error(res_data.extraDetails?res_data.extraDetails:res_data.message);
+        toast.error(
+          res_data.extraDetails ? res_data.extraDetails : res_data.message
+        );
       }
     } catch (error) {
-      console.log("error while register",error);
+      console.log("error while register", error);
+      toast.error("Registration failed. Please try again.");
     }
   };
 
-  if(isLoggedIn){
+  if (isLoggedIn) {
     return <Navigate to="/app/dashboard" replace />;
   }
 
   return (
     <div className={styles.container}>
-      <div className={styles.card}>
-        <div className={styles.content}>
-          <div className={styles.title}>
-            <div className={styles.logo}>TJ</div>
-            <div>
-              <h2 className={styles.h2}>Create Account</h2>
-              <div className={styles.subtitle}>
-                Start logging trades and tracking performance
+      {/* Back Button */}
+      <Link to="/" className={styles.backButton}>
+        Back to Home
+      </Link>
+
+      {/* Card Wrapper */}
+      <div className={styles.cardWrapper}>
+        <div className={styles.card}>
+          <div className={styles.content}>
+            <div className={styles.title}>
+              <div className={styles.logo}>TJ</div>
+              <div>
+                <h2 className={styles.h2}>Create Account</h2>
+                <div className={styles.subtitle}>
+                  Start logging trades and tracking performance
+                </div>
               </div>
             </div>
+
+            <form className={styles.form} onSubmit={handleSubmit}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Name</label>
+                <input
+                  className={styles.input}
+                  type="text"
+                  placeholder="Enter your name"
+                  name="name"
+                  id="name"
+                  value={user.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Email</label>
+                <input
+                  className={styles.input}
+                  type="email"
+                  placeholder="Enter your email"
+                  name="email"
+                  id="email"
+                  value={user.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Password</label>
+                <input
+                  className={styles.input}
+                  type="password"
+                  placeholder="Enter your password"
+                  name="password"
+                  id="password"
+                  value={user.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Confirm Password</label>
+                <input
+                  className={styles.input}
+                  type="password"
+                  placeholder="Confirm your password"
+                  ref={confirmPasswordRef}
+                  required
+                />
+              </div>
+
+              <button className={styles.btn} type="submit">
+                Create Account
+              </button>
+
+              <div className={styles.row}>
+                <div className={styles.small}>Already have an account?</div>
+                <Link className={styles.link} to="/login">
+                  Login
+                </Link>
+              </div>
+            </form>
           </div>
-
-          <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Name</label>
-              <input
-                className={styles.input}
-                type="text"
-                placeholder="Enter your name"
-                name="name"
-                id="name"
-                value={user.name}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Email</label>
-              <input
-                className={styles.input}
-                type="email"
-                placeholder="Enter your email"
-                name="email"
-                id="email"
-                value={user.email}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Password</label>
-              <input
-                className={styles.input}
-                type="password"
-                placeholder="Enter your password"
-                name="password"
-                id="password"
-                value={user.password}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Confirm Password</label>
-              <input
-                className={styles.input}
-                type="password"
-                placeholder="Confirm your password"
-                ref={confirmPasswordRef}
-              />
-            </div>
-
-            <button className={styles.btn} type="submit">
-              Register
-            </button>
-
-            <div className={styles.row}>
-              <div className={styles.small}>Already have an account?</div>
-              <Link className={styles.link} to="/login">
-                Login
-              </Link>
-            </div>
-          </form>
         </div>
       </div>
     </div>

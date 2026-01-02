@@ -136,9 +136,9 @@ export const Contact = () => {
       {!isLoggedIn ? <Navbar /> : ""}
 
       <main className={styles.hero}>
-        <h1 className={styles.title}>
+        <h2 className={styles.title}>
           Contact <span>Support</span>
-        </h1>
+        </h2>
 
         <p className={styles.subtitle}>
           Found a bug or need help? Send us a message and a brief description —

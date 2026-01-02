@@ -5,37 +5,33 @@ import { useAuth } from "../../../store/Auth";
 import styles from "./selectaccount.module.css";
 
 export const SelectAccount = ({ accounts, createAcc }) => {
-  const { authorizationToken, user, userAuthentication } = useAuth();
-  const { getUser } = useContext(UserContext);
-  const {
-    getActiveAccount,
-    accountDetails,
-    accounts: accountList, // if you need context accounts later
-  } = useContext(AccountContext);
+  const { authorizationToken, userAuthentication } = useAuth();
+  const { getUser, userDetails } = useContext(UserContext);
+  const { getActiveAccount, deleteAccount, getAllAccounts } =
+    useContext(AccountContext);
 
   const [selectedId, setSelectedId] = useState("");
   const [currAccName, setCurrAccName] = useState("");
 
-  // Helper: get account name from a given accountId using the `accounts` prop
-  const getAccountName = (activeAccountId) => {
-    if (!activeAccountId || !accounts || accounts.length === 0) return;
-
-    const activeAccount = accounts.find((acc) => acc._id === activeAccountId);
-
-    const activeAccountName = activeAccount
-      ? activeAccount.name
-      : "Account not found";
-
-    setCurrAccName(activeAccountName);
-  };
-
-  // Initialize current account name and selected option when user / accounts change
+  // ✅ SINGLE source of truth for name
   useEffect(() => {
-    if (user?.activeAccountId && accounts?.length) {
-      setSelectedId(user.activeAccountId);
-      getAccountName(user.activeAccountId);
+     if (!userDetails?.activeAccountId || !accounts?.length) {
+       setCurrAccName("");
+       setSelectedId("");
+       return;
+     }
+
+     const activeAccount = accounts.find(
+       (acc) => acc._id === userDetails.activeAccountId
+     );
+
+    if (activeAccount) {
+      setCurrAccName(activeAccount.name);
+      setSelectedId(activeAccount._id);
+    } else {
+      setCurrAccName("");
     }
-  }, [user?.activeAccountId, accounts]);
+  }, [userDetails?.activeAccountId, accounts]);
 
   const handleChange = async (e) => {
     const activeAccountId = e.target.value;
@@ -54,23 +50,27 @@ export const SelectAccount = ({ accounts, createAcc }) => {
         }
       );
 
-      const data = await response.json();
       if (response.ok) {
-        // Refresh user/account data in context
-        getUser();
-        getActiveAccount();
-        userAuthentication();
-
-        // Immediately update UI name from local accounts list
-        getAccountName(activeAccountId);
-
-        console.log(accountDetails);
-      } else {
-        console.log("Failed to update", data);
+        await Promise.all([
+          getUser(),
+          getAllAccounts(),
+          getActiveAccount(),
+          userAuthentication(),
+        ]);
       }
     } catch (error) {
       console.log("error while changing account:", error);
     }
+  };
+
+  const onDelete = async () => {
+    const confirmed = window.confirm(
+      "Deleting an account will also lead to delete trades taken from this account. also it cant be undone"
+    );
+
+    if (!confirmed) return;
+
+    await deleteAccount();
   };
 
   return (
@@ -81,10 +81,17 @@ export const SelectAccount = ({ accounts, createAcc }) => {
       </div>
 
       <label>Change Account</label>
-      <select value={selectedId} onChange={handleChange}>
+      <select
+        value={selectedId}
+        onChange={handleChange}
+        disabled={accounts.length === 0}
+      >
         <option value="" disabled>
-          Select an account
+          {accounts.length === 0
+            ? "Create an account first"
+            : "Select an account"}
         </option>
+
         {accounts.map((acc) => (
           <option key={acc._id} value={acc._id}>
             {acc.name}
@@ -97,6 +104,13 @@ export const SelectAccount = ({ accounts, createAcc }) => {
           Create New Account
         </button>
       </div>
+      {accounts.length > 0 && (
+        <div>
+          <button className={styles.dangerbtn} onClick={onDelete}>
+            Delete This Account
+          </button>
+        </div>
+      )}
     </div>
   );
 };

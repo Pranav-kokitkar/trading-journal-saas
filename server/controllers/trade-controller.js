@@ -2,10 +2,12 @@ const mongoose = require("mongoose");
 const Trade = require("../models/trade-model");
 const cloudinary = require("../config/cloudinary");
 
-const AddTrade = async (req, res, next) => {
+const AddTrade = async (req, res) => {
   try {
     const userId = req.userID || (req.user && req.user._id);
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
     const {
       marketType,
@@ -37,31 +39,45 @@ const AddTrade = async (req, res, next) => {
     ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
+
     if (!accountId || !mongoose.Types.ObjectId.isValid(accountId)) {
       return res.status(400).json({ message: "Valid accountId is required" });
     }
 
-    // ✅ NEW: handle exitedPrice coming as JSON string from FormData
+    /* ---------------- PARSE exitedPrice ---------------- */
     let parsedExitedPrice = exitedPrice;
     if (typeof parsedExitedPrice === "string") {
       try {
         parsedExitedPrice = JSON.parse(parsedExitedPrice);
-      } catch (e) {
+      } catch {
         parsedExitedPrice = [];
       }
     }
 
-    // ⬇️ HANDLE UP TO 2 SCREENSHOT FILES (from upload.array("screenshots", 2))
+    /* ---------------- FILE HANDLING ---------------- */
     const files = Array.isArray(req.files) ? req.files : [];
+
+    // ✅ PLAN-BASED LIMIT (BACKEND ENFORCEMENT)
+    const isPro =
+      req.user?.plan === "pro" &&
+      req.user?.planExpiresAt &&
+      new Date(req.user.planExpiresAt) > new Date();
+
+    const uploadLimit = isPro ? 3 : 1;
+
+    if (files.length > uploadLimit) {
+      return res.status(400).json({
+        message: `You can upload a maximum of ${uploadLimit} screenshots`,
+      });
+    }
+
     const screenshotUrls = [];
 
     for (const file of files) {
       try {
         const result = await new Promise((resolve, reject) => {
           const uploadStream = cloudinary.uploader.upload_stream(
-            {
-              folder: "trading-journal/trades", // folder in Cloudinary
-            },
+            { folder: "trading-journal/trades" },
             (error, uploadResult) => {
               if (error) return reject(error);
               resolve(uploadResult);
@@ -71,14 +87,15 @@ const AddTrade = async (req, res, next) => {
           uploadStream.end(file.buffer);
         });
 
-        if (result && result.secure_url) {
+        if (result?.secure_url) {
           screenshotUrls.push(result.secure_url);
         }
       } catch (err) {
-        console.error("Cloudinary upload error (trade screenshot):", err);
+        console.error("Cloudinary upload error:", err);
       }
     }
 
+    /* ---------------- SAVE TRADE ---------------- */
     const tradeToSave = {
       userId,
       accountId: new mongoose.Types.ObjectId(accountId),
@@ -90,7 +107,6 @@ const AddTrade = async (req, res, next) => {
       takeProfitPrice:
         takeProfitPrice == null ? undefined : Number(takeProfitPrice),
 
-      // ✅ CHANGED: use parsedExitedPrice instead of raw exitedPrice
       exitedPrice: Array.isArray(parsedExitedPrice)
         ? parsedExitedPrice.map((e) => ({
             price: Number(e.price),
@@ -107,7 +123,6 @@ const AddTrade = async (req, res, next) => {
         balanceAfterTrade == null ? 0 : Number(balanceAfterTrade),
       tradeNumber: tradeNumber == null ? 0 : Number(tradeNumber),
 
-      // array of screenshot URLs (0–2)
       screenshots: screenshotUrls,
 
       dateTime: dateTime ? new Date(dateTime) : new Date(),
@@ -119,24 +134,101 @@ const AddTrade = async (req, res, next) => {
 
     return res.status(201).json({ success: true, trade: savedTrade });
   } catch (error) {
-    console.error("AddTrade error", error);
+    console.error("AddTrade error:", error);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-const getAllTrades = async (req, res, next) => {
+const getAllTrades = async (req, res) => {
   try {
-    const userId = req.userID || (req.user && req.user._id);
+    const userId = req.userID || req.user?._id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    const response = await Trade.find({ userId }).sort({ date: -1 });
-    if (!response) {
-      return res.status(401).json({ message: "no trades found" });
+    const {
+      page = 1,
+      limit = 8,
+
+      symbol,
+      marketType,
+      status,
+      result,
+      direction,
+
+      pnlOperator,
+      pnlValue,
+
+      rrOperator,
+      rrValue,
+
+      startDate,
+      endDate,
+
+      startTradeNumber,
+      endTradeNumber,
+    } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    /** ---------------- BUILD QUERY ---------------- */
+    const query = { userId };
+
+    if (symbol) {
+      query.symbol = { $regex: symbol, $options: "i" };
     }
-    res.status(200).json({ response });
-  } catch (error) {
-    console.log("get all tardes error", error);
-    return res.status(400).json({ success: false, message: "server error" });
+
+    if (marketType) query.marketType = marketType;
+    if (status) query.tradeStatus = status;
+    if (result) query.tradeResult = result;
+    if (direction) query.tradeDirection = direction;
+
+    if (pnlValue) {
+      query.pnl = {
+        [pnlOperator === ">" ? "$gt" : pnlOperator === "<" ? "$lt" : "$eq"]:
+          Number(pnlValue),
+      };
+    }
+
+    if (rrValue) {
+      query.rr = {
+        [rrOperator === ">" ? "$gt" : rrOperator === "<" ? "$lt" : "$eq"]:
+          Number(rrValue),
+      };
+    }
+
+    if (startDate || endDate) {
+      query.dateTime = {};
+      if (startDate) query.dateTime.$gte = new Date(startDate);
+      if (endDate) query.dateTime.$lte = new Date(endDate);
+    }
+
+    if (startTradeNumber || endTradeNumber) {
+      query.tradeNumber = {};
+      if (startTradeNumber) query.tradeNumber.$gte = Number(startTradeNumber);
+      if (endTradeNumber) query.tradeNumber.$lte = Number(endTradeNumber);
+    }
+
+    /** ---------------- QUERY DB ---------------- */
+    const [trades, totalTrades] = await Promise.all([
+      Trade.find(query)
+        .sort({ dateTime: -1 }) // NEWEST FIRST
+        .skip(skip)
+        .limit(Number(limit)),
+
+      Trade.countDocuments(query),
+    ]);
+
+    res.status(200).json({
+      trades,
+      stats: { filteredTrades: totalTrades },
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(totalTrades / limit),
+      },
+    });
+  } catch (err) {
+    console.error("getAllTrades error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

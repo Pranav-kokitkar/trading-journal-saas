@@ -27,6 +27,16 @@ const Login = async (req, res, next) => {
       return res.status(400).json({ message: "user does not exist" });
     }
 
+    if (
+      userExist.plan === "pro" &&
+      userExist.planExpiresAt &&
+      userExist.planExpiresAt < Date.now()
+    ) {
+      userExist.plan = "free";
+      userExist.planExpiresAt = null;
+      await userExist.save();
+    }
+    ``;
     const passwordMatch = await userExist.comparePassword(password);
     if (!passwordMatch) {
       return res.status(400).json({ message: "Incorrect password" });
@@ -36,6 +46,8 @@ const Login = async (req, res, next) => {
       message: "login sucess",
       token: await userExist.generateToken(),
       userID: userExist._id.toString(),
+      plan: userExist.plan,
+      planExpiresAt: userExist.planExpiresAt,
     });
   } catch (error) {
     next(error);

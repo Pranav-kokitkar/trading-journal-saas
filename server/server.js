@@ -9,11 +9,12 @@ const userRoute = require("./routers/User-router");
 const contactRoute = require("./routers/Contact-router");
 const accountRoute = require("./routers/Account-router");
 const adminRoute = require("./routers/Admin-router");
+const paymentRoute = require("./routers/Payment-router");
 const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
 
-//cors issue tackle
+//cors
 const corsOptions = {
   origin: ["http://localhost:5173", "https://trading-journal-saas.netlify.app"],
   methods: "GET, POST, PATCH, DELETE, PUT, HEAD",
@@ -31,6 +32,7 @@ app.use("/api/notes", notesRoute);
 app.use("/api/contact", contactRoute);
 app.use("/api/account", accountRoute);
 app.use("/api/admin", adminRoute);
+app.use("/api/payment", paymentRoute);
 app.use(errorMiddleware);
 
 PORT = process.env.PORT || 5000;

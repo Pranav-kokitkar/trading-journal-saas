@@ -4,7 +4,6 @@ import styles from "./Trade.module.css";
 import { useContext, useState, useEffect } from "react";
 import { CloseTrade } from "./CloseTrade";
 import { calculateTradeOnExit } from "../../../utils/tradeUtils";
-import { PerformanceContext } from "../../../context/PerformanceContext";
 import { TradeContext, useTrades } from "../../../store/TradeContext";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
@@ -303,8 +302,10 @@ export const Trade = () => {
   return (
     <section className={styles.trade}>
       <div className={styles.tradeContainer}>
-        {/* Header */}
         <header className={styles.header}>
+          <button className={styles.backBtn} onClick={() => navigate(-1)}>
+            ← Back
+          </button>
           <div>
             <h2>Trade Details</h2>
             <p>{trade.dateNtime}</p>

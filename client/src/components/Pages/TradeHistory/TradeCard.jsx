@@ -5,9 +5,7 @@ import { NavLink } from "react-router-dom";
 export const TradeCard = ({ savedTrade }) => {
 
   if (!savedTrade || savedTrade.length === 0)
-    return <p className={styles.notrades}>No trades yet</p>;
-
-  
+    return <p className={styles.notrades}>No trades</p>;
 
   return (
     <>

@@ -71,6 +71,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+const isPro = Boolean(
+  user?.plan === "pro" &&
+    user?.planExpiresAt &&
+    new Date(user.planExpiresAt) > new Date()
+);
+
+
   useEffect(() => {
     userAuthentication();
   }, [token]);
@@ -87,6 +94,7 @@ export const AuthProvider = ({ children }) => {
         isAdmin,
         isAuthLoading,
         token,
+        isPro
       }}
     >
       {children}

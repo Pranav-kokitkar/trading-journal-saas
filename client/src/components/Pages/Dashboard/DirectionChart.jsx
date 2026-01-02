@@ -95,24 +95,27 @@ const DirectionChart = ({ trades }) => {
 
   return (
     <div className={styles.chartcontainer}>
-      <div className={styles.chart} style={{ width: "100%", height: 320 }}>
         <ResponsiveContainer width="100%" height={320}>
           <BarChart
             data={data}
             margin={{ top: 20, right: 20, left: 20, bottom: 10 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-            <XAxis dataKey="direction" stroke="#ccc" tick={{ fontSize: 12 }} />
+            <CartesianGrid stroke="rgba(255,255,255,0.08)" />
+            <XAxis
+              dataKey="direction"
+              stroke="#9aa4b2"
+              tick={{ fontSize: 12 }}
+            />
             <YAxis
               domain={[0, 100]}
               tickFormatter={(val) => `${val}%`}
-              stroke="#ccc"
+              stroke="#9aa4b2"
               tick={{ fontSize: 12 }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#4a4a4aff",
-                border: "none",
+                backgroundColor: "#0f172a",
+                border: "1px solid rgba(255,255,255,0.08)",
                 color: "#fff",
               }}
               formatter={(value, name, props) => {
@@ -137,7 +140,6 @@ const DirectionChart = ({ trades }) => {
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-      </div>
 
       <div className={styles.quickdata}>
         <p>

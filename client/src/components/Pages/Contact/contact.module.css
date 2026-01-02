@@ -1,125 +1,154 @@
-:root {
-  --bg: #0f1724;
-  --card: #0b1220;
-  --muted: #c3cad5;
-  --accent: #f6b93b;
-  --accent2: #ffd98a;
-  --radius: 12px;
-}
+/* ===================================
+   CONTACT PAGE - THEMED
+   =================================== */
 
-/* Page container */
+/* ===== Page Container ===== */
 .container {
   min-height: 100vh;
-
-  color: white;
-  padding: 24px;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .containerbg {
-  background: linear-gradient(180deg, var(--bg) 0%, #071226 100%);
-}
-/* Hero / content area */
-.hero {
-  text-align: center;
-  max-width: 860px;
-  margin: 48px auto;
+  background: linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
 }
 
+/* ===== Hero / Content Section ===== */
+.hero {
+  text-align: center;
+  width: 100%;
+  max-width: 980px;
+}
+
+/* ===== Title ===== */
 .title {
-  font-size: 40px;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 10px;
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
 }
 
 .title span {
-  background: linear-gradient(90deg, var(--accent2), var(--accent));
+  background: linear-gradient(90deg, var(--accent), #f5a623);
   -webkit-background-clip: text;
-  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .subtitle {
-  font-size: 15px;
+  font-size: 0.95rem;
   color: var(--muted);
-  margin-bottom: 22px;
+  margin-bottom: 2rem;
   max-width: 720px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
+  line-height: 1.6;
 }
 
-/* form */
+/* ===== Form Container ===== */
 .form {
-  margin-top: 18px;
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.01),
-    rgba(0, 0, 0, 0.02)
-  );
-  padding: 22px;
-  border-radius: var(--radius);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  width: 100%;
-  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.6);
+  gap: 1rem;
+  background: var(--gradient-card);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  text-align: left;
 }
 
+/* ===== Row Layout ===== */
 .row {
   display: flex;
-  gap: 12px;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
+/* ===== Field ===== */
 .field {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-weight: 700;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 200px;
 }
 
+/* ===== Inputs & Textarea ===== */
 .input,
 .textarea {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  padding: 12px;
-  border-radius: 10px;
-  color: white;
-  font-size: 14px;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+.input:focus,
+.textarea:focus {
   outline: none;
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+}
+
+.input:read-only {
+  background: rgba(255, 255, 255, 0.02);
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 .textarea {
-  min-height: 120px;
+  min-height: 140px;
   resize: vertical;
+  line-height: 1.6;
 }
 
+/* ===== Error Messages ===== */
 .err {
-  color: #ffc7c7;
-  font-size: 12px;
-  font-weight: 700;
+  color: var(--error);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0;
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--error);
 }
 
-/* upload row */
+/* ===== Upload Section ===== */
 .uploadRow {
-  align-items: center;
-  padding: 10px, 0px;
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem 0;
 }
 
 .uploadimage {
   display: flex;
   flex-direction: column;
-  gap: 5px;
   align-items: center;
-  justify-content: center;
-}
-
-.uploadLabel {
-  color: var(--muted);
-  font-weight: 700;
-  height: 100%;
+  gap: 0.75rem;
+  width: 100%;
 }
 
 .fileInput {
@@ -127,87 +156,154 @@
 }
 
 .uploadBtn {
-  background: white;
-  padding: 6px 10px;
-  border-radius: 10px;
-  color: #071226;
-  font-weight: 400;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-medium);
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.uploadBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(246, 185, 59, 0.05);
 }
 
 .removeBtn {
-  margin-left: 12px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-medium);
   color: var(--muted);
-  padding: 8px 10px;
-  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.removeBtn:hover {
+  border-color: var(--error);
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.hint {
+  text-align: center;
+  max-width: 400px;
 }
 
 .muted {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
-/* CTA row matches HomePage style (centered CTAs there) */
+/* ===== CTA Button ===== */
 .ctaRow {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 12px;
-  margin-top: 8px;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
 }
 
 .primaryBtn {
-  padding: 12px 20px;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  color: #071226;
-  text-decoration: none;
-  font-weight: 700;
-  border-radius: 10px;
+  padding: 0.75rem 2rem;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-radius: var(--radius-sm);
   border: none;
-  cursor: pointer;
-}
-
-.secondaryBtn {
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  color: white;
-  text-decoration: none;
+  font-size: 0.9rem;
   font-weight: 700;
-  border-radius: 10px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
 }
 
-/* Footer */
+.primaryBtn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ===== Footer ===== */
 .footer {
   margin-top: auto;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.8rem;
   color: var(--muted);
-  padding: 18px 0;
+  padding: 1.5rem 0;
 }
 
-/* Responsive */
-@media (max-width: 880px) {
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
   .hero {
-    margin: 28px 12px;
+    width: 95%;
+    margin-top: 1.5rem;
   }
+
+  .form {
+    padding: 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1.5rem 1rem;
+  }
+
+  .hero {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .form {
+    padding: 1rem;
+  }
+
   .row {
     flex-direction: column;
   }
-  .uploadRow {
-    flex-direction: column;
-    align-items: stretch;
+
+  .field {
+    min-width: 100%;
   }
-  .hint {
-    text-align: left;
-  }
+
   .ctaRow {
-    flex-direction: column-reverse;
+    flex-direction: column;
+  }
+
+  .primaryBtn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form {
+    gap: 0.75rem;
   }
 }

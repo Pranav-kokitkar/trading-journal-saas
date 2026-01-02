@@ -1,189 +1,223 @@
-:root {
-  --bg: #0f1724;
-  --panel: #07101a;
-  --muted: #9aa4b2;
-  --accent: #f6b93b;
-  --accent-2: #ffd98a;
-  --glass: rgba(255, 255, 255, 0.02);
-  --card-radius: 12px;
-  --pad: 18px;
-}
+/* ===================================
+   ADD NOTES PAGE - THEMED & RESTRUCTURED
+   =================================== */
 
-/* Page wrapper (keeps same layout behavior) */
+/* ===== Page Wrapper (matches other pages) ===== */
 .addnotescontainer {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
-  color: #e6eef6;
-  gap: 2rem;
 }
 
-/* Form panel (card) */
-.addnotescontainer form,
+/* ===== Main Content Container ===== */
+.mainContent {
+  width: 100%;
+  max-width: 980px;
+}
+
+/* ===== Page Heading (consistent with other pages) ===== */
+.heading {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.heading p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* ===== Form Card ===== */
 .addnotes {
-  width: 80%;
-  max-width: 900px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  border-radius: var(--card-radius);
-  padding: calc(var(--pad) - 2px);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  box-shadow: 0 12px 36px rgba(2, 6, 23, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  box-sizing: border-box;
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-subtle);
 }
 
-/* Heading */
-.addnotes h3 {
-  font-size: 1.4rem;
-  margin: 0;
-  padding-bottom: 0.5rem;
-  color: #fff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+.addnotes h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
 }
 
-/* Input field wrapper */
+/* ===== Input Fields ===== */
 .addnotesinputfiled {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 1rem;
 }
 
-/* row layout preserved */
 .row2 {
   display: flex;
-  flex-direction: column; /* label on top */
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
-/* Labels */
 .row2 label {
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Inputs & textarea styling (white inputs for readability like AddTrade) */
 .row2 input,
 .row2 textarea {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: #ffffff;
-  color: #07101a;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  outline: none;
-  transition: box-shadow 150ms ease, border-color 150ms ease,
-    transform 120ms ease;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
 }
 
-/* larger textarea */
+.row2 input::placeholder,
+.row2 textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+.row2 input:focus,
+.row2 textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+}
+
 .row2 textarea {
   min-height: 120px;
   resize: vertical;
 }
 
-/* focus */
-.row2 input:focus,
-.row2 textarea:focus {
-  box-shadow: 0 10px 30px rgba(246, 185, 59, 0.06);
-  border-color: rgba(246, 185, 59, 0.35);
-  transform: translateY(-1px);
-}
-
-/* Save button area */
+/* ===== Button Area ===== */
 .addnotebutton {
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
 }
 
-/* Buttons (themed) */
 .addnotebutton button {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: #07101a;
+  padding: 0.65rem 1.5rem;
+  background: var(--accent);
+  color: var(--bg-primary);
   border: none;
-  padding: 0.65rem 1.25rem;
-  font-size: 0.95rem;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: 800;
-  box-shadow: 0 10px 28px rgba(246, 185, 59, 0.08);
-  transition: transform 120ms ease, box-shadow 160ms ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
 }
 
 .addnotebutton button:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(246, 185, 59, 0.12);
 }
 
-/* DisplayNotes component area (keeps spacing; visually match card style) */
-.DisplayNotes,
-.addnotes + .DisplayNotes,
-.addnotescontainer .DisplayNotes {
-  width: 80%;
-  max-width: 900px;
-  box-sizing: border-box;
+/* ===== Notes Section ===== */
+.notessection {
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--border-subtle);
 }
 
-/* If your DisplayNotes uses list/cards, give them a matching card style */
-.display-note-card,
-.note-card {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  color: #e6eef6;
+.notessection h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
 }
 
-/* small helper text */
-.meta {
-  color: var(--muted);
+/* ===== No Notes Message ===== */
+.nonotes {
+  text-align: center;
   font-size: 0.9rem;
+  color: var(--muted);
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-light);
+  margin-top: 1rem;
 }
 
-/* RESPONSIVE: keep original breakpoints & behavior with theme applied */
-@media (max-width: 1024px) {
-  .addnotes,
-  .addnotescontainer form {
-    width: 92%;
-    padding: 1.6rem;
-  }
+/* ===== Note Cards ===== */
+.noteCard {
+  background: var(--bg-secondary);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  border-left: 4px solid var(--accent);
+  cursor: pointer;
+  transition: all 0.25s ease;
 }
 
+.noteCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px rgba(246, 185, 59, 0.12);
+}
+
+.notedata {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.noteTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.noteDate {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
+  .addnotescontainer {
+    padding: 1rem;
+  }
+
+  .mainContent {
+    width: 100%;
+  }
+
   .addnotes,
-  .addnotescontainer form {
-    width: 95%;
-    padding: 1.25rem;
-  }
-
-  .addnotes h3 {
-    font-size: 1.2rem;
-  }
-
-  .row2 input,
-  .row2 textarea {
-    font-size: 0.92rem;
-    padding: 0.8rem 1rem;
+  .notessection {
+    padding: 1rem;
   }
 
   .addnotebutton {
-    justify-content: center; /* center button on mobile */
+    justify-content: stretch;
   }
 
   .addnotebutton button {
@@ -192,23 +226,11 @@
 }
 
 @media (max-width: 480px) {
-  .addnotes,
-  .addnotescontainer form {
-    width: 98%;
-    padding: 1rem;
-    gap: 0.9rem;
+  .heading h3 {
+    font-size: 1.15rem;
   }
 
-  .row2 textarea {
-    min-height: 100px;
-  }
-
-  .addnotes h3 {
-    font-size: 1rem;
-  }
-
-  .addnotebutton button {
-    font-size: 0.88rem;
-    padding: 0.55rem 1rem;
+  .heading p {
+    font-size: 0.8rem;
   }
 }

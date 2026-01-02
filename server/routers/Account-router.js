@@ -5,6 +5,7 @@ const {
   getAccounts,
   getAcitveAccount,
   updateAccount,
+  deleteAccountByID,
 } = require("../controllers/account-controller");
 const router = express.Router();
 
@@ -13,6 +14,8 @@ router
   .post(authMiddleware, createAccount)
   .get(authMiddleware, getAccounts)
   .patch(authMiddleware, updateAccount);
+
+router.route("/:id").delete(authMiddleware, deleteAccountByID);
 
 router.route("/active-account").get(authMiddleware, getAcitveAccount);
 

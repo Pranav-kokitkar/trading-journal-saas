@@ -1,125 +1,134 @@
-:root {
-  /* fallback values (will be overridden by global theme if present) */
-  --bg: #0f1724;
-  --panel: #07101a;
-  --muted: #9aa4b2;
-  --accent: #f6b93b;
-  --accent-2: #ffd98a;
-  --card-radius: 12px;
-  --pad: 18px;
-}
+/* ===================================
+   ADD TRADE PAGE - THEMED
+   =================================== */
 
 /* ===== Base Section ===== */
 .addtrade {
   display: flex;
   justify-content: center;
-  padding: 2rem;
-  color: #e6eef6;
+  padding: 1.5rem;
   min-height: 100vh;
-  font-family: Inter, "Segoe UI", Roboto, system-ui, -apple-system,
-    "Helvetica Neue", Arial;
   gap: 2rem;
   flex-wrap: wrap;
 }
 
 /* ===== Form Container ===== */
 .addtrade form {
-  width: 80%;
+  width: 100%;
   max-width: 980px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
-  border-radius: calc(var(--card-radius));
-  padding: calc(var(--pad) + 6px);
-  box-shadow: 0 12px 40px rgba(2, 6, 23, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.015);
-  border: 1px solid rgba(255, 255, 255, 0.03);
   box-sizing: border-box;
 }
 
 /* ===== Heading ===== */
 .heading {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 1rem;
   margin-bottom: 1.5rem;
-}
-.heading h3 {
-  font-size: 1.4rem;
-  margin: 0;
-  color: #fff;
-  letter-spacing: -0.2px;
-}
-.heading p {
-  color: var(--muted);
-  font-size: 0.95rem;
-  margin-top: 6px;
+  text-align: center;
 }
 
-/* ===== Card Layout (Reusable) ===== */
+.title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.title span {
+  background: linear-gradient(90deg, var(--accent), #f5a623);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.heading p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* ===== Card Layout (Matches Admin Panel) ===== */
 .card {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  padding: 1.25rem 1.3rem;
-  border-radius: 10px;
+  background: var(--gradient-card);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
   margin-bottom: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border-subtle);
+  transition: border-color 0.25s ease;
+}
+
+.card:hover {
+  border-color: var(--border-light);
 }
 
 .card h3 {
-  margin-bottom: 0.9rem;
-  color: #ffffff;
-  font-size: 1.05rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
-  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
 }
 
-/* ===== Inputs ===== */
+.subText {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(246, 185, 59, 0.08);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+}
+
+/* ===== Input Group ===== */
 .inputGroup {
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
-}
-.inputGroup label {
-  margin-bottom: 0.5rem;
-  font-size: 0.92rem;
-  color: var(--muted);
-  font-weight: 600;
+  margin-bottom: 0.75rem;
 }
 
-/* target native inputs/selects/textarea used in InputField */
+.inputGroup label {
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Native inputs/selects/textarea */
 .inputGroup input,
 .inputGroup select,
 .inputGroup textarea {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: #ffffff; /* white inputs for readability */
-  color: #07101a;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  outline: none;
-  transition: box-shadow 150ms ease, border-color 150ms ease,
-    transform 120ms ease;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
 }
 
 .inputGroup input::placeholder,
 .inputGroup textarea::placeholder {
-  color: rgba(7, 16, 26, 0.45);
+  color: var(--muted);
+  opacity: 0.5;
 }
 
-/* focus state */
 .inputGroup input:focus,
 .inputGroup select:focus,
 .inputGroup textarea:focus {
-  box-shadow: 0 8px 30px rgba(246, 185, 59, 0.06);
-  border-color: rgba(246, 185, 59, 0.35);
-  transform: translateY(-1px);
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+}
+
+.inputGroup select {
+  cursor: pointer;
 }
 
 /* ===== Layout Helpers ===== */
@@ -127,49 +136,124 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-}
-.col2 {
-  flex: 1;
-  min-width: 45%;
+  margin-bottom: 0.75rem;
 }
 
-/* when inner rows use .row inside .row, ensure spacing */
-.row > .row {
-  gap: 0.8rem;
+.col2 {
+  flex: 1;
+  min-width: 200px;
 }
 
 /* ===== Radio Buttons ===== */
-.tradedirection,
-.radioContainer {
+.tradedirection {
   margin: 1rem 0;
 }
+
+.tradedirection > label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
 .radioContainer {
   display: flex;
-  gap: 1.25rem;
+  gap: 1.5rem;
   align-items: center;
 }
-.radioContainer input {
+
+.radioContainer > div {
+  display: flex;
+  align-items: center;
+}
+
+.radioContainer input[type="radio"] {
   margin-right: 0.5rem;
   accent-color: var(--accent);
   width: 16px;
   height: 16px;
+  cursor: pointer;
 }
 
-/* label text for radio */
 .radioContainer label {
-  color: var(--muted);
-  font-weight: 700;
-  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
-/* warning text */
+.radioContainer label:hover {
+  color: var(--text-primary);
+}
+
+/* ===== Warning Text ===== */
 .warning {
   color: var(--accent);
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   margin-bottom: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(246, 185, 59, 0.08);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
 }
 
-/* ===== Buttons ===== */
+/* ===== Exited Section ===== */
+.exitedSection {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.exitedSection > label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+.exitedSection input[type="checkbox"] {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.exitedSection .row input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ===== Add Button (for exit levels) ===== */
+.addButton {
+  width: 100%;
+  padding: 0.65rem;
+  background: transparent;
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.5rem;
+}
+
+.addButton:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(246, 185, 59, 0.05);
+}
+
+/* ===== Buttons Container ===== */
 .btncontainer {
   display: flex;
   justify-content: flex-end;
@@ -178,93 +262,130 @@
   align-items: center;
 }
 
-/* base style for both buttons */
 .btncontainer button {
-  padding: 0.7rem 1.5rem;
+  padding: 0.65rem 1.5rem;
   border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 800;
-  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms;
+  transition: all 0.2s ease;
   min-width: 120px;
   text-align: center;
-  color: #07101a;
-  box-shadow: 0 8px 22px rgba(2, 6, 23, 0.35);
 }
 
-/* reset button (styled as ghost/red) */
+/* Reset button */
 .btncontainer button[type="reset"] {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.04),
-    rgba(255, 255, 255, 0.02)
-  );
+  background: transparent;
   color: var(--muted);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-medium);
 }
+
 .btncontainer button[type="reset"]:hover {
-  transform: translateY(-2px);
-  opacity: 0.95;
+  border-color: var(--error);
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.05);
 }
 
-/* submit button (accent gold) */
+/* Submit button */
 .btncontainer button[type="submit"] {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: #07101a;
-  font-weight: 900;
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
 }
+
 .btncontainer button[type="submit"]:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 12px 30px rgba(246, 185, 59, 0.12);
 }
 
-/* ===== Trade History Section (aside) ===== */
-.addtrade aside {
-  flex: 1;
-  min-width: 300px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
-  border-radius: 12px;
-  padding: 1rem;
-  color: var(--muted);
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.45);
-}
-
-/* Textarea wrapper */
+/* ===== Textarea Group ===== */
 .textareaGroup {
   display: flex;
   flex-direction: column;
-  margin-top: 12px;
-}
-.textareaGroup label {
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: var(--muted);
-}
-.textareaGroup textarea {
-  min-width: 100%;
-  min-height: 120px;
-  resize: vertical;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  font-size: 14px;
-  background: #fff;
-  color: #07101a;
+  margin-top: 1rem;
 }
 
-/* small helper classes (if used inside subcomponents) */
-.inputSmall {
-  padding: 8px 10px;
-  font-size: 0.9rem;
+.textareaGroup label {
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
-.labelSmall {
+
+.textareaGroup textarea {
+  min-height: 120px;
+  resize: vertical;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
   font-size: 0.85rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.textareaGroup textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+}
+
+/* ===== File Input Styling ===== */
+.col2 > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.col2 > div label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.col2 input[type="file"] {
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.col2 input[type="file"]:hover {
+  border-color: var(--accent);
+}
+
+.col2 input[type="file"]::file-selector-button {
+  padding: 0.4rem 0.8rem;
+  margin-right: 0.75rem;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.col2 input[type="file"]::file-selector-button:hover {
+  background: var(--accent-hover);
+}
+
+.col2 small {
+  font-size: 0.7rem;
   color: var(--muted);
 }
 
@@ -272,28 +393,21 @@
 @media (max-width: 1024px) {
   .addtrade {
     gap: 1.5rem;
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
 
   .addtrade form {
-    width: 92%;
-  }
-
-  .addtrade aside {
-    min-width: 260px;
+    width: 95%;
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 768px) {
   .addtrade {
-    flex-direction: column;
-    align-items: center;
+    padding: 1rem;
   }
 
   .addtrade form {
     width: 100%;
-    padding: 1.25rem;
-    box-sizing: border-box;
   }
 
   .row {
@@ -304,17 +418,10 @@
     min-width: 100%;
   }
 
-  .btncontainer {
-    justify-content: center;
-  }
-}
-
-@media (max-width: 600px) {
-  .heading h3 {
-    font-size: 1.2rem;
-  }
-  .heading p {
-    font-size: 0.85rem;
+  .radioContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 
   .btncontainer {
@@ -324,5 +431,23 @@
 
   .btncontainer button {
     width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .heading h3 {
+    font-size: 1.15rem;
+  }
+
+  .heading p {
+    font-size: 0.8rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .card h3 {
+    font-size: 0.9rem;
   }
 }

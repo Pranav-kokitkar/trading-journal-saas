@@ -12,13 +12,12 @@ export const AddNotes = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNote((prev) => ({ ...prev, [name]: value })); // ✅ update the single note
+    setNote((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
-    if (note.title.trim() === "" && note.description.trim() === "") return;
     e.preventDefault();
-    console.log(note);
+    if (note.title.trim() === "" && note.description.trim() === "") return;
 
     try {
       const response = await fetch(
@@ -38,32 +37,22 @@ export const AddNotes = () => {
         toast.success("Note added", {
           position: "top-right",
           autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
           theme: "dark",
         });
         getAllNotes();
       } else {
-       toast.error("Failed to add note", {
-         position: "top-right",
-         autoClose: 2000,
-         hideProgressBar: false,
-         closeOnClick: false,
-         pauseOnHover: true,
-         draggable: true,
-         progress: undefined,
-         theme: "dark",
-       });
+        toast.error("Failed to add note", {
+          position: "top-right",
+          autoClose: 2000,
+          theme: "dark",
+        });
       }
     } catch (error) {
       console.log("add notes error", error);
     }
   };
 
-  const getAllNotes = async ()=>{
+  const getAllNotes = async () => {
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/notes/`,
@@ -76,25 +65,32 @@ export const AddNotes = () => {
         }
       );
       const res_data = await response.json();
-      if(response.ok){
-        console.log("notes fetched")
+      if (response.ok) {
         setNotes(res_data);
       }
     } catch (error) {
-      console.log("error while getting all notes",error)
+      console.log("error while getting all notes", error);
     }
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     getAllNotes();
-  },[])
-
+  }, []);
 
   return (
     <section className={styles.addnotescontainer}>
-      <form className={styles.addnotes} onSubmit={handleSubmit}>
-        <div>
-          <h3>Add New Notes</h3>
+      <div className={styles.mainContent}>
+        {/* Page Heading - Consistent with other pages */}
+        <div className={styles.heading}>
+          <h2 className={styles.title}>
+                    Notes
+                  </h2>
+          <p>Create and manage your trading notes and ideas</p>
+        </div>
+
+        {/* Add Note Form Card */}
+        <form className={styles.addnotes} onSubmit={handleSubmit}>
+          <h4>Add New Note</h4>
 
           <div className={styles.addnotesinputfiled}>
             <div className={styles.row2}>
@@ -102,15 +98,17 @@ export const AddNotes = () => {
               <input
                 type="text"
                 name="title"
+                placeholder="Enter note title..."
                 value={note.title}
                 onChange={handleChange}
               />
             </div>
 
             <div className={styles.row2}>
-              <label>Note:</label>
+              <label>Description:</label>
               <textarea
                 name="description"
+                placeholder="Write your note content..."
                 value={note.description}
                 onChange={handleChange}
               />
@@ -120,9 +118,14 @@ export const AddNotes = () => {
           <div className={styles.addnotebutton}>
             <button type="submit">Save Note</button>
           </div>
+        </form>
+
+        {/* Display Notes Section */}
+        <div className={styles.notessection}>
+          <h3>Saved Notes</h3>
+          <DisplayNotes notes={notes} getAllNotes={getAllNotes} />
         </div>
-      </form>
-      <DisplayNotes notes={notes} getAllNotes={getAllNotes} />
+      </div>
     </section>
   );
 };

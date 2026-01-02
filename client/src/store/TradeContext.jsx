@@ -14,11 +14,18 @@ export const TradeProvider = ({ children }) => {
       "TradeProvider: UserContext is undefined. Make sure <AccountProvider> wraps <TradeProvider>."
     );
   }
-  const { updateUser } = userCtx || {};
-  const {updateAccount, accountDetails} = useContext(AccountContext);
+  const {user} = useAuth();
+  const { updateAccount, accountDetails } = useContext(AccountContext);
 
   const [trades, setTrades] = useState([]);
-  const [ accountTrades, setAccountTrades ] = useState([]);
+  const [totalTrades, setTotalTrades] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [accountTrades, setAccountTrades] = useState([]);
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [limit, setLimit] = useState(5);
+
   const [trade, setTrade] = useState({
     id: "",
     marketType: "",
@@ -45,171 +52,155 @@ export const TradeProvider = ({ children }) => {
 
   const mountedRef = useRef(true);
 
-  useEffect(() => {
-    mountedRef.current = true;
-    if (!isLoggedIn) {
-      return;
-    }
-    getAllTrades();
-    return () => {
-      mountedRef.current = false;
-    };
-  }, [authorizationToken]);
-
-  async function getAllTrades() {
-
-    if (!isLoggedIn) {
-      console.log("getAllTrades: user not logged in, skipping fetch");
-      return;
-    }
-    
-    if (!authorizationToken) {
-      return;
-    }
+  async function getAllTrades(filters = {}) {
+    if (!isLoggedIn || !authorizationToken) return;
 
     try {
+      setLoading(true);
+
+      const params = new URLSearchParams({
+        page,
+        limit,
+        ...filters,
+      }).toString();
+
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/`,
+        `${import.meta.env.VITE_API_URL}/api/trades?${params}`,
         {
-          method: "GET",
-          headers: {
-            Authorization: authorizationToken,
-          },
+          headers: { Authorization: authorizationToken },
         }
       );
-      const res_data = await response.json();
+
+      const data = await response.json();
+
       if (response.ok) {
-        if (mountedRef.current) {
-          setTrades(res_data.response || []);
-          console.log(
-            "trades stored",
-            Array.isArray(res_data.response) ? res_data.response.length : 0
-          );
-        }
-      } else {
-        console.warn("getAllTrades failed", response.status, res_data);
+        setTrades(data.trades || []);
+        setTotalPages(data.pagination.totalPages);
+        setTotalTrades(data.stats.totalTrades);
       }
-    } catch (error) {
-      console.error("get trades error", error);
+    } catch (err) {
+      console.error("fetch trades error", err);
+    } finally {
+      setLoading(false);
     }
   }
 
-    const AddTrade = async (normalizedTrade, screenshots = []) => {
-      try {
-        // ✅ Build FormData instead of raw JSON
-        const formData = new FormData();
+  const AddTrade = async (normalizedTrade, screenshots = []) => {
 
-        // Append all normalizedTrade fields
-        Object.entries(normalizedTrade).forEach(([key, value]) => {
-          if (value === undefined || value === null) return;
+    try {
+      // ✅ Build FormData instead of raw JSON
+      const formData = new FormData();
 
-          if (Array.isArray(value)) {
-            // e.g. exitedPrice -> send as JSON string
-            formData.append(key, JSON.stringify(value));
-          } else {
-            formData.append(key, value);
+      // Append all normalizedTrade fields
+      Object.entries(normalizedTrade).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+
+        if (Array.isArray(value)) {
+          // e.g. exitedPrice -> send as JSON string
+          formData.append(key, JSON.stringify(value));
+        } else {
+          formData.append(key, value);
+        }
+      });
+
+      // Append up to 2 screenshot files (field name: "screenshots")
+      if (Array.isArray(screenshots)) {
+        screenshots.slice(0, 2).forEach((file) => {
+          if (file) {
+            formData.append("screenshots", file);
           }
         });
-
-        // Append up to 2 screenshot files (field name: "screenshots")
-        if (Array.isArray(screenshots)) {
-          screenshots.slice(0, 2).forEach((file) => {
-            if (file) {
-              formData.append("screenshots", file);
-            }
-          });
-        }
-
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/trades/`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: authorizationToken,
-            },
-            body: formData,
-          }
-        );
-
-        let data = {};
-        try {
-          data = await response.json();
-        } catch (err) {
-          // ignore parse error
-        }
-
-        if (response.ok) {
-          toast.success("Trade added succesfully", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          });
-
-          // Refresh trades list after new trade added
-          await getAllTrades();
-
-          // Update account details after successful add
-          try {
-            if (typeof updateAccount === "function") {
-              await updateAccount({
-                pnl: Number(normalizedTrade.pnl || 0),
-                deltaTrades: 1,
-              });
-            } else {
-              console.warn("updateAccount is not a function on UserContext");
-            }
-          } catch (err) {
-            console.error("Failed to update account after AddTrade:", err);
-          }
-
-          // reset local trade state
-          setTrade({
-            id: "",
-            marketType: "",
-            symbol: "",
-            tradedirection: "",
-            entryPrice: "",
-            stoplossPrice: "",
-            riskType: "",
-            takeProfitPrice: "",
-            tradeStatus: "",
-            exitedPrice: [{ price: "", volume: "" }],
-            rr: "",
-            pnl: "",
-            tradeResult: "",
-            riskamount: "",
-            riskPercent: "",
-            balanceAfterTrade: "",
-            tradeNumber: "",
-            dateNtime: "",
-            tradeNotes: "",
-          });
-        } else {
-          toast.error("Failed to add trade", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          });
-          const message =
-            data?.message || "Failed to add trade — check console for details";
-          alert(message);
-        }
-      } catch (error) {
-        console.error("add trade to db error", error);
-        alert("Network or unexpected error — see console");
       }
-    };
 
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/trades/`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: authorizationToken,
+          },
+          body: formData,
+        }
+      );
+
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (err) {
+        // ignore parse error
+      }
+
+      if (response.ok) {
+        toast.success("Trade added succesfully", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+
+        // Refresh trades list after new trade added
+        await getAllTrades();
+
+        // Update account details after successful add
+        try {
+          if (typeof updateAccount === "function") {
+            await updateAccount({
+              pnl: Number(normalizedTrade.pnl || 0),
+              deltaTrades: 1,
+            });
+          } else {
+            console.warn("updateAccount is not a function on UserContext");
+          }
+        } catch (err) {
+          console.error("Failed to update account after AddTrade:", err);
+        }
+
+        // reset local trade state
+        setTrade({
+          id: "",
+          marketType: "",
+          symbol: "",
+          tradedirection: "",
+          entryPrice: "",
+          stoplossPrice: "",
+          riskType: "",
+          takeProfitPrice: "",
+          tradeStatus: "",
+          exitedPrice: [{ price: "", volume: "" }],
+          rr: "",
+          pnl: "",
+          tradeResult: "",
+          riskamount: "",
+          riskPercent: "",
+          balanceAfterTrade: "",
+          tradeNumber: "",
+          dateNtime: "",
+          tradeNotes: "",
+        });
+      } else {
+        toast.error("Failed to add trade", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+        const message =
+          data?.message || "Failed to add trade — check console for details";
+        alert(message);
+      }
+    } catch (error) {
+      console.error("add trade to db error", error);
+      alert("Network or unexpected error — see console");
+    }
+  };
 
   const closeTradeByID = async (
     id,
@@ -255,7 +246,7 @@ export const TradeProvider = ({ children }) => {
       console.log("closeTradeByID response:", response.status, data);
       await getAllTrades();
 
-      if(response.ok){
+      if (response.ok) {
         toast.success("Trdae close sucessfully", {
           position: "top-right",
           autoClose: 2000,
@@ -266,7 +257,7 @@ export const TradeProvider = ({ children }) => {
           progress: undefined,
           theme: "dark",
         });
-      }else {
+      } else {
         toast.error("Failed to close tarde", {
           position: "top-right",
           autoClose: 2000,
@@ -351,21 +342,21 @@ export const TradeProvider = ({ children }) => {
       console.error("Failed to delete trade:", err);
       alert("Failed to delete trade — check console");
     }
-  };
-
-useEffect(() => {
-  if (!accountDetails?._id) {
-    setAccountTrades([]);
-    return;
   }
+  
+  useEffect(() => {
+    if (!accountDetails?._id) {
+      setAccountTrades([]);
+      return;
+    }
 
-  const filtered = trades.filter((t) => {
-    if (!t.accountId) return false;
-    return String(t.accountId) === String(accountDetails._id);
-  });
+    const filtered = trades.filter((t) => {
+      if (!t.accountId) return false;
+      return String(t.accountId) === String(accountDetails._id);
+    });
 
-  setAccountTrades(filtered);
-}, [trades, accountDetails]);
+    setAccountTrades(filtered);
+  }, [trades, accountDetails]);
 
   return (
     <TradeContext.Provider
@@ -378,6 +369,11 @@ useEffect(() => {
         closeTradeByID,
         deleteTradeByID,
         accountTrades,
+        page,
+        setPage,
+        loading,
+        totalPages,
+        totalTrades,
       }}
     >
       {children}

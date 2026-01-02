@@ -1,0 +1,177 @@
+/* ===================================
+   UPGRADE PAGE – MATCHES PRO MODAL
+   =================================== */
+
+.upgradePage {
+  min-height: 100%;
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-primary);
+}
+
+/* ===== Header ===== */
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  max-width: 520px;
+}
+
+.header h1 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent), #ffd98a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.header p {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ===== Why Pro Section ===== */
+.whyPro {
+  width: 100%;
+  max-width: 750px;
+  margin-bottom: 2.5rem;
+  padding: 1.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.whyPro h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.whyPro ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.whyPro li {
+  margin: 0.6rem 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ===== Pro Plan Card ===== */
+.planCard {
+  width: 100%;
+  max-width: 750px;
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  text-align: center;
+}
+
+.planCard h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ===== Features ===== */
+.features {
+  list-style: none;
+  padding: 1.5rem;
+  margin: 0 0 2rem 0;
+  background: rgba(246, 185, 59, 0.05);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.features li {
+  margin: 0.75rem 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  line-height: 1.6;
+}
+
+.features li::before {
+  content: "✓";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-radius: 50%;
+  font-weight: 900;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* ===== Pricing ===== */
+.pricing {
+  margin-bottom: 1.75rem;
+}
+
+.price {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.billing {
+  font-size: 1rem;
+  color: var(--muted);
+  margin-left: 0.25rem;
+}
+
+/* ===== CTA ===== */
+.primaryBtn {
+  width: 100%;
+  padding: 0.9rem 1.5rem;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: 0.8;
+  margin-bottom: 1rem;
+}
+
+/* ===== Trust Note ===== */
+.note {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+  .upgradePage {
+    padding: 2rem 1rem;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .planCard {
+    padding: 1.5rem;
+  }
+
+  .price {
+    font-size: 1.7rem;
+  }
+}

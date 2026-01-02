@@ -1,171 +1,271 @@
-/* === Modal Overlay === */
+/* ===================================
+   NOTE MODAL - THEMED
+   =================================== */
+
+/* ===== Modal Overlay ===== */
 .modalOverlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(3, 6, 12, 0.6); /* darker overlay for focus */
-  backdrop-filter: blur(4px);
+  background: rgba(12, 22, 40, 0.85);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
 }
 
-/* === Modal Content Box === */
+/* ===== Modal Content Box ===== */
 .modalContent {
-  background: #121721;
-  width: 490px;
-  max-width: 90%;
-  border-radius: 10px;
-  padding: 18px 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-  animation: fadeIn 0.22s ease-out;
+  background: var(--gradient-card);
+  width: 560px;
+  max-width: 92%;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.25s ease-out;
   display: flex;
   flex-direction: column;
-  gap: 19px;
+  gap: 1.25rem;
 }
 
-/* === Header Section === */
+/* ===== Header Section ===== */
 .modalHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-weight: 700;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
+
+.noteTitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
   margin: 0;
-  font-size: 1.3rem;
+}
+
+.editTitleInput {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.editTitleInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
 }
 
 .modalCloseButton {
   background: transparent;
   border: none;
-  font-size: 20px;
-  color: #fff;
+  font-size: 1.5rem;
+  color: var(--muted);
   cursor: pointer;
-  transition: 0.2s ease;
+  padding: 0.25rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  margin-left: 1rem;
 }
 
 .modalCloseButton:hover {
-  color: #ff4d4d;
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
 }
 
-/* === Body Section === */
+/* ===== Body Section ===== */
 .modalBody {
-  max-height: 250px;
+  max-height: 320px;
   overflow-y: auto;
-  padding-right: 6px;
+  padding-right: 0.5rem;
 }
 
 .noteDescription {
-  color: #d1d7e6;
-  line-height: 1.45rem;
-  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.9rem;
   white-space: pre-line;
 }
 
-/* Scrollbar */
-.modalBody::-webkit-scrollbar {
-  width: 4px;
-}
-.modalBody::-webkit-scrollbar-thumb {
-  background: #6a6f7a;
-  border-radius: 4px;
+.editTextArea {
+  width: 100%;
+  min-height: 180px;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.2s ease;
 }
 
-/* === Footer Section === */
+.editTextArea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+}
+
+/* ===== Scrollbar ===== */
+.modalBody::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalBody::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+}
+
+.modalBody::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: var(--radius-sm);
+}
+
+.modalBody::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* ===== Footer Section ===== */
 .modalFooter {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.editButton {
-  background: rgb(204, 172, 67);
+/* ===== Buttons ===== */
+.editButton,
+.deleteButton,
+.saveButton,
+.cancelButton {
+  padding: 0.6rem 1.25rem;
   border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
-  color: white;
-  transition: 0.2s ease;
+  transition: all 0.2s ease;
+}
+
+/* Edit Button */
+.editButton {
+  background: var(--accent);
+  color: var(--bg-primary);
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
 }
 
 .editButton:hover {
-  background: rgb(255, 196, 0);
-  transform: scale(1.05);
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  transform: translateY(-2px);
 }
 
+/* Delete Button */
 .deleteButton {
-  background: #d64040;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  color: white;
-  transition: 0.2s ease;
+  background: transparent;
+  color: var(--error);
+  border: 1px solid var(--border-medium);
 }
 
 .deleteButton:hover {
-  background: #b33030;
-  transform: scale(1.05);
+  background: rgba(239, 68, 68, 0.1);
+  border-color: var(--error);
 }
 
-.editTitleInput,
-.editTextArea {
-  width: 100%;
-  background: #0d1117;
-  border: 1px solid #3b3f46;
-  color: #fff;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 14px;
-}
-
-.editTextArea {
-  min-height: 140px;
-  resize: vertical;
-  width: 100%;
-}
-
-/* Footer buttons */
-.editButton {
-  background: #2c72ff;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: white;
-  margin-right: 8px;
-}
-
+/* Save Button */
 .saveButton {
-  background: #1db954;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
+  background: var(--success);
   color: white;
-  margin-right: 8px;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
 }
 
+.saveButton:hover {
+  background: #1ea34d;
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Cancel Button */
 .cancelButton {
-  background: #555;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  color: white;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border-medium);
 }
 
-/* === Animation === */
+.cancelButton:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ===== Animations ===== */
 @keyframes fadeIn {
   from {
-    transform: scale(0.92);
     opacity: 0;
   }
   to {
-    transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+  .modalContent {
+    width: 95%;
+    padding: 1.25rem;
+  }
+
+  .modalHeader {
+    flex-wrap: wrap;
+  }
+
+  .modalCloseButton {
+    margin-left: 0.5rem;
+  }
+
+  .modalFooter {
+    flex-direction: column;
+  }
+
+  .editButton,
+  .deleteButton,
+  .saveButton,
+  .cancelButton {
+    width: 100%;
+  }
+
+  .modalBody {
+    max-height: 240px;
   }
 }

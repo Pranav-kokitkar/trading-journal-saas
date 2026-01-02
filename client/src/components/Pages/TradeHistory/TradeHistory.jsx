@@ -1,133 +1,90 @@
-
-import { useState, useMemo, useContext } from "react";
+import { useState, useEffect } from "react";
 import styles from "./TradeHistory.module.css";
-import { useTrades } from "../../../store/TradeContext"; 
+import { useTrades } from "../../../store/TradeContext";
 import { TradeCard } from "./TradeCard";
+import { Pagination } from "../../Pagination";
+import { useAuth } from "../../../store/Auth";
+
+const defaultFilters = {
+  symbol: "",
+  marketType: "",
+  status: "",
+  result: "",
+  direction: "",
+  pnlOperator: ">",
+  pnlValue: "",
+  rrOperator: ">",
+  rrValue: "",
+  startDate: "",
+  endDate: "",
+  startTradeNumber: "",
+  endTradeNumber: "",
+};
 
 export const TradeHistory = () => {
-  // get trades from TradeContext (single source of truth)
-  const { trades: contextTrades = [] } = useTrades() || {};
+  const {
+    trades = [],
+    refreshTrades,
+    page,
+    setPage,
+    totalPages,
+    loading,
+    totalTrades,
+  } = useTrades();
 
-  // fallback for legacy/local dev: read from localStorage if context empty
-  const savedFromLocal = JSON.parse(localStorage.getItem("trades") || "[]");
-  const trades =
-    Array.isArray(contextTrades) && contextTrades.length > 0
-      ? contextTrades
-      : savedFromLocal;
+  const [filters, setFilters] = useState(defaultFilters);
+  const [showProTooltip, setShowProTooltip] = useState(null); // 'pnl' or 'rr'
 
-  const [filters, setFilters] = useState({
-    symbol: "",
-    marketType: "",
-    status: "",
-    result: "",
-    direction: "",
-    pnlOperator: ">",
-    pnlValue: "",
-    rrOperator: ">",
-    rrValue: "",
-    startDate: "",
-    endDate: "",
-    startTradeNumber: "",
-    endTradeNumber: "",
-  });
+  const { isAuthLoading, isPro } = useAuth();
 
-  const handleClearFilters = () =>
-    setFilters({
-      symbol: "",
-      marketType: "",
-      status: "",
-      result: "",
-      direction: "",
-      pnlOperator: ">",
-      pnlValue: "",
-      rrOperator: ">",
-      rrValue: "",
-      startDate: "",
-      endDate: "",
-      startTradeNumber: "",
-      endTradeNumber: "",
-    });
-
+  /** ---------------- FILTER HANDLERS ---------------- */
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+
+    setFilters((prev) => {
+      setPage(1);
+      return { ...prev, [name]: value };
+    });
   };
 
-  // compute filtered trades from the `trades` variable
-  const filteredTrades = useMemo(() => {
-    return (trades || []).filter((t) => {
-      // symbol search (partial, case-insensitive)
-      if (filters.symbol) {
-        const search = filters.symbol.toLowerCase();
-        if (!t.symbol?.toLowerCase().includes(search)) return false;
-      }
+  const handleProFeatureClick = (field) => (e) => {
+    if (!isPro) {
+      e.preventDefault();
+      setShowProTooltip(field);
 
-      if (filters.marketType && t.marketType !== filters.marketType)
-        return false;
-      if (filters.status && (t.tradeStatus || t.status) !== filters.status)
-        return false;
-      if (filters.result && (t.tradeResult || t.result) !== filters.result)
-        return false;
-      if (
-        filters.direction &&
-        (t.tradedirection || t.tradeDirection) !== filters.direction
-      )
-        return false;
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        setShowProTooltip(null);
+      }, 3000);
+    }
+  };
 
-      // PnL
-      if (filters.pnlValue) {
-        const val = Number(filters.pnlValue);
-        const tPnl = Number(t.pnl || 0);
-        if (filters.pnlOperator === ">" && !(tPnl > val)) return false;
-        if (filters.pnlOperator === "<" && !(tPnl < val)) return false;
-        if (filters.pnlOperator === "=" && !(tPnl === val)) return false;
-      }
+  const handleClearFilters = () => {
+    setPage(1);
+    setFilters(defaultFilters);
+  };
 
-      // RR
-      if (filters.rrValue) {
-        const val = Number(filters.rrValue);
-        const tRr = Number(t.rr || 0);
-        if (filters.rrOperator === ">" && !(tRr > val)) return false;
-        if (filters.rrOperator === "<" && !(tRr < val)) return false;
-        if (filters.rrOperator === "=" && !(tRr === val)) return false;
-      }
+  /** ---------------- FETCH FROM BACKEND ---------------- */
+  useEffect(() => {
+    refreshTrades(filters);
+  }, [filters, page]);
 
-      // Date range: support both dateTime and dateNtime
-      if (filters.startDate || filters.endDate) {
-        const raw = t.dateTime ?? t.dateNtime ?? t.date ?? null;
-        if (!raw) return false;
-        const tradeDate = new Date(raw);
-        if (filters.startDate && tradeDate < new Date(filters.startDate))
-          return false;
-        // add one day to endDate to include trades on that day (optional)
-        if (filters.endDate && tradeDate > new Date(filters.endDate))
-          return false;
-      }
-
-      // Trade number range
-      if (
-        filters.startTradeNumber &&
-        Number(t.tradeNumber) < Number(filters.startTradeNumber)
-      )
-        return false;
-      if (
-        filters.endTradeNumber &&
-        Number(t.tradeNumber) > Number(filters.endTradeNumber)
-      )
-        return false;
-
-      return true;
-    });
-  }, [filters, trades]);
+  if (isAuthLoading) {
+    return <p>loading...</p>;
+  }
 
   return (
     <section id="trade-history" className={styles.tardehistory}>
-      <div className={styles.tradehistorycontainer}>
-        <div className={styles.heading}>
-          <h3>Trade History</h3>
-          <p>Review and analyze all your trades here</p>
-        </div>
+      {/* ---------------- HEADER ---------------- */}
+      <div className={styles.heading}>
+        <h2 className={styles.title}>
+          Trade <span>History</span>
+        </h2>
+        <p>Review and analyze all your trades here</p>
+      </div>
 
+      <div className={styles.tradehistorycontainer}>
+        {/* ---------------- FILTER PANEL ---------------- */}
         <div className={styles.filter}>
           <h3>Advanced Filter & Search</h3>
 
@@ -169,6 +126,7 @@ export const TradeHistory = () => {
               <option value="">All Result</option>
               <option value="win">Win</option>
               <option value="loss">Loss</option>
+              <option value="breakeven">Breakeven</option>
             </select>
 
             <select
@@ -182,51 +140,87 @@ export const TradeHistory = () => {
             </select>
           </div>
 
+          {/* ---------------- PNL & RR ---------------- */}
           <div className={styles.filterinput}>
             <div className={styles.filterinputsec}>
-              <label>PnL:</label>
-              <select
-                name="pnlOperator"
-                value={filters.pnlOperator}
-                onChange={handleFilterChange}
-              >
-                <option value=">">&gt;</option>
-                <option value="<">&lt;</option>
-                <option value="=">=</option>
-              </select>
-              <input
-                type="number"
-                name="pnlValue"
-                placeholder="PnL"
-                value={filters.pnlValue}
-                onChange={handleFilterChange}
-              />
+              <label>
+                PNL
+                {!isPro && <span className={styles.proBadge}>PRO</span>}
+              </label>
+              <div className={styles.proInputWrapper}>
+                <select
+                  name="pnlOperator"
+                  value={filters.pnlOperator}
+                  onChange={handleFilterChange}
+                  onClick={handleProFeatureClick("pnl")}
+                  disabled={!isPro}
+                >
+                  <option value=">">&gt;</option>
+                  <option value="<">&lt;</option>
+                  <option value="=">=</option>
+                </select>
+                <input
+                  type="number"
+                  name="pnlValue"
+                  placeholder="PnL"
+                  value={filters.pnlValue}
+                  onChange={handleFilterChange}
+                  onClick={handleProFeatureClick("pnl")}
+                  disabled={!isPro}
+                />
+
+                {/* Tooltip for PnL */}
+                {showProTooltip === "pnl" && !isPro && (
+                  <div className={styles.proTooltip}>
+                    <span className={styles.tooltipIcon}>!</span>
+                    This feature is available in Pro plan
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className={styles.filterinputsec}>
-              <label>RR:</label>
-              <select
-                name="rrOperator"
-                value={filters.rrOperator}
-                onChange={handleFilterChange}
-              >
-                <option value=">">&gt;</option>
-                <option value="<">&lt;</option>
-                <option value="=">=</option>
-              </select>
-              <input
-                type="number"
-                name="rrValue"
-                placeholder="RR"
-                value={filters.rrValue}
-                onChange={handleFilterChange}
-              />
+              <label>
+                RR
+                {!isPro && <span className={styles.proBadge}>PRO</span>}
+              </label>
+              <div className={styles.proInputWrapper}>
+                <select
+                  name="rrOperator"
+                  value={filters.rrOperator}
+                  onChange={handleFilterChange}
+                  onClick={handleProFeatureClick("rr")}
+                  disabled={!isPro}
+                >
+                  <option value=">">&gt;</option>
+                  <option value="<">&lt;</option>
+                  <option value="=">=</option>
+                </select>
+                <input
+                  type="number"
+                  name="rrValue"
+                  placeholder="RR"
+                  value={filters.rrValue}
+                  onChange={handleFilterChange}
+                  onClick={handleProFeatureClick("rr")}
+                  disabled={!isPro}
+                />
+
+                {/* Tooltip for RR */}
+                {showProTooltip === "rr" && !isPro && (
+                  <div className={styles.proTooltip}>
+                    <span className={styles.tooltipIcon}>!</span>
+                    This feature is available in Pro plan
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
+          {/* ---------------- DATE & TRADE NUMBER ---------------- */}
           <div className={styles.filterinput}>
             <div className={styles.filterinputsec}>
-              <label>Date:</label>
+              <label>Date</label>
               <input
                 type="date"
                 name="startDate"
@@ -242,7 +236,7 @@ export const TradeHistory = () => {
             </div>
 
             <div className={styles.filterinputsec}>
-              <label>Trade:</label>
+              <label>Trade No</label>
               <input
                 type="number"
                 name="startTradeNumber"
@@ -260,20 +254,25 @@ export const TradeHistory = () => {
             </div>
           </div>
 
+          {/* ---------------- FOOTER ---------------- */}
           <div className={styles.filter3}>
-            <p>
-              Showing {filteredTrades.length} of {trades.length} trades
-            </p>
+            <p>Showing {totalTrades} trades</p>
             <button type="button" onClick={handleClearFilters}>
               Clear Filters
             </button>
           </div>
         </div>
 
-        <TradeCard savedTrade={filteredTrades} />
+        {/* ---------------- TRADE LIST ---------------- */}
+        {loading ? <p>Loading trades...</p> : <TradeCard savedTrade={trades} />}
+
+        {/* ---------------- PAGINATION ---------------- */}
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       </div>
     </section>
   );
 };
-
-

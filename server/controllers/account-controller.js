@@ -1,11 +1,11 @@
 // controllers/account-create-controller.js
 const Account = require("../models/account-model");
 const User = require("../models/user-model");
+const Trade = require("../models/trade-model");
 
 // POST /api/account
 const createAccount = async (req, res) => {
   try {
-    // trust the token for userId, not the body
     const userIdFromToken = req.userID;
     const { userId: userIdFromBody, name, initialCapital } = req.body;
 
@@ -28,6 +28,29 @@ const createAccount = async (req, res) => {
       return res.status(400).json({
         message: "initialCapital must be a positive number",
       });
+    }
+
+    const userDetails = await User.findById(userId);
+
+    const isPro =
+      userDetails?.plan === "pro" &&
+      userDetails?.planExpiresAt &&
+      new Date(userDetails.planExpiresAt) > new Date();
+
+    const totalAccounts = await Account.find({ userId }).countDocuments();
+
+    if (!isPro) {
+      if (totalAccounts >= 2) {
+        return res
+          .status(403)
+          .json({ message: "Cannt create more than 2 account in free plan " });
+      }
+    } else {
+      if (totalAccounts >= 5) {
+        return res
+          .status(403)
+          .json({ message: "max accounts per user is 5 accounts in pro plan" });
+      }
     }
 
     // 1) Create the account; currentBalance will auto = initialCapital via schema default
@@ -66,6 +89,54 @@ const createAccount = async (req, res) => {
   }
 };
 
+const deleteAccountByID = async (req, res) => {
+  try {
+    const userId = req.userID;
+    const accountId = req.params.id;
+
+    if (!accountId) {
+      return res.status(400).json({ message: "Account ID is required" });
+    }
+
+    // 1. Find account & verify ownership
+    const account = await Account.findOne({ _id: accountId, userId });
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    // 2. Delete the account
+    await Account.deleteOne({ _id: accountId });
+    await Trade.deleteMany({
+      accountId: accountId,
+    });
+
+    // 3. Check if it was the active account
+    const user = await User.findById(userId).select("activeAccountId");
+
+    let newActiveAccount = null;
+
+    if (user?.activeAccountId?.toString() === accountId) {
+      // Find another account for this user
+      newActiveAccount = await Account.findOne({ userId }).sort({
+        createdAt: 1, // oldest first (you can change this)
+      });
+
+      await User.findByIdAndUpdate(userId, {
+        activeAccountId: newActiveAccount ? newActiveAccount._id : null,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Account deleted successfully",
+      newActiveAccount,
+    });
+  } catch (error) {
+    console.error("deleteAccount error:", error);
+    return res.status(500).json({
+      message: "Server error: failed to delete account",
+    });
+  }
+};
 const getAccounts = async (req, res) => {
   try {
     const userId = req.userID || (req.user && req.user._id);
@@ -172,10 +243,10 @@ const updateAccount = async (req, res) => {
   }
 };
 
-
 module.exports = {
   createAccount,
   getAccounts,
   getAcitveAccount,
   updateAccount,
+  deleteAccountByID,
 };

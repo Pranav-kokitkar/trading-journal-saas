@@ -1,157 +1,157 @@
-:root {
-  --bg: #0f1724; /* page background */
-  --panel: #07101a; /* sidebar / panel */
-  --muted: #9aa4b2; /* muted text */
-  --accent: #f6b93b; /* gold accent */
-  --accent-2: #ffd98a; /* lighter gold */
-  --glass: rgba(255, 255, 255, 0.02);
-  --edge: rgba(255, 255, 255, 0.03);
-}
+/* ===================================
+   LAYOUT - COMPLETE MOBILE FIX
+   =================================== */
 
-/* ---------- LAYOUT (structure unchanged) ---------- */
+/* ===== Layout Container ===== */
 .layout {
   display: flex;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-  background: linear-gradient(180deg, var(--bg), #071226);
-  color: #e6eef6;
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
+  min-height: 100vh;
+  background: var(--bg-primary);
 }
 
-/* Sidebar wrapper (keeps your sticky desktop behaviour) */
+/* ===== Sidebar (Desktop Default) ===== */
 .sidebar {
-  height: 100vh;
-  border-right: 1px solid rgba(255, 255, 255, 0.02);
+  width: 260px;
   flex-shrink: 0;
-  transition: transform 0.3s ease-in-out;
-  z-index: 1000;
-  /* wrapper is neutral — inner panel styles live in SideBar.module.css */
-  background: transparent;
 }
 
-/* main content area (Outlet) */
+/* ===== Main Content Area ===== */
 .outlet {
   flex: 1;
-  height: 100vh;
   overflow-y: auto;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  padding: 28px;
-  box-sizing: border-box;
+  background: var(--bg-primary);
 }
 
-/* mobile header (hidden on desktop) */
+/* ===== Mobile Header (Hidden on Desktop) ===== */
 .mobileHeader {
   display: none;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  box-sizing: border-box;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.02),
-    rgba(255, 255, 255, 0.01)
-  );
 }
 
-/* hamburger (visual only) */
-
-.hamburger:hover {
-  background: rgba(255, 255, 255, 0.02);
+/* ===== Hamburger Menu ===== */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 22px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
+
 .hamburger span {
-  display: block;
-  height: 2px;
-  width: 20px;
-  background: rgba(255, 255, 255, 0.8);
+  width: 100%;
+  height: 3px;
+  background: var(--text-primary);
   border-radius: 2px;
+  transition: all 0.3s ease;
 }
 
-/* small heading text in header */
+.hamburger:hover span {
+  background: var(--accent);
+}
+
 .mobileHeader h3 {
   margin: 0;
-  font-size: 1rem;
-  color: #fff;
+  font-size: 1.1rem;
   font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
 }
 
-/* helper center container (unchanged) */
-.contentWrapper {
-  max-width: 1200px;
-  margin: 0 auto;
+/* ===== Overlay (Hidden by Default) ===== */
+.overlay {
+  display: none;
 }
 
-/* ---------- RESPONSIVE / MOBILE (keeps your original breakpoints & behaviour) ---------- */
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.title span {
+  background: linear-gradient(90deg, var(--accent), #f5a623);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===================================
+   MOBILE STYLES (768px and below)
+   =================================== */
 @media (max-width: 768px) {
-  .layout {
-    flex-direction: column; /* stack nav + content */
-  }
-
-  /* Sidebar becomes overlay — wrapper transform remains same as before */
-  .sidebar {
+  /* Show Mobile Header */
+  .mobileHeader {
+    display: flex !important;
     position: fixed;
     top: 0;
     left: 0;
-    width: 240px;
-    height: 100%;
-    transform: translateX(-100%); /* hidden by default (behavior unchanged) */
-    background: transparent;
-  }
-
-  .sidebar.show {
-    transform: translateX(0); /* slide in (unchanged behaviour) */
-  }
-
-  /* Mobile header visible (themed) */
-  .mobileHeader {
-    display: flex;
+    right: 0;
+    z-index: 200;
+    background: var(--gradient-card);
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 1rem 1.25rem;
     align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    /* themed header background to match panel */
-    background: linear-gradient(
-      180deg,
-      rgba(7, 16, 26, 0.86),
-      rgba(11, 18, 32, 0.92)
-    );
-    color: #fff;
-    padding: 0 16px;
-    z-index: 1100;
+    gap: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   }
 
-  /* hamburger variant on mobile (unchanged behavior, themed) */
-  .hamburger {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 24px;
-    height: 18px;
-    background: none;
-    border: none;
+  .mobileHeader h3 {
+    font-size: 1.7rem;
+  }
+
+  /* Hide Sidebar by Default on Mobile */
+  .sidebar {
+    position: fixed !important;
+    top: 0;
+    left: -280px !important;
+    width: 260px;
+    height: 100vh;
+    z-index: 999;
+    transition: left 0.3s ease-in-out;
+    overflow-y: auto;
+  }
+
+  /* Show Sidebar When .show Class is Added */
+  .sidebar.show {
+    left: 0 !important;
+  }
+
+  /* Show Overlay When Sidebar is Open */
+  .overlay {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 500;
     cursor: pointer;
   }
 
-  .hamburger span {
-    height: 3px;
-    background: white;
-    border-radius: 2px;
+  /* Add padding to main content for mobile header */
+  .outlet {
+    padding-top: 60px;
   }
-  .hamburger span {
-    height: 3px;
-    background: #fff;
-    border-radius: 2px;
+}
+
+/* ===================================
+   SMALL MOBILE (480px and below)
+   =================================== */
+@media (max-width: 480px) {
+  .sidebar {
+    width: 240px;
+    left: -250px !important;
   }
 
-  /* Outlet pushed below header (behavior preserved) */
-  .outlet {
-    flex: none;
-    width: 100%;
-    height: calc(100vh - 56px);
-    padding: 16px;
+  .mobileHeader h3 {
+    font-size: 1.3rem;
   }
 }

@@ -207,7 +207,9 @@ export const AddTrade = () => {
 
 const PageHeading = () => (
   <div className={styles.heading}>
-    <h3>Add New Trade</h3>
+    <h2 className={styles.title}>
+              Add <span>Trade</span>
+            </h2>
     <p>Fill this to add new trade to your journal</p>
   </div>
 );

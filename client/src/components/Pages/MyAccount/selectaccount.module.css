@@ -1,96 +1,137 @@
-/* Main container */
+/* ===================================
+   SELECT ACCOUNT COMPONENT - THEMED
+   =================================== */
+
 .selectaccountcontainer {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  padding: 1.4rem 1.2rem;
-  border-radius: 14px;
-  margin-bottom: 2rem;
+  background: var(--gradient-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
-
-  width: 100%;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
+/* ===== Current Account Display ===== */
 .currentacc {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  background: rgba(246, 185, 59, 0.08);
+  border-radius: var(--radius-sm);
+  border-left: 4px solid var(--accent);
+}
+
+.currentacc h3 {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .name {
-  margin: 0px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  margin: 0;
 }
 
-.selectaccountcontainer p {
-  font-size: 0.9rem;
-  color: #e2e8f0;
-  letter-spacing: 0.01em;
-}
-
-/* Label above select */
+/* ===== Label ===== */
 .selectaccountcontainer label {
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: #e2e8f0;
-}
-
-/* Dropdown styling */
-.selectaccountcontainer select {
-  background: #1a2033;
-  color: #f8fafc;
-  border: 1px solid #1e293b;
-  border-radius: 8px;
-
-  padding: 0.55rem 0.7rem;
-  font-size: 0.88rem;
-
-  outline: none;
-  transition: 0.15s ease;
-}
-
-/* On hover & focus */
-.selectaccountcontainer select:hover,
-.selectaccountcontainer select:focus {
-  background: #1e2538;
-  border-color: #c7a72c;
-}
-
-/* Create Account Button Row */
-.createAcccontainer {
-  display: flex;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   margin-top: 0.5rem;
 }
 
-/* Button */
-.createAccBtn {
-  padding: 0.6rem 1rem;
-  border-radius: 10px;
-  border: none;
-  background: #c7a72c;
-  color: #0c1324;
+/* ===== Select Dropdown ===== */
+.selectaccountcontainer select {
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
 
-  font-size: 0.9rem;
+.selectaccountcontainer select:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+}
+
+.selectaccountcontainer select option {
+  background: var(--bg-secondary);
+  color: var(--text);
+  padding: 0.5rem;
+}
+
+/* ===== Create Account Button Container ===== */
+.createAcccontainer {
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.createAccBtn {
+  padding: 0.65rem 1.25rem;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: 0.01em;
-  transition: background 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  width: 100%;
 }
 
 .createAccBtn:hover {
-  background: #b09028;
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  transform: translateY(-2px);
 }
 
-.createAccBtn:active {
-  transform: scale(0.97);
+.dangerbtn {
+  background: var(--error);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
+  margin-top: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
 
-/* Mobile tweak */
-@media (max-width: 480px) {
+.dangerbtn:hover {
+  background: #c62828;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
   .selectaccountcontainer {
-    max-width: 100%;
-    padding: 1.2rem 1rem;
+    padding: 1rem;
+  }
+
+  .currentacc {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }

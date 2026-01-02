@@ -16,8 +16,10 @@ export const AdminSidebar = () => {
       {/* Logo */}
       <div className={styles.logo}>
         <div className={styles.logoText}>
-          <h3>Admin Panel</h3>
-          <p>Log My Trade </p>
+          <h3 className={styles.title}>
+            Log My <span>Trade</span>
+          </h3>
+          <p>Admin Panel </p>
         </div>
       </div>
 
@@ -40,18 +42,25 @@ export const AdminSidebar = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/admin/trades">Trades</NavLink>
+            <NavLink className={getNavLinkClass} to="/admin/trades">
+              Trades
+            </NavLink>
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/admin/contacts">
               Contacts
             </NavLink>
           </li>
+          <li>
+            <NavLink className={getNavLinkClass} to="/app">
+              Client
+            </NavLink>
+          </li>
         </ul>
       </nav>
 
       {/* Bottom User Info */}
-      <Link to="/app/my-account">
+      <Link to="/app/my-account" style={{ visibility: "hidden" }}>
         <div className={styles.user}>
           <div className={styles.avatar}>U</div>
           <div>

@@ -1,4 +1,5 @@
 import styles from "./addtrade.module.css";
+import { useAuth } from "../../../store/Auth";
 
 export const TradeInfo = ({
   trade,
@@ -6,11 +7,20 @@ export const TradeInfo = ({
   screenshots,
   setScreenshots,
 }) => {
-  // handle file selection (max 2 images)
+  const { user, isPro } = useAuth();
+
+  const uploadLimit = isPro ? 3 : 1;
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
-    const limited = files.slice(0, 2); // enforce max: 2
-    setScreenshots(limited);
+
+    if (files.length > uploadLimit) {
+      alert(`You can upload a maximum of ${uploadLimit} screenshots.`);
+      e.target.value = "";
+      return;
+    }
+
+    setScreenshots(files);
   };
 
   return (
@@ -20,7 +30,7 @@ export const TradeInfo = ({
       <div className={styles.col2}>
         {/* File input for screenshots */}
         <div>
-          <label>Upload Screenshot (max 2)</label>
+          <label>Upload Screenshot (max {uploadLimit})</label>
           <input
             type="file"
             accept="image/*"
@@ -28,7 +38,7 @@ export const TradeInfo = ({
             onChange={handleFileChange}
           />
           {screenshots && screenshots.length > 0 && (
-            <small>{screenshots.length}/2 selected</small>
+            <small>{screenshots.length}/{uploadLimit} selected</small>
           )}
         </div>
       </div>

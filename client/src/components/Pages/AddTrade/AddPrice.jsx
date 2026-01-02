@@ -8,7 +8,7 @@ export const AddPrice = ({ trade, handleChange }) => {
   return (
     <div className={styles.card}>
       <h3>Price & Risk Management</h3>
-      <p style={{ fontSize: "0.8rem", color: "gray", paddingBottom: "1rem" }}>
+      <p className={styles.subText}>
         Account Balance: ${accountDetails?.currentBalance}
       </p>
 

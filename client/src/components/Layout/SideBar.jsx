@@ -4,7 +4,7 @@ import { useAuth } from "../../store/Auth";
 
 export const Sidebar = () => {
 
-  const {user, isAdmin} = useAuth();
+  const { user, isAdmin, isPro, isAuthLoading } = useAuth();
 
   const getNavLinkClass = ({ isActive }) => {
     return isActive ? `${styles.navlink} ${styles.active}` : `${styles.navlink}`; 
@@ -15,15 +15,17 @@ export const Sidebar = () => {
       {/* Logo */}
       <div className={styles.logo}>
         <div className={styles.logoText}>
-          <h3>Log My Trade</h3>
-          <p>Professional Trading journal  </p>
+          <h3 className={styles.title}>
+            Log My <span>Trade</span>
+          </h3>
+          <p>Professional Trading journal </p>
         </div>
       </div>
 
       {/* Navigation Menu */}
       <nav className={styles.nav}>
         <ul>
-          <li >
+          <li>
             <NavLink className={getNavLinkClass} to="/app/dashboard">
               Dashboard
             </NavLink>
@@ -45,26 +47,34 @@ export const Sidebar = () => {
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/app/contact">
-            Contact
+              Contact
             </NavLink>
           </li>
           <li>
-            {isAdmin?<NavLink className={getNavLinkClass} to="/admin">
-            Admin
-            </NavLink>:""}
+            <NavLink className={getNavLinkClass} to="/app/upgrade">
+              Upgrade
+            </NavLink>
+          </li>
+          <li>
+            {isAdmin && (
+              <NavLink className={getNavLinkClass} to="/admin">
+                Admin
+              </NavLink>
+            ) }
           </li>
         </ul>
       </nav>
 
       {/* Bottom User Info */}
-        <Link to="/app/my-account">
-      <div className={styles.user}>
-        <div className={styles.avatar}>U</div>
-        <div>
-          <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
-          <span className={styles.subText}>Your Account</span>
+      <Link to="/app/my-account">
+        <div className={styles.user}>
+          <div className={styles.avatar}>U</div>
+          <div>
+            <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
+            <span className={styles.subText}>Your Account</span>
+          </div>
+          {!isAuthLoading && isPro && <p className={styles.proBadge}>PRO</p>}
         </div>
-      </div>
       </Link>
     </div>
   );

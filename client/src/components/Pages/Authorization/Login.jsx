@@ -1,4 +1,3 @@
-// src/pages/Login.jsx
 import React, { useContext, useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
@@ -15,9 +14,9 @@ export const Login = () => {
   });
 
   const { storeTokenInLS } = useAuth();
-  const {isLoggedIn} = useAuth();
-  const {refreshTrades} = useContext(TradeContext);
-  const {getAllAccounts} = useContext(AccountContext);
+  const { isLoggedIn } = useAuth();
+  const { refreshTrades } = useContext(TradeContext);
+  const { getAllAccounts } = useContext(AccountContext);
 
   const navigate = useNavigate();
 
@@ -74,58 +73,70 @@ export const Login = () => {
     }
   };
 
-  if(isLoggedIn){
-    return <Navigate to="/app/dashboard" replace/>
+  if (isLoggedIn) {
+    return <Navigate to="/app/dashboard" replace />;
   }
 
   return (
     <div className={styles.container}>
-      <div className={styles.card}>
-        <div className={styles.content}>
-          <div className={styles.title}>
-            <div className={styles.logo}>TJ</div>
-            <div>
-              <h2 className={styles.h2}>Login</h2>
-              <div className={styles.subtitle}>Access your trading journal</div>
+      {/* Back Button */}
+      <Link to="/" className={styles.backButton}>
+        Back to Home
+      </Link>
+
+      {/* Card Wrapper */}
+      <div className={styles.cardWrapper}>
+        <div className={styles.card}>
+          <div className={styles.content}>
+            <div className={styles.title}>
+              <div className={styles.logo}>TJ</div>
+              <div>
+                <h2 className={styles.h2}>Welcome Back</h2>
+                <div className={styles.subtitle}>
+                  Access your trading journal
+                </div>
+              </div>
             </div>
+
+            <form className={styles.form} onSubmit={handleSubmit}>
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Email</label>
+                <input
+                  className={styles.input}
+                  type="email"
+                  placeholder="Enter your email"
+                  name="email"
+                  value={user.email}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.label}>Password</label>
+                <input
+                  className={styles.input}
+                  type="password"
+                  placeholder="Enter your password"
+                  name="password"
+                  value={user.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
+              <button className={styles.btn} type="submit">
+                Login
+              </button>
+
+              <div className={styles.row}>
+                <div className={styles.small}>Don't have an account?</div>
+                <Link className={styles.link} to="/register">
+                  Register
+                </Link>
+              </div>
+            </form>
           </div>
-
-          <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Email</label>
-              <input
-                className={styles.input}
-                type="email"
-                placeholder="Enter your email"
-                name="email"
-                value={user.email}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className={styles.formGroup}>
-              <label className={styles.label}>Password</label>
-              <input
-                className={styles.input}
-                type="password"
-                placeholder="Enter your password"
-                name="password"
-                value={user.password}
-                onChange={handleChange}
-              />
-            </div>
-
-            <button className={styles.btn} type="submit">
-              Login
-            </button>
-
-            <div className={styles.row}>
-              <div className={styles.small}>Don't have an account?</div>
-              <Link className={styles.link} to="/register">
-                Register
-              </Link>
-            </div>
-          </form>
         </div>
       </div>
     </div>

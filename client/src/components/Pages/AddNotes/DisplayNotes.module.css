@@ -1,171 +1,69 @@
-:root {
-  --panel: #07101a;
-  --muted: #9aa4b2;
-  --accent: #f6b93b;
-  --danger: #d9534f;
-  --glass: rgba(255, 255, 255, 0.02);
-  --card-radius: 10px;
-}
-
-/* no-notes text */
 .nonotes {
   margin-top: 1.4rem;
   color: var(--muted);
   text-align: center;
-  font-size: 0.98rem;
+  font-size: 14px;
 }
 
-/* center the notes section */
+/* Wrapper */
 .notessection {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
   width: 100%;
-  box-sizing: border-box;
   padding: 0 12px;
 }
 
-/* main notes card (matches AddNotes card style) */
+/* Notes card */
 .notes {
   width: 80%;
   max-width: 900px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  padding: 1.25rem;
-  border-radius: var(--card-radius);
-  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  color: #e6eef6;
-  text-align: left;
-  box-sizing: border-box;
+  background: var(--card);
+  padding: 18px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
 }
 
-/* heading */
+/* Heading */
 .notes h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: #ffffff;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border);
 }
 
-/* individual note card */
+/* Note card */
 .noteCard {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.01),
-    rgba(255, 255, 255, 0.007)
-  );
+  background: #0b1220;
   padding: 14px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.041);
-  border-left: 5px solid #f6b93b;
-  width: 100%;
-  box-sizing: border-box;
+  margin-bottom: 50px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  cursor: pointer;
+}
 
-  /* keep vertical stacking like before */
+/* Content */
+.notedata {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
-/* note content container */
-.notedata {
-  flex-grow: 1;
-}
-
-/* title */
 .noteTitle {
-  font-weight: 700;
-  margin: 0;
-  font-size: 1.3rem;
-  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .noteDate {
-  padding: 0;
-  margin-top: 8px;
-  font-size: 0.7rem;
-  color: rgba(240, 255, 255, 0.534);
-}
-
-/* description */
-.noteDescription {
-  font-size: 0.98rem;
+  font-size: 11px;
   color: var(--muted);
-  margin: 6px 0 0 0;
-  line-height: 1.45;
-  white-space: pre-wrap;
-  word-break: break-word;
 }
 
-/* delete button container */
-.notecarddelete {
-  display: flex;
-  justify-content: flex-start; /* keep left aligned */
-  margin-top: 8px;
-}
-
-/* delete button (themed but still clearly destructive) */
-.notecarddelete button {
-  background: linear-gradient(
-    90deg,
-    rgba(217, 83, 79, 0.95),
-    rgba(185, 60, 60, 0.95)
-  );
-  color: #fff;
-  border: none;
-  padding: 0.45rem 0.9rem;
-  font-size: 0.92rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms;
-  box-shadow: 0 8px 20px rgba(217, 83, 79, 0.12);
-}
-
-.notecarddelete button:hover {
-  transform: translateY(-2px);
-  opacity: 0.95;
-}
-
-/* SMALL SCREEN tweaks */
-@media (max-width: 1024px) {
-  .notes {
-    width: 92%;
-    padding: 1rem;
-  }
-}
-
+/* Responsive */
 @media (max-width: 768px) {
   .notes {
     width: 95%;
-    padding: 0.9rem;
-  }
-  .noteTitle {
-    font-size: 1.05rem;
-  }
-  .noteDescription {
-    font-size: 0.96rem;
-  }
-  .notecarddelete button {
-    padding: 0.45rem 0.8rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .notes {
-    width: 98%;
-    padding: 0.8rem;
-  }
-  .noteCard {
-    padding: 12px;
-  }
-  .notes h3 {
-    font-size: 1.15rem;
   }
 }

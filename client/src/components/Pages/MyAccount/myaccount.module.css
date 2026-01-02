@@ -1,369 +1,397 @@
-:root {
-  --bg: #0f1724;
-  --panel: #07101a;
-  --muted: #9aa4b2;
-  --accent: #f6b93b;
-  --accent-2: #ffd98a;
-  --danger: #d9534f;
-  --card-radius: 12px;
-  --pad: 16px;
-}
+/* ===================================
+   MY ACCOUNT PAGE - THEMED & RESTRUCTURED
+   =================================== */
 
-/* Page wrapper */
+/* ===== Page Wrapper ===== */
 .myaccount {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
   min-height: 100vh;
-  padding: 2rem 6rem;
-  color: #e6eef6;
-  font-family: Inter, "Segoe UI", Arial, sans-serif;
   box-sizing: border-box;
 }
 
-/* Heading */
-.myaccountpageheading {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-.myaccountpageheading h2 {
-  font-size: 1.8rem;
-  margin-bottom: 0.3rem;
-  color: #fff;
-}
-.myaccountpageheading p {
-  color: var(--muted);
-  font-size: 0.95rem;
-  margin: 0;
+/* ===== Main Content Container ===== */
+.mainContent {
+  width: 100%;
+  max-width: 980px;
 }
 
-/* Account overview card */
+/* ===== Page Heading (consistent with other pages) ===== */
+.myaccountpageheading {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.title span {
+  background: linear-gradient(90deg, var(--accent), #f5a623);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.myaccountpageheading p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* ===== Account Overview Section ===== */
 .accountdatacontainer {
-  margin-bottom: 2rem;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  padding: calc(var(--pad) - 4px);
-  border-radius: var(--card-radius);
-  box-shadow: 0 12px 36px rgba(2, 6, 23, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  color: #e6eef6;
+  background: var(--gradient-card);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.accountdatacontainer h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
 }
 
 .accountdata {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-top: 1rem;
 }
 
 .accountbox {
   flex: 1;
-  min-width: 150px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.01),
-    rgba(255, 255, 255, 0.007)
-  );
+  min-width: 180px;
+  background: var(--bg-secondary);
   padding: 1rem;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   text-align: center;
-  box-shadow: 0 8px 24px rgba(2, 6, 23, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.02);
-}
-.accountbox p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-.accountbox h3 {
-  margin: 8px 0 0 0;
-  font-size: 1.25rem;
-  color: #fff;
+  border: 1px solid var(--border-medium);
+  transition: all 0.25s ease;
 }
 
-/* Update Capital */
-.updatecapitalcontainer {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  padding: calc(var(--pad) - 4px);
-  border-radius: var(--card-radius);
-  margin-bottom: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.5);
-}
-
-.inlineform {
-  display: flex;
-  gap: 0.8rem;
-  align-items: center;
-  margin-top: 0.5rem;
-}
-
-.inlineform input {
-  flex: 0 0 220px; /* keep your shorter width */
-  padding: 0.6rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 8px;
-  background: #ffffff; /* white input for readability */
-  color: #07101a;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-}
-
-.inlineform input:focus {
-  outline: none;
-  box-shadow: 0 10px 30px rgba(246, 185, 59, 0.06);
-  border-color: rgba(246, 185, 59, 0.35);
-}
-
-.inlineform button {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  color: #07101a;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease;
-  font-weight: 800;
-}
-.inlineform button:hover {
+.accountbox:hover {
+  border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 12px 36px rgba(246, 185, 59, 0.08);
+  box-shadow: 0 8px 24px rgba(246, 185, 59, 0.12);
 }
 
-/* warning */
-.warning {
-  font-size: 0.88rem;
-  color: #ffb84d;
+.accountbox p {
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.accountbox h3 {
   margin-top: 0.5rem;
+  font-size: 1.2rem;
+  color: var(--accent);
+  font-weight: 600;
 }
 
-/* Section boxes */
+/* ===== Section Boxes ===== */
 .sectionbox {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.015),
-    rgba(255, 255, 255, 0.01)
-  );
-  padding: calc(var(--pad) - 4px);
-  border-radius: var(--card-radius);
-  margin-bottom: 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  box-shadow: 0 12px 30px rgba(2, 6, 23, 0.45);
+  background: var(--gradient-card);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-subtle);
 }
 
 .sectionbox h3 {
-  margin: 0 0 0.5rem 0;
-  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
 }
 
-/* Buttons group */
+.sectionbox h4 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.sectionbox p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ===== Buttons Group ===== */
 .btngroup {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-top: 1rem;
-}
-.btngroup button {
-  background: linear-gradient(90deg, #9cc8ff, #61aef0);
-  color: #07101a;
-  border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease;
-  font-weight: 700;
-}
-.btngroup button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(97, 174, 240, 0.08);
+  flex-wrap: wrap;
 }
 
-/* Toggle container */
+.btngroup button {
+  padding: 0.65rem 1.25rem;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+}
+
+.btngroup button:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ===== Toggle Container ===== */
 .togglecontainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 0.75rem 0;
 }
 
-/* Toggle Switch (themed) */
+.togglecontainer p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* ===== Toggle Switch ===== */
 .switch {
   position: relative;
-  display: inline-block;
   width: 52px;
   height: 28px;
+  cursor: pointer;
 }
+
 .switch input {
   opacity: 0;
   width: 0;
   height: 0;
 }
+
 .slider {
   position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(255, 255, 255, 0.07);
+  inset: 0;
+  background: var(--border-medium);
   border-radius: 999px;
-  transition: background 200ms ease;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  transition: background 0.3s ease;
 }
-.slider:before {
-  position: absolute;
+
+.slider::before {
   content: "";
-  height: 22px;
-  width: 22px;
-  left: 3px;
-  bottom: 3px;
-  background-color: #fff;
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  top: 4px;
+  background: var(--text-primary);
   border-radius: 50%;
-  transition: transform 200ms ease;
-  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.25);
+  transition: transform 0.3s ease;
 }
+
 .switch input:checked + .slider {
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: var(--accent);
 }
-.switch input:checked + .slider:before {
+
+.switch input:checked + .slider::before {
   transform: translateX(24px);
 }
 
-/* Danger zone */
+/* ===== Danger Zone ===== */
 .dangerzone {
-  border: 1px solid rgba(217, 83, 79, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.01),
-    rgba(255, 255, 255, 0.007)
+    rgba(239, 68, 68, 0.05),
+    rgba(239, 68, 68, 0.02)
   );
 }
-.dangerzone h4 {
-  margin-top: 0.75rem;
-  color: #ff8a8a;
+
+.dangerzone h3 {
+  color: var(--error);
+  border-bottom-color: rgba(239, 68, 68, 0.2);
 }
 
-/* Danger button */
+.dangerzone h4 {
+  color: var(--error);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.dangerzone p {
+  color: var(--text-secondary);
+}
+
+.dangerzone p b {
+  color: var(--error);
+}
+
 .dangerbtn {
-  background: linear-gradient(90deg, #ff8a8a, var(--danger));
-  color: #07101a;
+  background: var(--error);
+  color: white;
   border: none;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-sm);
   margin-top: 1rem;
   cursor: pointer;
-  transition: transform 120ms ease, box-shadow 120ms ease;
-  font-weight: 800;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
 }
+
 .dangerbtn:hover {
+  background: #c62828;
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
   transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(217, 83, 79, 0.08);
 }
 
-/* Help & About and other small boxes */
-.sectionbox p {
-  color: var(--muted);
-  margin: 0;
+/* ===== Update Capital (if needed) ===== */
+.updatecapitalcontainer {
+  background: var(--gradient-card);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-subtle);
 }
 
-/* Accounts  */
+.updatecapitalcontainer h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
 
-.selectaccountcontainer {
+.inlineform {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 10px 0;
-  margin-bottom: 2rem;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.selectaccountcontainer label {
-  font-size: 14px;
-  color: #e0e0e0; /* soft gray */
-  font-weight: 500;
+.inlineform input {
+  flex: 0 1 220px;
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
 }
 
-.selectaccountcontainer select {
-  background: #1a1a1a;
-  border: 1px solid #333;
-  padding: 8px 10px;
-  border-radius: 6px;
-  font-size: 14px;
-  color: #f2f2f2;
+.inlineform input:focus {
   outline: none;
-  cursor: pointer;
-  transition: 0.2s ease-in-out;
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
 }
 
-/* Subtle hover - minimal */
-.selectaccountcontainer select:hover {
-  border-color: #555;
-}
-
-/* Focus effect — slight highlight */
-.selectaccountcontainer select:focus {
-  border-color: #6ea8fe;
-  background: #202020;
-}
-
-.selectaccountcontainer option {
-  background: #121212;
-  color: #ffffff;
-  font-size: 14px;
-}
-
-.createAcccontainer {
-  margin: 0.8rem 0rem;
-}
-
-.createAccBtn {
+.inlineform button {
+  padding: 0.65rem 1.25rem;
+  background: var(--accent);
+  color: var(--bg-primary);
   border: none;
-  border-radius: 3px;
-  padding: 5px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
 }
 
-/* Responsive tweaks */
+.inlineform button:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  transform: translateY(-2px);
+}
+
+.warning {
+  font-size: 0.75rem;
+  color: var(--warning);
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(246, 185, 59, 0.08);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent);
+}
+
+/* ===== Responsive ===== */
 @media (max-width: 1024px) {
   .myaccount {
-    padding: 2rem 3.5rem;
-  }
-  .inlineform input {
-    flex: 0 0 180px;
+    padding: 1.25rem;
   }
 }
 
 @media (max-width: 768px) {
   .myaccount {
-    padding: 1.5rem 2rem;
+    padding: 1rem;
   }
+
+  .accountdata {
+    flex-direction: column;
+  }
+
+  .accountbox {
+    min-width: 100%;
+  }
+
   .btngroup {
     flex-direction: column;
   }
+
+  .btngroup button {
+    width: 100%;
+  }
+
   .inlineform {
     flex-direction: column;
     align-items: stretch;
   }
-  .inlineform input {
-    width: 100%;
-    flex: none;
-  }
+
+  .inlineform input,
   .inlineform button {
     width: 100%;
+    flex: 1;
   }
 }
 
-@media (max-width: 420px) {
-  .myaccount {
-    padding: 1.25rem;
+@media (max-width: 480px) {
+  .myaccountpageheading h2 {
+    font-size: 1.15rem;
   }
+
+  .myaccountpageheading p {
+    font-size: 0.8rem;
+  }
+
   .accountbox h3 {
-    font-size: 1.05rem;
-  }
-  .inlineform input {
-    padding: 0.55rem;
-  }
-  .btngroup button {
-    width: 100%;
+    font-size: 1rem;
   }
 }
