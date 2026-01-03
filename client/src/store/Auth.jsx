@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export const AuthContext = createContext();
 
@@ -13,15 +14,15 @@ export const AuthProvider = ({ children }) => {
   const storeTokenInLS = (newToken) => {
     localStorage.setItem("token", newToken);
     setToken(newToken);
-    console.log("token stored in ls");
   };
 
   const logoutUser = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("hasSeenUpgradeModal");
     setToken("");
     setUser(null);
     setIsAdmin(false);
-    console.log("logout successful");
+    toast.success("logout successful");
   };
 
   const userAuthentication = async () => {

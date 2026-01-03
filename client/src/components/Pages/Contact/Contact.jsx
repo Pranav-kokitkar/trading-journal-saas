@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Navbar } from "../../Layout/Navbar";
 import { Footer } from "../../Layout/Footer";
 import { useAuth } from "../../../store/Auth";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 export const Contact = () => {
   const [form, setForm] = useState({
@@ -92,16 +92,7 @@ export const Contact = () => {
       );
 
       if (response.ok) {
-        toast.success("submitted", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.success("message submitted");
 
         setForm({
           name: isLoggedIn && user?.name ? user.name : "",
@@ -114,19 +105,10 @@ export const Contact = () => {
         setFile(null);
         if (fileRef.current) fileRef.current.value = "";
       } else {
-        toast.error("Failed to submit", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.error("Failed to submit");
       }
     } catch (error) {
-      console.log("Contact error", error);
+      toast.error("Failed to submit, try re-login");
     }
   };
 

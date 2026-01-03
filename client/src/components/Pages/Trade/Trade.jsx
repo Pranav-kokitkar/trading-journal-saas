@@ -8,6 +8,7 @@ import { TradeContext, useTrades } from "../../../store/TradeContext";
 import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
 import { AccountContext } from "../../../context/AccountContext";
+import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
 
 export const Trade = () => {
   const { accountDetails, updateAccount } = useContext(AccountContext);
@@ -25,6 +26,7 @@ export const Trade = () => {
   const [isMultipleTP, setIsMultipleTP] = useState(false);
   const [exitLevels, setExitLevels] = useState([]);
   const [tradeStatus, setTradeStatus] = useState("live");
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [triedRefresh, setTriedRefresh] = useState(false);
@@ -235,10 +237,6 @@ export const Trade = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    await deleteTradeByID(id, trade.pnl);
-    navigate("/app/trade-history");
-  };
 
   const handleEdit = () => {
     setIsEditingNote(true);
@@ -294,6 +292,20 @@ export const Trade = () => {
     }
   };
 
+    const onDelete = async (id) => {
+      setIsDeleteModalOpen(true);
+    };
+
+    const confirmDeleteAccount = async (id)=>{
+      try {
+        await deleteTradeByID(id, trade.pnl);
+        navigate("/app/trade-history");
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+
   // Colors
   const pnlColor = trade.pnl >= 0 ? "positive" : "negative";
   const directionColor =
@@ -307,7 +319,9 @@ export const Trade = () => {
             ← Back
           </button>
           <div>
-            <h2>Trade Details</h2>
+            <h2>
+              Trade Details: <span>{trade.symbol}</span>
+            </h2>
             <p>{trade.dateNtime}</p>
           </div>
           <div
@@ -434,10 +448,7 @@ export const Trade = () => {
 
         {/* Buttons */}
         <div className={styles.tradeBtns}>
-          <button
-            className={styles.deleteTrade}
-            onClick={() => handleDelete(trade._id)}
-          >
+          <button className={styles.deleteTrade} onClick={onDelete}>
             Delete Trade
           </button>
           {trade.tradeStatus === "live" && (
@@ -450,6 +461,15 @@ export const Trade = () => {
           )}
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        title="Delete This Trade?"
+        message="This action cannot be undone."
+        confirmText="Delete Trade"
+        cancelText="Cancel"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => confirmDeleteAccount(trade._id)}
+      />
 
       {closeTrade && (
         <CloseTrade

@@ -85,7 +85,10 @@ export const AddTrade = () => {
     if (pnl > 0) tradeResult = "win";
     else if (pnl < 0) tradeResult = "loss";
 
-    const isoDate = new Date().toISOString();
+    const isoDate =
+      trade.tradeMode === "backtest" && trade.tradeDate
+        ? new Date(trade.tradeDate).toISOString()
+        : new Date().toISOString();
 
     const tradeNumber = prevTotalTrades + 1;
     const balanceAfterTrade = Number(

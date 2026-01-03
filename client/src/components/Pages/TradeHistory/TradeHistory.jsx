@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import styles from "./TradeHistory.module.css";
 import { useTrades } from "../../../store/TradeContext";
 import { TradeCard } from "./TradeCard";
 import { Pagination } from "../../Pagination";
 import { useAuth } from "../../../store/Auth";
+import { AccountContext } from "../../../context/AccountContext";
 
 const defaultFilters = {
   symbol: "",
@@ -19,6 +20,7 @@ const defaultFilters = {
   endDate: "",
   startTradeNumber: "",
   endTradeNumber: "",
+  accountId: "", // ✅ ONLY ADDITION
 };
 
 export const TradeHistory = () => {
@@ -33,14 +35,14 @@ export const TradeHistory = () => {
   } = useTrades();
 
   const [filters, setFilters] = useState(defaultFilters);
-  const [showProTooltip, setShowProTooltip] = useState(null); // 'pnl' or 'rr'
+  const [showProTooltip, setShowProTooltip] = useState(null);
 
   const { isAuthLoading, isPro } = useAuth();
+  const { accounts } = useContext(AccountContext);
 
   /** ---------------- FILTER HANDLERS ---------------- */
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-
     setFilters((prev) => {
       setPage(1);
       return { ...prev, [name]: value };
@@ -51,11 +53,7 @@ export const TradeHistory = () => {
     if (!isPro) {
       e.preventDefault();
       setShowProTooltip(field);
-
-      // Auto-hide after 3 seconds
-      setTimeout(() => {
-        setShowProTooltip(null);
-      }, 3000);
+      setTimeout(() => setShowProTooltip(null), 3000);
     }
   };
 
@@ -64,18 +62,15 @@ export const TradeHistory = () => {
     setFilters(defaultFilters);
   };
 
-  /** ---------------- FETCH FROM BACKEND ---------------- */
+  /** ---------------- FETCH ---------------- */
   useEffect(() => {
     refreshTrades(filters);
   }, [filters, page]);
 
-  if (isAuthLoading) {
-    return <p>loading...</p>;
-  }
+  if (isAuthLoading) return <p>loading...</p>;
 
   return (
     <section id="trade-history" className={styles.tardehistory}>
-      {/* ---------------- HEADER ---------------- */}
       <div className={styles.heading}>
         <h2 className={styles.title}>
           Trade <span>History</span>
@@ -140,12 +135,11 @@ export const TradeHistory = () => {
             </select>
           </div>
 
-          {/* ---------------- PNL & RR ---------------- */}
+          {/* ---------------- PNL & RR (UNCHANGED) ---------------- */}
           <div className={styles.filterinput}>
             <div className={styles.filterinputsec}>
               <label>
-                PNL
-                {!isPro && <span className={styles.proBadge}>PRO</span>}
+                PNL {!isPro && <span className={styles.proBadge}>PRO</span>}
               </label>
               <div className={styles.proInputWrapper}>
                 <select
@@ -159,6 +153,7 @@ export const TradeHistory = () => {
                   <option value="<">&lt;</option>
                   <option value="=">=</option>
                 </select>
+
                 <input
                   type="number"
                   name="pnlValue"
@@ -169,7 +164,6 @@ export const TradeHistory = () => {
                   disabled={!isPro}
                 />
 
-                {/* Tooltip for PnL */}
                 {showProTooltip === "pnl" && !isPro && (
                   <div className={styles.proTooltip}>
                     <span className={styles.tooltipIcon}>!</span>
@@ -181,8 +175,7 @@ export const TradeHistory = () => {
 
             <div className={styles.filterinputsec}>
               <label>
-                RR
-                {!isPro && <span className={styles.proBadge}>PRO</span>}
+                RR {!isPro && <span className={styles.proBadge}>PRO</span>}
               </label>
               <div className={styles.proInputWrapper}>
                 <select
@@ -196,6 +189,7 @@ export const TradeHistory = () => {
                   <option value="<">&lt;</option>
                   <option value="=">=</option>
                 </select>
+
                 <input
                   type="number"
                   name="rrValue"
@@ -206,7 +200,6 @@ export const TradeHistory = () => {
                   disabled={!isPro}
                 />
 
-                {/* Tooltip for RR */}
                 {showProTooltip === "rr" && !isPro && (
                   <div className={styles.proTooltip}>
                     <span className={styles.tooltipIcon}>!</span>
@@ -217,7 +210,7 @@ export const TradeHistory = () => {
             </div>
           </div>
 
-          {/* ---------------- DATE & TRADE NUMBER ---------------- */}
+          {/* ---------------- DATE & ACCOUNT ---------------- */}
           <div className={styles.filterinput}>
             <div className={styles.filterinputsec}>
               <label>Date</label>
@@ -236,25 +229,26 @@ export const TradeHistory = () => {
             </div>
 
             <div className={styles.filterinputsec}>
-              <label>Trade No</label>
-              <input
-                type="number"
-                name="startTradeNumber"
-                placeholder="From"
-                value={filters.startTradeNumber}
+              <select
+                name="accountId"
+                value={filters.accountId}
                 onChange={handleFilterChange}
-              />
-              <input
-                type="number"
-                name="endTradeNumber"
-                placeholder="To"
-                value={filters.endTradeNumber}
-                onChange={handleFilterChange}
-              />
+                disabled={accounts.length === 0}
+              >
+                <option value="">
+                  {accounts.length === 0
+                    ? "Create an account first"
+                    : "All Accounts"}
+                </option>
+                {accounts.map((acc) => (
+                  <option key={acc._id} value={acc._id}>
+                    {acc.name}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
-          {/* ---------------- FOOTER ---------------- */}
           <div className={styles.filter3}>
             <p>Showing {totalTrades} trades</p>
             <button type="button" onClick={handleClearFilters}>
@@ -263,10 +257,8 @@ export const TradeHistory = () => {
           </div>
         </div>
 
-        {/* ---------------- TRADE LIST ---------------- */}
         {loading ? <p>Loading trades...</p> : <TradeCard savedTrade={trades} />}
 
-        {/* ---------------- PAGINATION ---------------- */}
         <Pagination
           page={page}
           totalPages={totalPages}

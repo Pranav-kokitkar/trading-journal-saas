@@ -24,6 +24,8 @@ const emptyPerformance = {
   lowestLoss: 0,
   highestRisk: 0,
   lowestRisk: 0,
+  expectancyRR: 0,
+  expectancyPnL: 0,
 };
 
 export const PerformanceProvider = ({ children }) => {

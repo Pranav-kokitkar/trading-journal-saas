@@ -1,6 +1,6 @@
 import styles from "./AddNotes.module.css";
 import { useAuth } from "../../../store/Auth";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useState } from "react";
 import { NoteModal } from "./NoteModal";
 
@@ -23,7 +23,6 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
   };
 
   const deleteNote = async (id) => {
-    if (!window.confirm("Delete this note? This cannot be undone.")) return;
 
     try {
       const response = await fetch(
@@ -41,20 +40,12 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
         setShowModal(false);
         setSelectedNote(null);
 
-        toast.success("Note deleted", {
-          position: "top-right",
-          autoClose: 2000,
-          theme: "dark",
-        });
+        toast.success("Note deleted");
       } else {
-        toast.error("Failed to delete note", {
-          position: "top-right",
-          autoClose: 2000,
-          theme: "dark",
-        });
+        toast.error("Failed to delete note");
       }
     } catch (error) {
-      console.log(error);
+      toast.error("Failed to delete note, try re-login");
     }
   };
 
@@ -81,20 +72,12 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
         await getAllNotes();
         setShowModal(false);
         setSelectedNote(null);
-        toast.success("Note updated successfully!", {
-          position: "top-right",
-          autoClose: 1500,
-          theme: "dark",
-        });
+        toast.success("Note updated successfully!");
       } else {
-        toast.error("Note update failed!", {
-          position: "top-right",
-          autoClose: 1500,
-          theme: "dark",
-        });
+        toast.error("Note update failed!");
       }
     } catch (error) {
-      console.log("Error while updating note:", error);
+      toast.error("Note update failed!, try re-login");
     }
   };
 

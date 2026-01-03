@@ -25,6 +25,8 @@ export const Dashboard = () => {
   const { accountTrades = [] } = useTrades() || {};
   const {isAdmin} = useAuth();
 
+  console.log(performance);
+
   // Accept both "closed" and "exited" as finished trades (case-insensitive)
   const finishedStatuses = new Set(["closed", "exited"]);
 
@@ -74,7 +76,6 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      
     </section>
   );
 };
@@ -155,8 +156,10 @@ const TradingDashboard = ({ accountDetails, performance }) => {
 
           <h3>
             <FaTrophy className={`${styles.icon} ${styles.iconBlue}`} />
-            Live Trades:{" "}
-            <span className={styles.blue}>{performance.totalLiveTrades}</span>
+            Expectancy:{" "}
+            <span className={styles.blue}>
+              {performance.expectancyRR}R / {performance.expectancyPnL}$
+            </span>
           </h3>
 
           <h3>
@@ -171,10 +174,22 @@ const TradingDashboard = ({ accountDetails, performance }) => {
 
           <h2>Quick Stats</h2>
           <h3>
-            Initial Capital: <span>${accountDetails?.initialCapital}</span>
+            Initial Capital:{" "}
+            <span>
+              $
+              {accountDetails?.initialCapital != null
+                ? Number(accountDetails.initialCapital).toFixed(2)
+                : "—"}
+            </span>
           </h3>
           <h3>
-            Current Balance: <span>${accountDetails?.currentBalance}</span>
+            Current Balance:{" "}
+            <span>
+              $
+              {accountDetails?.initialCapital != null
+                ? Number(accountDetails.currentBalance).toFixed(2)
+                : "—"}
+            </span>
           </h3>
         </div>
       </div>

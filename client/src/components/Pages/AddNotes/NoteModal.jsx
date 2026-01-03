@@ -1,8 +1,10 @@
 import { useState } from "react";
 import styles from "./NoteModal.module.css";
+import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
 
 export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [updatedNote, setUpdatedNote] = useState({
     title: "",
     description: "",
@@ -86,7 +88,10 @@ export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
               <button className={styles.editButton} onClick={handleEdit}>
                 Edit
               </button>
-              <button className={styles.deleteButton} onClick={onDelete}>
+              <button
+                className={styles.deleteButton}
+                onClick={() => setIsDeleteModalOpen(true)}
+              >
                 Delete
               </button>
             </>
@@ -102,6 +107,19 @@ export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
           )}
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        title="Delete Note?"
+        message="This note will be permanently deleted. This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          onDelete();
+          setIsDeleteModalOpen(false);
+          onClose();
+        }}
+      />
     </div>
   );
 };

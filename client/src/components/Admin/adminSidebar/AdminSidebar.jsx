@@ -1,8 +1,8 @@
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
-import styles from "../../Layout/SideBar.module.css"
+import styles from "../../Layout/SideBar.module.css";
 
-export const AdminSidebar = () => {
+export const AdminSidebar = ({ onClose }) => {
   const { user } = useAuth();
 
   const getNavLinkClass = ({ isActive }) => {
@@ -27,32 +27,52 @@ export const AdminSidebar = () => {
       <nav className={styles.nav}>
         <ul>
           <li>
-            <NavLink className={getNavLinkClass} to="/admin/dashboard">
+            <NavLink
+              className={getNavLinkClass}
+              to="/admin/dashboard"
+              onClick={onClose}
+            >
               Dashboard
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/admin/users">
+            <NavLink
+              className={getNavLinkClass}
+              to="/admin/users"
+              onClick={onClose}
+            >
               Users
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/admin/accounts">
+            <NavLink
+              className={getNavLinkClass}
+              to="/admin/accounts"
+              onClick={onClose}
+            >
               Accounts
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/admin/trades">
+            <NavLink
+              className={getNavLinkClass}
+              to="/admin/trades"
+              onClick={onClose}
+            >
               Trades
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/admin/contacts">
+            <NavLink
+              className={getNavLinkClass}
+              to="/admin/contacts"
+              onClick={onClose}
+            >
               Contacts
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app">
+            <NavLink className={getNavLinkClass} to="/app" onClick={onClose}>
               Client
             </NavLink>
           </li>

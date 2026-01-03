@@ -1,0 +1,147 @@
+/* ===================================
+   CONFIRMATION MODAL - THEMED
+   =================================== */
+
+/* ===== Modal Overlay ===== */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 22, 40, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* ===== Modal Container ===== */
+.modal {
+  width: 100%;
+  max-width: 460px;
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  animation: slideUp 0.25s ease-out;
+}
+
+/* ===== Title ===== */
+.modal h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+/* ===== Message ===== */
+.modal p {
+  margin: 0 0 1.75rem 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ===== Actions Container ===== */
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* ===== Cancel Button ===== */
+.cancelBtn {
+  padding: 0.65rem 1.25rem;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ===== Confirm Button ===== */
+.confirmBtn {
+  padding: 0.65rem 1.5rem;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.25);
+}
+
+.confirmBtn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.35);
+  transform: translateY(-2px);
+}
+
+.confirmBtn:active {
+  transform: translateY(0);
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 640px) {
+  .modal {
+    width: 92%;
+    max-width: none;
+    padding: 1.5rem;
+    margin: 0 1rem;
+  }
+
+  .modal h4 {
+    font-size: 1.1rem;
+  }
+
+  .modal p {
+    font-size: 0.9rem;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .cancelBtn,
+  .confirmBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}

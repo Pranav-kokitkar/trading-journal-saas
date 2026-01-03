@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../store/Auth";
 import { UserContext } from "./UserContext";
+import toast from "react-hot-toast";
 
 export const AccountContext = createContext();
 
@@ -27,10 +28,9 @@ export const AccountProvider = ({ children }) => {
       if (response.ok) {
         setAccounts(res_data);
       } else {
-        console.log("failed to get accounts");
       }
     } catch (error) {
-      console.log("error while getting accounts", error);
+      toast.error("error while getting accounts, try re-login")
     }
   };
 
@@ -49,43 +49,44 @@ export const AccountProvider = ({ children }) => {
       if (response.ok) {
         setAccountDetails(res_data);
       } else {
-        console.log("failed to get account deatis");
+        toast.error("failed to get account details");
       }
     } catch (error) {
-      console.log("error to fetch account detaisl");
+      toast.error("error to fetch account details");
     }
   };
 
   const updateAccount = async (input) => {
     try {
-      if (!authorizationToken) return;
+      if (!authorizationToken) {
+        return null;
+      }
 
-      // normalize input to an object { pnl: number, deltaTrades?: number }
+      // normalize token
+      const authHeader = authorizationToken.startsWith("Bearer ")
+        ? authorizationToken
+        : `Bearer ${authorizationToken}`;
+
       let pnlNum;
       let deltaTradesNum;
 
       if (typeof input === "number") {
-        // support plain number as pnl
         pnlNum = Number(input);
       } else if (typeof input === "object" && input !== null) {
-        // try to coerce pnl
         pnlNum = Number(input.pnl);
         if (input.deltaTrades !== undefined) {
           deltaTradesNum = Number(input.deltaTrades);
         }
       } else {
-        console.error("updateAccount received invalid value:", input);
-        return;
+        return null;
       }
 
       if (!Number.isFinite(pnlNum)) {
-        console.error("updateAccount: pnl is not a finite number:", input);
-        return;
+        return null;
       }
 
-      // build body, include deltaTrades only if valid number
       const bodyObj = { pnl: pnlNum };
-      if (deltaTradesNum !== undefined && Number.isFinite(deltaTradesNum)) {
+      if (Number.isFinite(deltaTradesNum)) {
         bodyObj.deltaTrades = deltaTradesNum;
       }
 
@@ -94,7 +95,7 @@ export const AccountProvider = ({ children }) => {
         {
           method: "PATCH",
           headers: {
-            Authorization: authorizationToken,
+            Authorization: authHeader,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(bodyObj),
@@ -103,31 +104,26 @@ export const AccountProvider = ({ children }) => {
 
       const result = await response.json();
 
-      if (response.ok) {
-        console.log("account details updated", result);
-
-        if (result.account) {
-          setAccountDetails(result.account);
-
-          setAccounts((prev) =>
-            prev.map((acc) =>
-              acc._id === result.account._id ? result.account : acc
-            )
-          );
-
-          return result.account;
-        }
-
-        return result;
-      } else {
-        console.log("failed to update account details", result);
+      if (!response.ok) {
         return null;
       }
+
+      if (result.account) {
+        setAccountDetails(result.account);
+
+        setAccounts((prev) =>
+          prev.map((acc) =>
+            acc._id === result.account._id ? result.account : acc
+          )
+        );
+      }
+
+      return result.account ?? result;
     } catch (error) {
-      console.log("error while updating account details", error);
       return null;
     }
   };
+
 
   const deleteAccount = async () => {
     try {
@@ -142,14 +138,14 @@ export const AccountProvider = ({ children }) => {
       );
       if (response.ok) {
         getAllAccounts();
-        console.log("account deleted sucessfull");
         getActiveAccount();
         getUser();
+        toast.success("account deleted sucessfull");
       } else {
-        console.log("failed");
+        toast.error("failed to delete account")
       }
     } catch (error) {
-      console.log(error);
+      toast.error("failed to delete account, try re-login");
     }
   };
 

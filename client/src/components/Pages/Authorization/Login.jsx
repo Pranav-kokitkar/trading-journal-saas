@@ -2,8 +2,7 @@ import React, { useContext, useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
-import { toast } from "react-toastify";
-import { PerformanceContext } from "../../../context/PerformanceContext";
+import toast from "react-hot-toast";
 import { TradeContext } from "../../../store/TradeContext";
 import { AccountContext } from "../../../context/AccountContext";
 
@@ -48,16 +47,7 @@ export const Login = () => {
         refreshTrades();
         getAllAccounts();
         navigate("/app/dashboard");
-        toast.success("login successful", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.success("Login successful");
         setUser({
           name: "",
           email: "",

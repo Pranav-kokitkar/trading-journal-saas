@@ -2,7 +2,7 @@
 import { useAuth } from "./Auth";
 import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { UserContext } from "../context/UserContext";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { AccountContext } from "../context/AccountContext";
 
 export const TradeContext = createContext();
@@ -131,18 +131,7 @@ export const TradeProvider = ({ children }) => {
       }
 
       if (response.ok) {
-        toast.success("Trade added succesfully", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-
-        // Refresh trades list after new trade added
+        toast.success("Trade added succesfully");
         await getAllTrades();
 
         // Update account details after successful add
@@ -152,11 +141,8 @@ export const TradeProvider = ({ children }) => {
               pnl: Number(normalizedTrade.pnl || 0),
               deltaTrades: 1,
             });
-          } else {
-            console.warn("updateAccount is not a function on UserContext");
           }
         } catch (err) {
-          console.error("Failed to update account after AddTrade:", err);
         }
 
         // reset local trade state
@@ -182,23 +168,10 @@ export const TradeProvider = ({ children }) => {
           tradeNotes: "",
         });
       } else {
-        toast.error("Failed to add trade", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-        const message =
-          data?.message || "Failed to add trade — check console for details";
-        alert(message);
+        toast.error("Failed to add trade");
       }
     } catch (error) {
-      console.error("add trade to db error", error);
-      alert("Network or unexpected error — see console");
+      toast.error("Network or unexpected error, try re-Login");
     }
   };
 
@@ -247,27 +220,9 @@ export const TradeProvider = ({ children }) => {
       await getAllTrades();
 
       if (response.ok) {
-        toast.success("Trdae close sucessfully", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.success("Trade closed sucessfully");
       } else {
-        toast.error("Failed to close tarde", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.error("Failed to close tarde");
         const errMsg = data?.message || `HTTP ${response.status}`;
         throw new Error(errMsg);
       }
@@ -294,7 +249,6 @@ export const TradeProvider = ({ children }) => {
   };
 
   const deleteTradeByID = async (id, pnl) => {
-    if (!window.confirm("Delete this trade? This cannot be undone.")) return;
 
     try {
       const response = await fetch(
@@ -307,16 +261,7 @@ export const TradeProvider = ({ children }) => {
         }
       );
       if (response.ok) {
-        toast.success("Trade deleted", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.success("Trade deleted");
         try {
           if (typeof updateAccount === "function") {
             const pnlToAdjust = -parseFloat(pnl || 0) || 0;
@@ -327,22 +272,18 @@ export const TradeProvider = ({ children }) => {
           console.error("updateAccount failed on delete", err);
         }
       } else {
-        toast.error("Failed to delete trade", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toast.error("Failed to delete trade");
       }
     } catch (err) {
-      console.error("Failed to delete trade:", err);
-      alert("Failed to delete trade — check console");
+      toast.error("Failed to delete trade, try re-login");
     }
   }
+
+  useEffect(() => {
+    if (isLoggedIn && authorizationToken) {
+      getAllTrades();
+    }
+  }, [isLoggedIn, authorizationToken]);
   
   useEffect(() => {
     if (!accountDetails?._id) {
@@ -352,8 +293,15 @@ export const TradeProvider = ({ children }) => {
 
     const filtered = trades.filter((t) => {
       if (!t.accountId) return false;
-      return String(t.accountId) === String(accountDetails._id);
+
+      const tradeAccountId =
+        typeof t.accountId === "object" && t.accountId !== null
+          ? t.accountId._id
+          : t.accountId;
+
+      return String(tradeAccountId) === String(accountDetails._id);
     });
+
 
     setAccountTrades(filtered);
   }, [trades, accountDetails]);

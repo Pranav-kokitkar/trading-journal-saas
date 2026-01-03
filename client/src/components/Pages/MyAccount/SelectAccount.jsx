@@ -3,6 +3,8 @@ import { AccountContext } from "../../../context/AccountContext";
 import { UserContext } from "../../../context/UserContext";
 import { useAuth } from "../../../store/Auth";
 import styles from "./selectaccount.module.css";
+import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
+import toast from "react-hot-toast";
 
 export const SelectAccount = ({ accounts, createAcc }) => {
   const { authorizationToken, userAuthentication } = useAuth();
@@ -12,6 +14,7 @@ export const SelectAccount = ({ accounts, createAcc }) => {
 
   const [selectedId, setSelectedId] = useState("");
   const [currAccName, setCurrAccName] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // ✅ SINGLE source of truth for name
   useEffect(() => {
@@ -51,6 +54,7 @@ export const SelectAccount = ({ accounts, createAcc }) => {
       );
 
       if (response.ok) {
+        toast.success("account changed");
         await Promise.all([
           getUser(),
           getAllAccounts(),
@@ -63,14 +67,19 @@ export const SelectAccount = ({ accounts, createAcc }) => {
     }
   };
 
-  const onDelete = async () => {
-    const confirmed = window.confirm(
-      "Deleting an account will also lead to delete trades taken from this account. also it cant be undone"
-    );
+  const onDelete = () => {
+    setIsDeleteModalOpen(true);
+  };
 
-    if (!confirmed) return;
+  const confirmDeleteAccount = async () => {
+    try {
+      await deleteAccount();
 
-    await deleteAccount();
+      setIsDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      setIsDeleteModalOpen(false);
+    }
   };
 
   return (
@@ -111,6 +120,15 @@ export const SelectAccount = ({ accounts, createAcc }) => {
           </button>
         </div>
       )}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        title="Delete This Account?"
+        message="Deleting this account will permanently remove all trades linked to it. This action cannot be undone."
+        confirmText="Delete Account"
+        cancelText="Cancel"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={confirmDeleteAccount}
+      />
     </div>
   );
 };

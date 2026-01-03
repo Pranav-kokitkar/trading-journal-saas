@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./Upgrade.module.css";
 import { useAuth } from "../../../store/Auth";
+import toast from "react-hot-toast";
 
 export const Upgrade = () => {
   const { authorizationToken } = useAuth(); // Bearer token
@@ -20,7 +21,7 @@ export const Upgrade = () => {
     // 1. Load Razorpay SDK
     const isLoaded = await loadRazorpayScript();
     if (!isLoaded) {
-      alert("Razorpay SDK failed to load. Check your internet.");
+      toast.error("Razorpay SDK failed to load. Check your internet.");
       return;
     }
 
@@ -40,7 +41,7 @@ export const Upgrade = () => {
       const data = await res.json();
 
       if (!data.success) {
-        alert("Unable to create order");
+        toast.error("Unable to create order");
         return;
       }
 
@@ -53,8 +54,6 @@ export const Upgrade = () => {
         name: "Trading Journal Pro",
         description: "Pro Subscription",
         handler: async function (response) {
-          // STEP 4 will verify this on backend
-          console.log("Payment Success:", response);
 
           try {
             const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
@@ -69,14 +68,13 @@ export const Upgrade = () => {
             const verifyData = await verifyRes.json();
 
             if (verifyData.success) {
-              alert("Payment verified! Pro activated.");
+              toast.success("Payment verified! Pro activated.");
               window.location.href = "/app/dashboard";
             } else {
-              alert("Payment verification failed.");
+              toast.error("Payment verification failed.");
             }
           } catch (err) {
-            console.error("Verification error:", err);
-            alert("Verification error. Contact support.");
+             toast.error("Verification error. Contact support.");
           }
         },
         theme: {
@@ -88,8 +86,7 @@ export const Upgrade = () => {
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error) {
-      console.error("Payment error:", error);
-      alert("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 

@@ -54,16 +54,7 @@ export const Register = () => {
         storeTokenInLS(res_data.token);
         refreshTrades();
         getAllAccounts();
-        toast.success("Registration successful", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.success("Registration successful");
         setUser({
           name: "",
           email: "",

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./AddNotes.module.css";
 import { DisplayNotes } from "./DisplayNotes";
 import { useAuth } from "../../../store/Auth";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 
 export const AddNotes = () => {
   const [notes, setNotes] = useState([]);
@@ -34,21 +34,13 @@ export const AddNotes = () => {
 
       if (response.ok) {
         setNote({ title: "", description: "" });
-        toast.success("Note added", {
-          position: "top-right",
-          autoClose: 2000,
-          theme: "dark",
-        });
+        toast.success("Note added");
         getAllNotes();
       } else {
-        toast.error("Failed to add note", {
-          position: "top-right",
-          autoClose: 2000,
-          theme: "dark",
-        });
+        toast.error("Failed to add note");
       }
     } catch (error) {
-      console.log("add notes error", error);
+      toast.error("Failed to add note, try re-login");
     }
   };
 
@@ -69,7 +61,7 @@ export const AddNotes = () => {
         setNotes(res_data);
       }
     } catch (error) {
-      console.log("error while getting all notes", error);
+      toast.error("Failed to get notes, try re-login");
     }
   };
 

@@ -7,7 +7,7 @@ export const AddPrice = ({ trade, handleChange }) => {
   const { accountDetails } = useContext(AccountContext);
   return (
     <div className={styles.card}>
-      <h3>Price & Risk Management</h3>
+      <h3>Price & Risk</h3>
       <p className={styles.subText}>
         Account Balance: ${accountDetails?.currentBalance}
       </p>

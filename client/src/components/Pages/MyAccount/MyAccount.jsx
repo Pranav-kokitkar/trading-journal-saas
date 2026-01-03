@@ -6,6 +6,8 @@ import { UserContext } from "../../../context/UserContext";
 import { AccountContext } from "../../../context/AccountContext";
 import { SelectAccount } from "./SelectAccount";
 import { CreateAccModal } from "../../modals/CreateAccModal/CreateAccModal";
+import { exportTrades } from "../../../services/exportService";
+import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
 
 export const MyAccount = () => {
   const { getUser } = useContext(UserContext);
@@ -14,6 +16,7 @@ export const MyAccount = () => {
   const { accounts, accountDetails } =
     useContext(AccountContext);
   const [IsCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const [tempCapital, setTempCapital] = useState("");
 
@@ -32,14 +35,25 @@ export const MyAccount = () => {
     console.log("will add soon")
   };
 
-  const handleLogout = () => {
-    logoutUser();
-    localStorage.removeItem("hasSeenUpgradeModal");
-    navigate("/app/dashboard");
+  const confirmLogout =() => {
+    try {
+      logoutUser();
+      navigate("/app/dashboard");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const createAcc = () => {
     setIsCreateModalOpen(true);
+  };
+
+  const handleExport = async (format) => {
+    try {
+      await exportTrades(format);
+    } catch (error) {
+      alert("Failed to export trades");
+    }
   };
 
   return (
@@ -68,7 +82,7 @@ export const MyAccount = () => {
               <p>Initial Capital</p>
               <h3>
                 {accountDetails && accounts.length > 0
-                  ? `$${accountDetails.initialCapital}`
+                  ? `$${Number(accountDetails.initialCapital).toFixed(2)}`
                   : "—"}
               </h3>
             </div>
@@ -76,7 +90,7 @@ export const MyAccount = () => {
               <p>Current Balance</p>
               <h3>
                 {accountDetails && accounts.length > 0
-                  ? `$${accountDetails.currentBalance}`
+                  ? `$${Number(accountDetails.currentBalance).toFixed(2)}`
                   : "—"}
               </h3>
             </div>
@@ -101,8 +115,9 @@ export const MyAccount = () => {
             information.
           </p>
           <div className={styles.btngroup}>
-            <button>Export as CSV</button>
-            <button>Export as JSON</button>
+            <button onClick={() => handleExport("csv")}>Export as CSV</button>
+
+            <button onClick={() => handleExport("json")}>Export as JSON</button>
           </div>
         </div>
 
@@ -139,7 +154,7 @@ export const MyAccount = () => {
         <div className={styles.sectionbox}>
           <h3>Log Out</h3>
           <p>Log out of your account on this device.</p>
-          <button className={styles.dangerbtn} onClick={handleLogout}>
+          <button className={styles.dangerbtn} onClick={()=>setIsLogoutModalOpen(true)}>
             Logout
           </button>
         </div>
@@ -154,6 +169,15 @@ export const MyAccount = () => {
           </p>
         </div>
       </div>
+      <ConfirmationModal
+              isOpen={isLogoutModalOpen}
+              title="Logout from app"
+              message="arey you sure you want to perfom this action ?"
+              confirmText="Logout"
+              cancelText="Cancel"
+              onCancel={() => setIsLogoutModalOpen(false)}
+              onConfirm={confirmLogout}
+            />
     </section>
   );
 };

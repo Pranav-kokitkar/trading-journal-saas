@@ -8,7 +8,7 @@ export const TradeDetails = ({ trade, handleChange }) => {
 
       <div className={styles.row}>
         <div className={styles.inputGroup}>
-          <label htmlFor="marketType">Market Type</label>
+          <label htmlFor="marketType">Market Type*</label>
           <select
             id="marketType"
             name="marketType"
@@ -34,7 +34,7 @@ export const TradeDetails = ({ trade, handleChange }) => {
       </div>
 
       <div className={styles.tradedirection}>
-        <label>Trade Direction</label>
+        <label>Trade Direction*</label>
         <div className={styles.radioContainer}>
           <div>
             <input

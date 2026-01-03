@@ -65,9 +65,11 @@ export const calculatePerformance = (trades = []) => {
   // Win / loss counts (closed)
   const totalWins = closedWinTrades.length;
 
-  const totalLosses = closedTrades.filter(
+  const closedLossTrades = closedTrades.filter(
     (t) => String(read(t, "tradeResult") || "").toLowerCase() === "loss"
-  ).length;
+  );
+
+  const totalLosses = closedLossTrades.length;
 
   // Win rate in %
   const winRate =
@@ -96,7 +98,6 @@ export const calculatePerformance = (trades = []) => {
       currentLossStreak++;
       currentWinStreak = 0;
     } else {
-      // breakeven or other result breaks streaks
       currentWinStreak = 0;
       currentLossStreak = 0;
     }
@@ -149,16 +150,43 @@ export const calculatePerformance = (trades = []) => {
   const highestBalance = balances.length > 0 ? Math.max(...balances) : 0;
   const lowestBalance = balances.length > 0 ? Math.min(...balances) : 0;
 
-  // Safely compute highest win (no -Infinity)
   const positivePnls = pnls.filter((p) => p > 0);
   const highestWin = positivePnls.length > 0 ? Math.max(...positivePnls) : 0;
 
-  // Safely compute lowest loss (no Infinity)
   const negativePnls = pnls.filter((p) => p < 0);
   const lowestLoss = negativePnls.length > 0 ? Math.min(...negativePnls) : 0;
 
   const highestRisk = risks.length > 0 ? Math.max(...risks) : 0;
   const lowestRisk = risks.length > 0 ? Math.min(...risks) : 0;
+
+  /* ===========================
+     EXPECTANCY (NEW — CLOSED ONLY)
+     =========================== */
+
+  // Avg Win RR
+  let winRRSum = 0;
+  closedWinTrades.forEach((t) => {
+    const n = Number(read(t, "rr"));
+    if (!isNaN(n)) winRRSum += n;
+  });
+  const avgWinRR =
+    closedWinTrades.length > 0 ? winRRSum / closedWinTrades.length : 0;
+
+  // Avg Loss RR (absolute)
+  let lossRRSum = 0;
+  closedLossTrades.forEach((t) => {
+    const n = Math.abs(Number(read(t, "rr")));
+    if (!isNaN(n)) lossRRSum += n;
+  });
+  const avgLossRR =
+    closedLossTrades.length > 0 ? lossRRSum / closedLossTrades.length : 0;
+
+  const lossRate =
+    totalWins + totalLosses > 0 ? totalLosses / (totalWins + totalLosses) : 0;
+
+  const expectancyRR = (winRate / 100) * avgWinRR - lossRate * avgLossRR;
+
+  const expectancyPnL = totalTrades > 0 ? totalPnL / totalTrades : 0;
 
   return {
     totalTrades,
@@ -179,5 +207,7 @@ export const calculatePerformance = (trades = []) => {
     lowestLoss,
     highestRisk,
     lowestRisk,
+    expectancyRR: Number(expectancyRR.toFixed(2)),
+    expectancyPnL: Number(expectancyPnL.toFixed(2)),
   };
 };
