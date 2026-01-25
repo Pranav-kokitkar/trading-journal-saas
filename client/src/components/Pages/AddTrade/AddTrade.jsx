@@ -39,6 +39,7 @@ export const AddTrade = () => {
     tradeNumber: "",
     dateNtime: "",
     tradeNotes: "",
+    tags :[],
   });
 
   // ✅ NEW: hold up to 2 screenshot files selected in the UI
@@ -135,7 +136,7 @@ export const AddTrade = () => {
       pnl: Number(pnl || 0),
       tradeResult,
       riskAmount: Number(
-        riskamount ?? trade.riskamount ?? trade.riskAmount ?? 0
+        riskamount ?? trade.riskamount ?? trade.riskAmount ?? 0,
       ),
       riskPercent: Number(riskPercent || 0),
       balanceAfterTrade: Number(balanceAfterTrade),
@@ -144,6 +145,7 @@ export const AddTrade = () => {
       tradeNotes: trade.tradeNotes || "",
       tradeStatus: normalizedStatus,
       accountId,
+      tags: trade.tags || [],
     };
 
     if (

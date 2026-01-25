@@ -8,6 +8,9 @@ const {
   closeTradeByID,
   deleteTradeById,
   updateTradeNotesById,
+  updateTradeTagsById,
+  updateTradeScreenshots,
+  deleteTradeScreenshot,
 } = require("../controllers/trade-controller");
 const router = express.Router();
 
@@ -23,5 +26,14 @@ router
   .delete(authMiddleware, deleteTradeById);
 
 router.route("/:id/note").patch(authMiddleware, updateTradeNotesById);
+router.route("/:id/tags").patch(authMiddleware, updateTradeTagsById);
+router
+  .route("/:id/screenshots")
+  .patch(
+    authMiddleware,
+    upload.array("screenshots", 3),
+    updateTradeScreenshots,
+  );
+router.route("/:id/screenshot").delete(authMiddleware, deleteTradeScreenshot);
 
 module.exports = router;

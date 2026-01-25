@@ -28,6 +28,7 @@ import { AdminTradesProvider } from "./components/Admin/store/AdminTradesContext
 import { AdminTradeDetails } from "./components/Admin/adminTrades/AdminTradeDetails";
 import { AdminUserDetails } from "./components/Admin/adminUsers/AdminUserDetails";
 import { Upgrade } from "./components/Pages/Upgrade/Upgrade";
+import { Tags } from "./components/Pages/Tags/Tags";
 
 const router = createBrowserRouter([
   {
@@ -93,9 +94,10 @@ const router = createBrowserRouter([
       },
       {
         path: "upgrade",
-        element:<Upgrade/>,
-        errorElement:<ErrorPage/>
+        element: <Upgrade />,
+        errorElement: <ErrorPage />,
       },
+      { path: "tags", element: <Tags />, errorElement: <ErrorPage /> },
 
       { index: true, element: <Dashboard /> },
     ],
@@ -127,9 +129,9 @@ const router = createBrowserRouter([
         errorElement: <ErrorPage />,
       },
       {
-        path:"user/:id",
-        element: <AdminUserDetails/>,
-        errorElement: <ErrorPage/>
+        path: "user/:id",
+        element: <AdminUserDetails />,
+        errorElement: <ErrorPage />,
       },
       {
         path: "contacts",

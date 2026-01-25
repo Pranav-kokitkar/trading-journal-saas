@@ -1,4 +1,6 @@
 require("dotenv").config();
+require("./models/tags-model");
+require("./models/trade-model");
 const express = require("express");
 const connectDB = require("./utils/db");
 const cors = require("cors");
@@ -10,6 +12,8 @@ const contactRoute = require("./routers/Contact-router");
 const accountRoute = require("./routers/Account-router");
 const adminRoute = require("./routers/Admin-router");
 const paymentRoute = require("./routers/Payment-router");
+const exportRoute = require("./routers/Export-router");
+const tagsRoute = require("./routers/Tags-router");
 const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
@@ -33,11 +37,13 @@ app.use("/api/contact", contactRoute);
 app.use("/api/account", accountRoute);
 app.use("/api/admin", adminRoute);
 app.use("/api/payment", paymentRoute);
+app.use("/api/export", exportRoute);
+app.use("/api/tags", tagsRoute);
 app.use(errorMiddleware);
 
-PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log("server is running at port 3000...");
+    console.log(`Server is running on port ${PORT}`);
   });
 });

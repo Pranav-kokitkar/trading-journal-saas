@@ -25,7 +25,7 @@ const tradeSchema = new mongoose.Schema({
   riskType: { type: String },
   exitedPrice: { type: [exitedPriceSchema], default: [] },
 
-  rr: { type: Number, default: 0 },
+  rr: { type: Number, default: 0 }, 
   pnl: { type: Number, default: 0 },
   tradeResult: { type: String, default: "" },
   riskAmount: { type: Number, default: 0 },
@@ -36,6 +36,12 @@ const tradeSchema = new mongoose.Schema({
   dateTime: { type: Date, required: true },
   tradeNotes: { type: String, default: "" },
   tradeStatus: { type: String, default: "" },
+  tags: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Tags",
+    },
+  ],
   screenshots: {
     type: [String],
     default: [],

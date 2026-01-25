@@ -40,7 +40,7 @@ const editNoteByID = async (req, res) => {
     const updatedNote = req.body;
     const updateNote = await Notes.updateOne(
       { _id: id },
-      { $set: updatedNote }
+      { $set: updatedNote },
     );
     res.status(200).json(updateNote);
   } catch (error) {

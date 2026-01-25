@@ -24,23 +24,14 @@
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 1rem;
   margin-bottom: 1.5rem;
-  text-align: center;
 }
 
-.title {
-  font-size: 2.5rem;
-  font-weight: 600;
-  line-height: 1.2;
-  margin-bottom: 1rem;
+.heading h3 {
+  font-size: 1.35rem;
+  margin: 0;
   color: var(--text-primary);
-  letter-spacing: -0.5px;
-}
-
-.title span {
-  background: linear-gradient(90deg, var(--accent), #f5a623);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-weight: 600;
+  letter-spacing: -0.3px;
 }
 
 .heading p {
@@ -387,6 +378,109 @@
 .col2 small {
   font-size: 0.7rem;
   color: var(--muted);
+}
+
+/* ===================================
+   TAGS SECTION - ADD TRADE
+   =================================== */
+
+/* Add Tags Button */
+.addTagBtn {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  background: transparent;
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.addTagBtn:hover {
+  border-color: var(--accent);
+  background: rgba(246, 185, 59, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Tag Picker Dropdown */
+.tagPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Tag Picker Scrollbar */
+.tagPicker::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tagPicker::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: var(--radius-sm);
+}
+
+.tagPicker::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: var(--radius-sm);
+}
+
+.tagPicker::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Tag Picker Buttons */
+.tagPicker button {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid;
+}
+
+.tagUnselected {
+  background: transparent;
+  transform: scale(1);
+}
+
+.tagSelected {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.tagPicker button:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Remove Selected Tags Section */
+.selectedTagsSection {
+  display: none;
+}
+
+.selectedTagsContainer {
+  display: none;
+}
+
+.selectedTag {
+  display: none;
+}
+
+.noTagsText {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-style: italic;
 }
 
 /* ===== Responsiveness ===== */

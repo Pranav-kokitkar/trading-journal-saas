@@ -28,6 +28,7 @@ const AddTrade = async (req, res) => {
       tradeNotes,
       tradeStatus,
       accountId,
+      tags,
     } = req.body;
 
     if (
@@ -52,6 +53,12 @@ const AddTrade = async (req, res) => {
       } catch {
         parsedExitedPrice = [];
       }
+    }
+
+    let validTagIds = [];
+
+    if (Array.isArray(tags) && tags.length > 0) {
+      validTagIds = tags.filter((id) => mongoose.Types.ObjectId.isValid(id));
     }
 
     /* ---------------- FILE HANDLING ---------------- */
@@ -81,7 +88,7 @@ const AddTrade = async (req, res) => {
             (error, uploadResult) => {
               if (error) return reject(error);
               resolve(uploadResult);
-            }
+            },
           );
 
           uploadStream.end(file.buffer);
@@ -128,6 +135,7 @@ const AddTrade = async (req, res) => {
       dateTime: dateTime ? new Date(dateTime) : new Date(),
       tradeNotes: tradeNotes || "",
       tradeStatus: (tradeStatus || "").toString().trim(),
+      tags: validTagIds,
     };
 
     const savedTrade = await Trade.create(tradeToSave);
@@ -232,13 +240,16 @@ const getAllTrades = async (req, res) => {
   }
 };
 
-const getTradeByID = async (req, res, next) => {
+const getTradeByID = async (req, res) => {
   try {
-    const id = req.params.id;
-    const data = await Trade.findOne({ _id: id });
-    return res.status(200).json(data);
-  } catch (error) {
-    return res.status(400).json({ message: error });
+    console.log("HIT getTradeByID", req.params.id);
+    const trade = await Trade.findById(req.params.id)
+      .populate("tags", "name colour")
+      .lean();
+
+    res.status(200).json(trade);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -283,7 +294,7 @@ const closeTradeByID = async (req, res, next) => {
 
     const totalVolume = exitedPrice.reduce(
       (s, l) => s + Number(l.volume || 0),
-      0
+      0,
     );
     if (Math.abs(totalVolume - 100) > 0.01 && totalVolume !== 0) {
       return res.status(400).json({
@@ -331,13 +342,13 @@ const closeTradeByID = async (req, res, next) => {
         price: Number(lvl.price),
         volume: Number(lvl.volume),
       })),
-      pnl: pnl !== undefined ? Number(pnl) : trade.pnl ?? 0,
-      rr: rr !== undefined ? Number(rr) : trade.rr ?? 0,
+      pnl: pnl !== undefined ? Number(pnl) : (trade.pnl ?? 0),
+      rr: rr !== undefined ? Number(rr) : (trade.rr ?? 0),
       tradeResult: tradeResult || trade.tradeResult || "breakeven",
       balanceAfterTrade:
         balanceAfterTrade !== undefined
           ? Number(balanceAfterTrade)
-          : trade.balanceAfterTrade ?? null,
+          : (trade.balanceAfterTrade ?? null),
       tradeStatus: "closed",
       closedBy: userId,
       exitTime: new Date().toISOString(),
@@ -384,6 +395,136 @@ const updateTradeNotesById = async (req, res) => {
   }
 };
 
+const updateTradeTagsById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tags } = req.body;
+    const userId = req.userID || req.user?._id;
+
+    // Validate tags is an array
+    if (!Array.isArray(tags)) {
+      return res.status(400).json({ message: "Tags must be an array" });
+    }
+
+    // Find and update the trade
+    const updatedTrade = await Trade.findOneAndUpdate(
+      { _id: id, userId },
+      { tags },
+      { new: true },
+    ).populate("tags");
+
+    if (!updatedTrade) {
+      return res.status(404).json({ message: "Trade not found" });
+    }
+
+    res.status(200).json(updatedTrade);
+  } catch (error) {
+    console.error("Error updating tags:", error);
+    res.status(500).json({ message: "Failed to update tags" });
+  }
+};
+
+const updateTradeScreenshots = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userID || req.user?._id;
+
+    const files = Array.isArray(req.files) ? req.files : [];
+
+    if (files.length === 0) {
+      return res.status(400).json({ message: "No files uploaded" });
+    }
+
+    const isPro =
+      req.user?.plan === "pro" &&
+      req.user?.planExpiresAt &&
+      new Date(req.user.planExpiresAt) > new Date();
+
+    const uploadLimit = isPro ? 3 : 1;
+
+    if (files.length > uploadLimit) {
+      return res.status(400).json({
+        message: `You can upload a maximum of ${uploadLimit} screenshots`,
+      });
+    }
+
+    const screenshotUrls = [];
+    for (const file of files) {
+      try {
+        const result = await new Promise((resolve, reject) => {
+          const uploadStream = cloudinary.uploader.upload_stream(
+            { folder: "trading-journal/trades" },
+            (error, uploadResult) => {
+              if (error) return reject(error);
+              resolve(uploadResult);
+            },
+          );
+          uploadStream.end(file.buffer);
+        });
+
+        if (result?.secure_url) {
+          screenshotUrls.push(result.secure_url);
+        }
+      } catch (err) {
+        console.error("Cloudinary upload error:", err);
+      }
+    }
+
+    const updatedTrade = await Trade.findOneAndUpdate(
+      { _id: id, userId },
+      { $push: { screenshots: { $each: screenshotUrls } } },
+      { new: true },
+    ).populate("tags");
+
+    if (!updatedTrade) {
+      return res.status(404).json({ message: "Trade not found" });
+    }
+
+    res.status(200).json(updatedTrade);
+  } catch (error) {
+    console.error("Error updating screenshots:", error);
+    res.status(500).json({ message: "Failed to update screenshots" });
+  }
+};
+
+const deleteTradeScreenshot = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { screenshotUrl } = req.body;
+    const userId = req.userID || req.user?._id;
+
+    if (!screenshotUrl) {
+      return res.status(400).json({ message: "Screenshot URL required" });
+    }
+
+    const updatedTrade = await Trade.findOneAndUpdate(
+      { _id: id, userId },
+      { $pull: { screenshots: screenshotUrl } },
+      { new: true },
+    ).populate("tags");
+
+    if (!updatedTrade) {
+      return res.status(404).json({ message: "Trade not found" });
+    }
+
+    // Optional: Delete from Cloudinary
+    try {
+      const urlParts = screenshotUrl.split("/");
+      const filename = urlParts[urlParts.length - 1];
+      const publicId = `trading-journal/trades/${filename.split(".")[0]}`;
+      await cloudinary.uploader.destroy(publicId);
+    } catch (err) {
+      console.error("Cloudinary delete error:", err);
+    }
+
+    res.status(200).json(updatedTrade);
+  } catch (error) {
+    console.error("Error deleting screenshot:", error);
+    res.status(500).json({ message: "Failed to delete screenshot" });
+  }
+};
+
+// Update exports
 module.exports = {
   AddTrade,
   getAllTrades,
@@ -391,4 +532,7 @@ module.exports = {
   closeTradeByID,
   deleteTradeById,
   updateTradeNotesById,
+  updateTradeTagsById,
+  updateTradeScreenshots,
+  deleteTradeScreenshot,
 };

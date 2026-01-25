@@ -21,20 +21,45 @@ export const Trade = () => {
   const { trades = [], refreshTrades, closeTradeByID } = useTrades() || {};
 
   const [isEditingNote, setIsEditingNote] = useState(false);
+  const [isAddingTags, setIsAddingTags] = useState(false);
   const [updatedNote, setUpdatedNote] = useState("");
   const [closeTrade, setCloseTrade] = useState(false);
   const [isMultipleTP, setIsMultipleTP] = useState(false);
   const [exitLevels, setExitLevels] = useState([]);
   const [tradeStatus, setTradeStatus] = useState("live");
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleteScreenshotModalOpen, setIsDeleteScreenshotModalOpen] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [triedRefresh, setTriedRefresh] = useState(false);
 
-  // ✅ NEW: local state to hold trade fetched directly by ID (for refresh / deep link)
   const [fetchedTrade, setFetchedTrade] = useState(null);
 
+  // Tags state
+  const [allTags, setAllTags] = useState([]);
+  const [editableTags, setEditableTags] = useState([]);
+
+  // ✅ NEW: Screenshot state
+  const [isEditingScreenshots, setIsEditingScreenshots] = useState(false);
+  const [newScreenshots, setNewScreenshots] = useState([]);
+
   const { authorizationToken } = useAuth();
+
+  const [fullscreenImage, setFullscreenImage] = useState(null);
+  const [screenshotToDelete, setScreenshotToDelete] = useState(null);
+
+  // Add handler after saveScreenshots function
+  const openFullscreen = (imageUrl) => {
+    setFullscreenImage(imageUrl);
+  };
+
+  const closeFullscreen = () => {
+    setFullscreenImage(null);
+  };
+
+  const openScreenshotDeleteModal = ()=>{
+    setIsDeleteScreenshotModalOpen(true);
+  }
 
   // helper to find trade by several possible id fields
   const findTradeById = (list, idParam) => {
@@ -48,8 +73,8 @@ export const Trade = () => {
   // Try to find trade in context
   const contextTrade = findTradeById(trades, id);
 
-  // ✅ Use trade from context if available, otherwise fall back to fetchedTrade
-  const trade = contextTrade || fetchedTrade;
+  // Use trade from context if available, otherwise fall back to fetchedTrade
+  const trade = fetchedTrade || contextTrade;
 
   // keep tradeStatus synced when we have trade
   useEffect(() => {
@@ -58,11 +83,10 @@ export const Trade = () => {
     }
   }, [trade]);
 
-  // ✅ NEW: if trade is not in context, fetch it directly from backend by ID
+  // if trade is not in context, fetch it directly from backend by ID
   useEffect(() => {
     const fetchSingleTrade = async () => {
-      // if we already have it from context or no token, skip
-      if (contextTrade || !authorizationToken) return;
+      if (!authorizationToken) return;
 
       try {
         setIsLoading(true);
@@ -73,7 +97,7 @@ export const Trade = () => {
             headers: {
               Authorization: authorizationToken,
             },
-          }
+          },
         );
 
         if (res.ok) {
@@ -92,11 +116,10 @@ export const Trade = () => {
     fetchSingleTrade();
   }, [id, contextTrade, authorizationToken]);
 
-  // If trade is missing, attempt one guarded refresh of the context trades (context-first approach)
+  // If trade is missing, attempt one guarded refresh of the context trades
   useEffect(() => {
     let mounted = true;
     const tryRefresh = async () => {
-      // if we already have a trade (from context or fetch) or we already tried, or no refresh function
       if (trade || triedRefresh || typeof refreshTrades !== "function") return;
       try {
         setIsLoading(true);
@@ -114,7 +137,6 @@ export const Trade = () => {
     return () => {
       mounted = false;
     };
-    // only re-run if id changes or refreshTrades identity changes, or trade/triedRefresh changes
   }, [id, trade, triedRefresh, refreshTrades]);
 
   if (isLoading && !trade) return <p>Loading trade…</p>;
@@ -140,24 +162,21 @@ export const Trade = () => {
   };
 
   const handleSave = async () => {
-    // basic validation: there must be at least one exit level
     if (!Array.isArray(exitLevels) || exitLevels.length === 0) {
       alert("Please enter at least one exit price.");
       return;
     }
 
-    // If using percent volumes, ensure they sum to ~100
     const totalPct = exitLevels.reduce((s, l) => s + Number(l.volume || 0), 0);
     if (totalPct > 0 && Math.abs(totalPct - 100) > 0.1) {
       alert(
-        "Total exit volume must equal 100% (or leave volumes 0 if using absolute qty)."
+        "Total exit volume must equal 100% (or leave volumes 0 if using absolute qty).",
       );
       return;
     }
 
     setIsLoading(true);
     try {
-      // 1) compute updated trade using your util
       const updatedTrade = calculateTradeOnExit({
         trade,
         exitLevels,
@@ -168,20 +187,20 @@ export const Trade = () => {
         throw new Error("Calculation failed");
       }
 
-      // normalize exitedPrice shape to send to backend (numbers)
       const exitedPrice = (updatedTrade.exitedPrice || exitLevels || []).map(
         (lvl) => ({
           price: Number(lvl.price),
           volume: Number(lvl.volume),
-        })
+        }),
       );
 
-      // derive fields backend expects
       const pnl = Number(updatedTrade.pnl || 0);
       const rr = Number(updatedTrade.rr || 0);
       const tradeResult = updatedTrade.tradeResult || "breakeven";
       const balanceAfterTrade = Number(
-        updatedTrade.balanceAfterTrade || accountDetails?.currentBalance + pnl || 0
+        updatedTrade.balanceAfterTrade ||
+          accountDetails?.currentBalance + pnl ||
+          0,
       );
 
       console.log("CALC INPUTS", {
@@ -194,39 +213,30 @@ export const Trade = () => {
         pnlPreview: updatedTrade.pnl,
       });
 
-      // 2) call TradeContext API to close on server
       const closedTrade = await closeTradeByID(
         trade._id || trade.id,
         exitedPrice,
         pnl,
         rr,
         tradeResult,
-        balanceAfterTrade
+        balanceAfterTrade,
       );
 
       if (!closedTrade) {
         throw new Error("Server did not return updated trade.");
       }
 
-      // Optional: keep local fetchedTrade in sync if we fetched it directly
       setFetchedTrade(closedTrade);
-
-      // 3) refresh local lists & performance (server is source of truth)
       await refreshTrades();
 
-      // 4) update account on server by sending pnl (do NOT change totalTrades when closing)
       try {
         if (typeof updateAccount === "function") {
           await updateAccount({ pnl });
         }
       } catch (err) {
         console.error("updateAccount failed", err);
-        // we continue — server trade was closed; account sync can be retried
       }
 
-      // refresh analytics/charts
-
-      // close modal & stay on same page (trade will now be closed)
       setCloseTrade(false);
       navigate(`/app/trade/${id}`);
     } catch (err) {
@@ -236,7 +246,6 @@ export const Trade = () => {
       setIsLoading(false);
     }
   };
-
 
   const handleEdit = () => {
     setIsEditingNote(true);
@@ -260,7 +269,7 @@ export const Trade = () => {
           body: JSON.stringify({
             tradeNotes: updatedNote,
           }),
-        }
+        },
       );
       if (response.ok) {
         setIsEditingNote(false);
@@ -292,24 +301,230 @@ export const Trade = () => {
     }
   };
 
-    const onDelete = async (id) => {
-      setIsDeleteModalOpen(true);
-    };
-
-    const confirmDeleteAccount = async (id)=>{
-      try {
-        await deleteTradeByID(id, trade.pnl);
-        navigate("/app/trade-history");
-      } catch (error) {
-        console.log(error);
+  // Tag handlers
+  const handleAddTags = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tags`, {
+        headers: {
+          Authorization: authorizationToken,
+        },
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setAllTags(data);
+        setEditableTags((trade.tags || []).map((t) => t._id));
+        setIsAddingTags(true);
       }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const toggleTag = (tagId) => {
+    setEditableTags((prev) =>
+      prev.includes(tagId)
+        ? prev.filter((id) => id !== tagId)
+        : [...prev, tagId],
+    );
+  };
+
+  const saveTags = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/trades/${trade._id}/tags`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorizationToken,
+          },
+          body: JSON.stringify({
+            tags: editableTags,
+          }),
+        },
+      );
+
+      if (response.ok) {
+        setIsAddingTags(false);
+        await refreshTrades();
+
+        const updated = await response.json();
+        if (fetchedTrade) {
+          setFetchedTrade(updated);
+        }
+
+        toast.success("Tags Updated", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      } else {
+        toast.error("Failed to update tags", {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating tags", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "dark",
+      });
+    }
+  };
+
+  // ✅ NEW: Screenshot handlers
+  const handleEditScreenshots = () => {
+    setIsEditingScreenshots(true);
+  };
+
+  const handleScreenshotFileChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    const uploadLimit = 3;
+
+    if (files.length > uploadLimit) {
+      alert(`You can upload a maximum of ${uploadLimit} screenshots.`);
+      e.target.value = "";
+      return;
     }
 
+    setNewScreenshots(files);
+  };
+
+  const deleteScreenshot = async (screenshotUrl) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/trades/${trade._id}/screenshot`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorizationToken,
+          },
+          body: JSON.stringify({ screenshotUrl }),
+        },
+      );
+
+      if (response.ok) {
+        await refreshTrades();
+
+        const updated = await response.json();
+        if (fetchedTrade) {
+          setFetchedTrade(updated);
+        }
+
+        toast.success("Screenshot deleted", {
+          position: "top-right",
+          autoClose: 2000,
+          theme: "dark",
+        });
+      } else {
+        toast.error("Failed to delete screenshot", {
+          position: "top-right",
+          autoClose: 2000,
+          theme: "dark",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error deleting screenshot", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "dark",
+      });
+    }
+  };
+
+  const saveScreenshots = async () => {
+    if (newScreenshots.length === 0) {
+      toast.error("Please select at least one screenshot", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "dark",
+      });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      newScreenshots.forEach((file) => {
+        formData.append("screenshots", file);
+      });
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/trades/${trade._id}/screenshots`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: authorizationToken,
+          },
+          body: formData,
+        },
+      );
+
+      if (response.ok) {
+        setIsEditingScreenshots(false);
+        setNewScreenshots([]);
+        await refreshTrades();
+
+        const updated = await response.json();
+        if (fetchedTrade) {
+          setFetchedTrade(updated);
+        }
+
+        toast.success("Screenshots added", {
+          position: "top-right",
+          autoClose: 2000,
+          theme: "dark",
+        });
+      } else {
+        toast.error("Failed to add screenshots", {
+          position: "top-right",
+          autoClose: 2000,
+          theme: "dark",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error adding screenshots", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "dark",
+      });
+    }
+  };
+
+  const onDelete = async (id) => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteAccount = async (id) => {
+    try {
+      await deleteTradeByID(id, trade.pnl);
+      navigate("/app/trade-history");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // Colors
   const pnlColor = trade.pnl >= 0 ? "positive" : "negative";
   const directionColor =
     trade.tradedirection?.toLowerCase() === "long" ? "long" : "short";
+
+  console.log(trade);
 
   return (
     <section className={styles.trade}>
@@ -382,6 +597,80 @@ export const Trade = () => {
           </div>
         </div>
 
+        {/*Tags*/}
+        <div className={styles.tradeTags}>
+          <div className={styles.notesHeader}>
+            <h4>Tags</h4>
+            {!isAddingTags ? (
+              <button onClick={handleAddTags} className={styles.notebtn}>
+                {Array.isArray(trade.tags) && trade.tags.length > 0
+                  ? "Edit"
+                  : "Add"}
+              </button>
+            ) : (
+              <button onClick={saveTags} className={styles.notebtn}>
+                Save
+              </button>
+            )}
+          </div>
+
+          {!isAddingTags ? (
+            Array.isArray(trade.tags) && trade.tags.length > 0 ? (
+              <div className={styles.tagsContainer}>
+                {trade.tags.map((tag) => (
+                  <span
+                    key={tag._id}
+                    className={styles.tagBadge}
+                    style={{ backgroundColor: tag.colour }}
+                  >
+                    {tag.name}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p
+                style={{
+                  fontSize: "0.85rem",
+                  opacity: 0.7,
+                  marginTop: "0.75rem",
+                }}
+              >
+                No tags added
+              </p>
+            )
+          ) : (
+            <div className={styles.tagPicker}>
+              {allTags.length === 0 ? (
+                <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+                  No tags available. Create tags in the Tags page.
+                </p>
+              ) : (
+                allTags.map((t) => {
+                  const isSelected = editableTags.includes(t._id);
+
+                  return (
+                    <button
+                      key={t._id}
+                      type="button"
+                      onClick={() => toggleTag(t._id)}
+                      className={
+                        isSelected ? styles.tagSelected : styles.tagUnselected
+                      }
+                      style={{
+                        backgroundColor: isSelected ? t.colour : "transparent",
+                        color: isSelected ? "#fff" : t.colour,
+                        borderColor: t.colour,
+                      }}
+                    >
+                      {t.name}
+                    </button>
+                  );
+                })
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Notes */}
         <div className={styles.tradeDescription}>
           <div className={styles.notesHeader}>
@@ -422,27 +711,99 @@ export const Trade = () => {
           </div>
         </div>
 
-        {/* Screenshot */}
+        {/* ✅ Screenshot - UPDATED SECTION */}
         <div className={styles.tradeScreenshot}>
-          <p>Screenshot / Chart Placeholder</p>
+          <div className={styles.notesHeader}>
+            <p>Screenshots</p>
+            {!isEditingScreenshots ? (
+              <button
+                onClick={handleEditScreenshots}
+                className={styles.notebtn}
+              >
+                Add
+              </button>
+            ) : (
+              <button onClick={saveScreenshots} className={styles.notebtn}>
+                Save
+              </button>
+            )}
+          </div>
 
-          {Array.isArray(trade.screenshots) && trade.screenshots.length > 0 && (
-            <div className={styles.screenshotList}>
-              {trade.screenshots.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`Trade screenshot ${index + 1}`}
-                />
-              ))}
+          {isEditingScreenshots && (
+            <div className={styles.uploadSection}>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleScreenshotFileChange}
+                className={styles.fileInput}
+              />
+              {newScreenshots.length > 0 && (
+                <small
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "var(--muted)",
+                    marginTop: "0.5rem",
+                    display: "block",
+                  }}
+                >
+                  {newScreenshots.length} file(s) selected
+                </small>
+              )}
             </div>
           )}
 
-          {(!Array.isArray(trade.screenshots) ||
-            trade.screenshots.length === 0) && (
-            <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
+          {Array.isArray(trade.screenshots) && trade.screenshots.length > 0 ? (
+            <div className={styles.screenshotList}>
+              {trade.screenshots.map((url, index) => (
+                <div key={index} className={styles.screenshotItem}>
+                  <img
+                    src={url}
+                    alt={`Trade screenshot ${index + 1}`}
+                    onClick={() => openFullscreen(url)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setScreenshotToDelete(url);
+                      openScreenshotDeleteModal();
+                    }}
+                    className={styles.deleteScreenshotBtn}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p
+              style={{
+                fontSize: "0.85rem",
+                opacity: 0.7,
+                marginTop: "0.75rem",
+              }}
+            >
               No screenshots added
             </p>
+          )}
+
+          {/* ✅ NEW: Fullscreen Modal */}
+          {fullscreenImage && (
+            <div className={styles.fullscreenOverlay} onClick={closeFullscreen}>
+              <button
+                className={styles.fullscreenClose}
+                onClick={closeFullscreen}
+              >
+                ✕
+              </button>
+              <img
+                src={fullscreenImage}
+                alt="Fullscreen view"
+                className={styles.fullscreenImage}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </div>
           )}
         </div>
 
@@ -469,6 +830,24 @@ export const Trade = () => {
         cancelText="Cancel"
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => confirmDeleteAccount(trade._id)}
+      />
+      <ConfirmationModal
+        isOpen={isDeleteScreenshotModalOpen}
+        title="Delete Screenshot?"
+        message="This screenshot will be permanently deleted. This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onCancel={() => {
+          setIsDeleteScreenshotModalOpen(false);
+          setScreenshotToDelete(null);
+        }}
+        onConfirm={() => {
+          if (screenshotToDelete) {
+            deleteScreenshot(screenshotToDelete);
+          }
+          setIsDeleteScreenshotModalOpen(false);
+          setScreenshotToDelete(null);
+        }}
       />
 
       {closeTrade && (

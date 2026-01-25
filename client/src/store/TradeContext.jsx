@@ -50,8 +50,6 @@ export const TradeProvider = ({ children }) => {
 
   const { authorizationToken, isLoggedIn } = useAuth();
 
-  const mountedRef = useRef(true);
-
   async function getAllTrades(filters = {}) {
     if (!isLoggedIn || !authorizationToken) return;
 
@@ -74,7 +72,8 @@ export const TradeProvider = ({ children }) => {
       const data = await response.json();
 
       if (response.ok) {
-        setTrades(data.trades || []);
+        setTrades(data.trades);
+        console.log("trades",data.trades)
         setTotalPages(data.pagination.totalPages);
         setTotalTrades(data.stats.totalTrades);
       }
@@ -95,8 +94,11 @@ export const TradeProvider = ({ children }) => {
       Object.entries(normalizedTrade).forEach(([key, value]) => {
         if (value === undefined || value === null) return;
 
-        if (Array.isArray(value)) {
-          // e.g. exitedPrice -> send as JSON string
+        if (key === "tags") {
+          // send tags as multiple fields so backend gets an array
+          value.forEach((id) => formData.append("tags", id));
+        } else if (Array.isArray(value)) {
+          // exitedPrice etc.
           formData.append(key, JSON.stringify(value));
         } else {
           formData.append(key, value);

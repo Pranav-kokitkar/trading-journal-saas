@@ -56,11 +56,16 @@ export const Sidebar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink className={getNavLinkClass} to="/app/tags">
+              Tags
+            </NavLink>
+          </li>
+          <li>
             {isAdmin && (
               <NavLink className={getNavLinkClass} to="/admin">
                 Admin
               </NavLink>
-            ) }
+            )}
           </li>
         </ul>
       </nav>

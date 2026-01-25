@@ -16,7 +16,6 @@ const getUser = async (req, res) => {
     }
 
     return res.status(200).json(user);
-    return res.status(200).json(user);
   } catch (error) {
     console.error("getAccount error:", error);
     return res.status(500).json({
@@ -47,6 +46,10 @@ const updateUser = async (req, res, next) => {
       balance: pnl,
       totalTrades: deltaTrades ?? 0,
     };
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
