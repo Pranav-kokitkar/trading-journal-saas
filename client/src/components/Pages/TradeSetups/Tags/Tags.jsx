@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../../../store/Auth";
+import { useAuth } from "../../../../store/Auth";
 import toast from "react-hot-toast";
-import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
+import { ConfirmationModal } from "../../../modals/ConfirmationModal/ConfirmationModal";
 import styles from "./Tags.module.css";
+import { getMaxTags } from "../../../../config/planLimits";
 
 export const Tags = () => {
   const TAG_COLORS = [
@@ -23,7 +24,7 @@ export const Tags = () => {
   const [tagToDelete, setTagToDelete] = useState(null);
   const [tagToUpdate, setTagToUpdate] = useState(null);
 
-  const { authorizationToken } = useAuth();
+  const { authorizationToken, isPro } = useAuth();
 
   /* -------------------- CREATE TAG -------------------- */
 
@@ -37,6 +38,17 @@ export const Tags = () => {
 
     if (!tag.name.trim() || !tag.colour) {
       toast.error("Tag name and colour are required");
+      return;
+    }
+
+    // Check tag limit before sending request
+    const maxTags = getMaxTags(isPro);
+    if (tags.length >= maxTags) {
+      toast.error(
+        isPro
+          ? `Pro plan tag limit (${maxTags}) reached`
+          : `Free plan tag limit (${maxTags}) reached. Upgrade to Pro.`
+      );
       return;
     }
 
@@ -164,7 +176,7 @@ export const Tags = () => {
   /* -------------------- UI -------------------- */
 
   return (
-    <section className={styles.tagsPage}>
+    <div className={styles.tagsPage}>
       <div className={styles.mainContent}>
         {/* Page Heading */}
         <div className={styles.heading}>
@@ -280,7 +292,7 @@ export const Tags = () => {
           onConfirm={confirmUpdate}
         />
       )}
-    </section>
+    </div>
   );
 };
 
@@ -293,9 +305,9 @@ const TagUpdateModal = ({ tag, setTag, TAG_COLORS, onCancel, onConfirm }) => {
   };
 
   return (
-    <div className={styles.modalOverlay}>
-      <div className={styles.modal}>
-        <h4>Update Tag</h4>
+    <div className={styles.modalOverlay} onClick={onCancel}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        <h3 className={styles.modalTitle}>Update Tag</h3>
 
         <div className={styles.formGroup}>
           <label>Tag Name</label>

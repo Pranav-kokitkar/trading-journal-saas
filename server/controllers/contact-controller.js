@@ -45,9 +45,9 @@ const contactForm = async (req, res) => {
       contact,
     });
   } catch (error) {
-    console.log("CONTACT ERROR:", error);
-    return res.status(400).json({
-      message: "error from server while submitting contact",
+    console.error("CONTACT ERROR:", error);
+    return res.status(500).json({
+      message: "Failed to submit contact form",
       error: error.message,
     });
   }

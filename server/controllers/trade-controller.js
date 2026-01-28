@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Trade = require("../models/trade-model");
 const cloudinary = require("../config/cloudinary");
+const { getMaxScreenshots } = require("../config/planLimits");
 
 const AddTrade = async (req, res) => {
   try {
@@ -29,6 +30,7 @@ const AddTrade = async (req, res) => {
       tradeStatus,
       accountId,
       tags,
+      strategy,
     } = req.body;
 
     if (
@@ -55,10 +57,45 @@ const AddTrade = async (req, res) => {
       }
     }
 
-    let validTagIds = [];
+    /* ---------------- PARSE tags ---------------- */
+    let parsedTags = tags;
 
-    if (Array.isArray(tags) && tags.length > 0) {
-      validTagIds = tags.filter((id) => mongoose.Types.ObjectId.isValid(id));
+    // When using FormData with multer, tags might come as a string or array
+    if (typeof parsedTags === "string") {
+      try {
+        parsedTags = JSON.parse(parsedTags);
+      } catch {
+        // If it's a single tag ID as string, wrap it in array
+        parsedTags = parsedTags ? [parsedTags] : [];
+      }
+    }
+
+    // Ensure it's an array
+    if (!Array.isArray(parsedTags)) {
+      parsedTags = parsedTags ? [parsedTags] : [];
+    }
+
+    let validTagIds = [];
+    if (parsedTags.length > 0) {
+      validTagIds = parsedTags.filter(
+        (id) => id && mongoose.Types.ObjectId.isValid(id.toString()),
+      );
+    }
+
+    /* ---------------- PARSE strategy ---------------- */
+    let validStrategyId = undefined;
+
+    if (
+      strategy &&
+      strategy !== "" &&
+      strategy !== "null" &&
+      strategy !== "undefined"
+    ) {
+      // Strategy is a single value, not an array
+      const strategyId = strategy.toString().trim();
+      if (strategyId && mongoose.Types.ObjectId.isValid(strategyId)) {
+        validStrategyId = new mongoose.Types.ObjectId(strategyId);
+      }
     }
 
     /* ---------------- FILE HANDLING ---------------- */
@@ -70,7 +107,7 @@ const AddTrade = async (req, res) => {
       req.user?.planExpiresAt &&
       new Date(req.user.planExpiresAt) > new Date();
 
-    const uploadLimit = isPro ? 3 : 1;
+    const uploadLimit = getMaxScreenshots(isPro);
 
     if (files.length > uploadLimit) {
       return res.status(400).json({
@@ -136,6 +173,7 @@ const AddTrade = async (req, res) => {
       tradeNotes: tradeNotes || "",
       tradeStatus: (tradeStatus || "").toString().trim(),
       tags: validTagIds,
+      strategy: validStrategyId,
     };
 
     const savedTrade = await Trade.create(tradeToSave);
@@ -216,11 +254,17 @@ const getAllTrades = async (req, res) => {
     }
 
     /** ---------------- QUERY DB ---------------- */
+    // ✅ PERFORMANCE: Cap max limit to prevent huge payloads
+    const maxLimit = Math.min(Number(limit), 50); // Max 50 trades per request
+
     const [trades, totalTrades] = await Promise.all([
       Trade.find(query)
         .sort({ dateTime: -1 }) // NEWEST FIRST
         .skip(skip)
-        .limit(Number(limit)),
+        .limit(maxLimit)
+        .populate("tags", "name colour") // Only select needed fields
+        .populate("strategy", "name description")
+        .lean(), // ✅ Returns plain JS objects (faster, less memory)
 
       Trade.countDocuments(query),
     ]);
@@ -230,8 +274,8 @@ const getAllTrades = async (req, res) => {
       stats: { filteredTrades: totalTrades },
       pagination: {
         page: Number(page),
-        limit: Number(limit),
-        totalPages: Math.ceil(totalTrades / limit),
+        limit: maxLimit,
+        totalPages: Math.ceil(totalTrades / maxLimit),
       },
     });
   } catch (err) {
@@ -242,9 +286,9 @@ const getAllTrades = async (req, res) => {
 
 const getTradeByID = async (req, res) => {
   try {
-    console.log("HIT getTradeByID", req.params.id);
     const trade = await Trade.findById(req.params.id)
       .populate("tags", "name colour")
+      .populate("strategy", "name description")
       .lean();
 
     res.status(200).json(trade);
@@ -255,12 +299,6 @@ const getTradeByID = async (req, res) => {
 
 const closeTradeByID = async (req, res, next) => {
   try {
-    console.log("CLOSE TRADE called:", {
-      params: req.params,
-      body: req.body,
-      user: req.user,
-    });
-
     const userId = req.user && (req.user.id || req.user._id);
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
@@ -411,7 +449,9 @@ const updateTradeTagsById = async (req, res) => {
       { _id: id, userId },
       { tags },
       { new: true },
-    ).populate("tags");
+    )
+      .populate("tags")
+      .populate("strategy", "name description");
 
     if (!updatedTrade) {
       return res.status(404).json({ message: "Trade not found" });
@@ -440,11 +480,20 @@ const updateTradeScreenshots = async (req, res) => {
       req.user?.planExpiresAt &&
       new Date(req.user.planExpiresAt) > new Date();
 
-    const uploadLimit = isPro ? 3 : 1;
+    const uploadLimit = getMaxScreenshots(isPro);
 
-    if (files.length > uploadLimit) {
+    // ✅ Check existing screenshots on the trade
+    const existingTrade = await Trade.findOne({ _id: id, userId });
+    if (!existingTrade) {
+      return res.status(404).json({ message: "Trade not found" });
+    }
+
+    const currentScreenshotCount = existingTrade.screenshots?.length || 0;
+    const totalAfterUpload = currentScreenshotCount + files.length;
+
+    if (totalAfterUpload > uploadLimit) {
       return res.status(400).json({
-        message: `You can upload a maximum of ${uploadLimit} screenshots`,
+        message: `Total screenshots cannot exceed ${uploadLimit}. You currently have ${currentScreenshotCount} screenshot(s).`,
       });
     }
 
@@ -474,7 +523,9 @@ const updateTradeScreenshots = async (req, res) => {
       { _id: id, userId },
       { $push: { screenshots: { $each: screenshotUrls } } },
       { new: true },
-    ).populate("tags");
+    )
+      .populate("tags")
+      .populate("strategy", "name description");
 
     if (!updatedTrade) {
       return res.status(404).json({ message: "Trade not found" });
@@ -501,7 +552,9 @@ const deleteTradeScreenshot = async (req, res) => {
       { _id: id, userId },
       { $pull: { screenshots: screenshotUrl } },
       { new: true },
-    ).populate("tags");
+    )
+      .populate("tags")
+      .populate("strategy", "name description");
 
     if (!updatedTrade) {
       return res.status(404).json({ message: "Trade not found" });

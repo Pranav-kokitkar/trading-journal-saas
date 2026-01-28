@@ -27,8 +27,12 @@ const accountSchema = new Schema(
       default: "active",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+// ✅ INDEXES for performance
+accountSchema.index({ userId: 1, status: 1 }); // Filter by user and status
+accountSchema.index({ userId: 1, createdAt: -1 }); // Sort by creation date
 
 const Account = mongoose.model("Account", accountSchema);
 module.exports = Account;

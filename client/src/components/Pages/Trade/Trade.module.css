@@ -243,6 +243,60 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* ===================================
+   STRATEGY SECTION
+   =================================== */
+
+.tradeStrategy {
+  background: var(--bg-secondary);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-accent);
+}
+
+.tradeStrategy h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.5rem;
+}
+
+.strategyDisplay {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(246, 185, 59, 0.08);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(246, 185, 59, 0.2);
+}
+
+.strategyIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.strategyInfo {
+  flex: 1;
+}
+
+.strategyName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 0.5rem 0;
+}
+
+.strategyDescription {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
 /* ===== Tags Section ===== */
 .tradeTags {
   background: var(--bg-secondary);

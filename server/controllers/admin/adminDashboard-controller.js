@@ -11,6 +11,7 @@ const getStats = async (req, res) => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
+    // ✅ PERFORMANCE: Using aggregation pipelines for efficiency
     /** ================= CONTACTS ================= */
     const contactData = await Contacts.aggregate([
       {

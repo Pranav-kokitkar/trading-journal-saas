@@ -39,7 +39,8 @@ export const AddTrade = () => {
     tradeNumber: "",
     dateNtime: "",
     tradeNotes: "",
-    tags :[],
+    tags: [],
+    strategy: "",
   });
 
   // ✅ NEW: hold up to 2 screenshot files selected in the UI
@@ -146,6 +147,7 @@ export const AddTrade = () => {
       tradeStatus: normalizedStatus,
       accountId,
       tags: trade.tags || [],
+      strategy: trade.strategy || undefined,
     };
 
     if (

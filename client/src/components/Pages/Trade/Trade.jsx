@@ -9,6 +9,7 @@ import { useAuth } from "../../../store/Auth";
 import { toast } from "react-toastify";
 import { AccountContext } from "../../../context/AccountContext";
 import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
+import { getMaxScreenshots } from "../../../config/planLimits";
 
 export const Trade = () => {
   const { accountDetails, updateAccount } = useContext(AccountContext);
@@ -43,7 +44,7 @@ export const Trade = () => {
   const [isEditingScreenshots, setIsEditingScreenshots] = useState(false);
   const [newScreenshots, setNewScreenshots] = useState([]);
 
-  const { authorizationToken } = useAuth();
+  const { authorizationToken, isPro } = useAuth();
 
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const [screenshotToDelete, setScreenshotToDelete] = useState(null);
@@ -392,10 +393,18 @@ export const Trade = () => {
 
   const handleScreenshotFileChange = (e) => {
     const files = Array.from(e.target.files || []);
-    const uploadLimit = 3;
+    const uploadLimit = getMaxScreenshots(isPro);
+    const currentScreenshotCount = trade?.screenshots?.length || 0;
+    const totalAfterUpload = currentScreenshotCount + files.length;
 
     if (files.length > uploadLimit) {
-      alert(`You can upload a maximum of ${uploadLimit} screenshots.`);
+      alert(`You can upload a maximum of ${uploadLimit} screenshots at once.`);
+      e.target.value = "";
+      return;
+    }
+
+    if (totalAfterUpload > uploadLimit) {
+      alert(`Total screenshots cannot exceed ${uploadLimit}. You currently have ${currentScreenshotCount} screenshot(s).`);
       e.target.value = "";
       return;
     }
@@ -526,6 +535,8 @@ export const Trade = () => {
 
   console.log(trade);
 
+  console
+
   return (
     <section className={styles.trade}>
       <div className={styles.tradeContainer}>
@@ -596,6 +607,26 @@ export const Trade = () => {
                 ))}
           </div>
         </div>
+
+        {/* Strategy Display */}
+        {trade.strategy && (
+          <div className={styles.tradeStrategy}>
+            <h4>Strategy</h4>
+            <div className={styles.strategyDisplay}>
+              <span className={styles.strategyIcon}>📊</span>
+              <div className={styles.strategyInfo}>
+                <p className={styles.strategyName}>
+                  {typeof trade.strategy === 'object' ? trade.strategy.name : 'Strategy Selected'}
+                </p>
+                {typeof trade.strategy === 'object' && trade.strategy.description && (
+                  <p className={styles.strategyDescription}>
+                    {trade.strategy.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/*Tags*/}
         <div className={styles.tradeTags}>

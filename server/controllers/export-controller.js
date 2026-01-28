@@ -5,7 +5,11 @@ const exportTrades = async (req, res) => {
     const { format } = req.query; // csv | json
     const userId = req.userID;
 
-    const trades = await Trade.find({ userId }).sort({ dateTime: 1 }).lean();
+    // ✅ PERFORMANCE: Only select needed fields, use lean()
+    const trades = await Trade.find({ userId })
+      .select("-__v -userId") // Exclude unnecessary fields
+      .sort({ dateTime: 1 })
+      .lean();
 
     if (!trades.length) {
       return res.status(404).json({ message: "No trades found" });
@@ -39,7 +43,7 @@ const exportTrades = async (req, res) => {
 
       res.setHeader(
         "Content-Disposition",
-        "attachment; filename=trading-journal.json"
+        "attachment; filename=trading-journal.json",
       );
       return res.json(exportData);
     }
@@ -83,7 +87,7 @@ const exportTrades = async (req, res) => {
               t.riskAmount,
               t.tradeResult,
               `"${(t.tradeNotes || "").replace(/"/g, '""')}"`,
-            ].join(",")
+            ].join(","),
           );
         });
       });
@@ -93,7 +97,7 @@ const exportTrades = async (req, res) => {
       res.setHeader("Content-Type", "text/csv");
       res.setHeader(
         "Content-Disposition",
-        "attachment; filename=trading-journal.csv"
+        "attachment; filename=trading-journal.csv",
       );
 
       return res.send(csv);

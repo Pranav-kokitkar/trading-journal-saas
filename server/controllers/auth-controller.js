@@ -56,10 +56,17 @@ const Login = async (req, res, next) => {
 
 const user = async (req, res) => {
   try {
-    const userData = req.user;
+    // Fetch fresh user data (only when explicitly needed)
+    const userData = await User.findById(req.userID).select("-password");
+
+    if (!userData) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     return res.status(200).json({ userData });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching user data:", error);
+    res.status(500).json({ message: "Error fetching user data" });
   }
 };
 

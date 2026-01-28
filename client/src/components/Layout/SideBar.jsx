@@ -31,11 +31,6 @@ export const Sidebar = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/add-trade">
-              Add Trade
-            </NavLink>
-          </li>
-          <li>
             <NavLink className={getNavLinkClass} to="/app/trade-history">
               Trade History
             </NavLink>
@@ -51,13 +46,13 @@ export const Sidebar = () => {
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/upgrade">
-              Upgrade
+            <NavLink className={getNavLinkClass} to="/app/trade-setups">
+              Trade Setups
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/tags">
-              Tags
+            <NavLink className={getNavLinkClass} to="/app/upgrade">
+              Upgrade
             </NavLink>
           </li>
           <li>

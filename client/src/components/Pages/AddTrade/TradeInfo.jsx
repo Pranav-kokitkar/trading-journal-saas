@@ -1,6 +1,7 @@
 import styles from "./addtrade.module.css";
 import { useAuth } from "../../../store/Auth";
 import { useEffect, useState } from "react";
+import { getMaxScreenshots } from "../../../config/planLimits";
 
 export const TradeInfo = ({
   trade,
@@ -11,9 +12,10 @@ export const TradeInfo = ({
   const { isPro, authorizationToken } = useAuth();
 
   const [tags, setTags] = useState([]);
+  const [strategies, setStrategies] = useState([]);
   const [showTagPicker, setShowTagPicker] = useState(false);
 
-  const uploadLimit = isPro ? 3 : 1;
+  const uploadLimit = getMaxScreenshots(isPro);
 
   /* ---------------- FILE HANDLING ---------------- */
 
@@ -45,8 +47,28 @@ export const TradeInfo = ({
     }
   };
 
+  /* ---------------- FETCH STRATEGIES (ACCOUNT BASED) ---------------- */
+  const getAllStrategies = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/strategy`,
+        {
+          headers: {
+            Authorization: authorizationToken,
+          },
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) setStrategies(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     getAllTags();
+    getAllStrategies();
   }, []);
 
   /* ---------------- TAG TOGGLE ---------------- */
@@ -70,9 +92,35 @@ export const TradeInfo = ({
     <div className={styles.card}>
       <h3>Additional Info</h3>
 
+      {/* ---------------- STRATEGY SECTION ---------------- */}
+
+      <div className={styles.sectionSpacing}>
+        <div className={styles.inputGroup}>
+        <label htmlFor="strategy">Strategy (Optional)</label>
+        <select
+          id="strategy"
+          name="strategy"
+          value={trade.strategy || ""}
+          onChange={handleChange}
+        >
+          <option value="">-- Select Strategy --</option>
+          {strategies.map((s) => (
+            <option key={s._id} value={s._id}>
+              {s.name}
+            </option>
+          ))}
+        </select>
+        {strategies.length === 0 && (
+          <small className={styles.helperText}>
+            No strategies available. Create one in Trade Setups page.
+          </small>
+        )}
+        </div>
+      </div>
+
       {/* ---------------- TAG SECTION ---------------- */}
 
-      <div>
+      <div className={styles.sectionSpacing}>
         <button
           type="button"
           className={styles.addTagBtn}
@@ -116,7 +164,7 @@ export const TradeInfo = ({
 
       {/* ---------------- SCREENSHOTS ---------------- */}
 
-      <div className={styles.col2}>
+      <div className={`${styles.col2} ${styles.sectionSpacing}`}>
         <div>
           <label>Upload Screenshot (max {uploadLimit})</label>
           <input
@@ -135,7 +183,7 @@ export const TradeInfo = ({
 
       {/* ---------------- NOTES ---------------- */}
 
-      <div className={styles.textareaGroup}>
+      <div className={`${styles.textareaGroup} ${styles.sectionSpacing}`}>
         <label htmlFor="tradeNotes">Notes and Description</label>
         <textarea
           id="tradeNotes"

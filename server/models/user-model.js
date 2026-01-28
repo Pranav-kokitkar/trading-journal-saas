@@ -13,7 +13,6 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
     password: {
@@ -42,8 +41,12 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+// ✅ INDEXES for performance
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ plan: 1, planExpiresAt: 1 });
 
 // Hash password before save
 userSchema.pre("save", async function (next) {
@@ -72,7 +75,7 @@ userSchema.methods.generateToken = function () {
         isAdmin: this.isAdmin,
       },
       process.env.JWT_SECRET_KEY || process.env.JWT_SECRETE_KEY, // safe fallback
-      { expiresIn: "30d" }
+      { expiresIn: "30d" },
     );
   } catch (error) {
     console.log("Error while generating token", error);

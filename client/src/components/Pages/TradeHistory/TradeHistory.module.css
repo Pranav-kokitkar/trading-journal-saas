@@ -233,10 +233,25 @@ a {
   gap: 1rem;
   font-size: 0.75rem;
   color: var(--muted);
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .belowsymbol p {
   margin: 0;
+}
+
+.strategyBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(246, 185, 59, 0.15);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-full);
+  color: var(--accent);
+  font-size: 0.7rem;
+  font-weight: 600;
 }
 
 /* ===== Quick Data ===== */

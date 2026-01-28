@@ -20,6 +20,7 @@ const getAllNotes = async (req, res) => {
 
     return res.status(200).json(notes);
   } catch (error) {
+    console.error("getAllNotes error:", error);
     return res.status(500).json({ message: "Failed to get notes from server" });
   }
 };

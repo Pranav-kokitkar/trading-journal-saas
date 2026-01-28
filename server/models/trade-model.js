@@ -25,7 +25,7 @@ const tradeSchema = new mongoose.Schema({
   riskType: { type: String },
   exitedPrice: { type: [exitedPriceSchema], default: [] },
 
-  rr: { type: Number, default: 0 }, 
+  rr: { type: Number, default: 0 },
   pnl: { type: Number, default: 0 },
   tradeResult: { type: String, default: "" },
   riskAmount: { type: Number, default: 0 },
@@ -42,11 +42,22 @@ const tradeSchema = new mongoose.Schema({
       ref: "Tags",
     },
   ],
+  strategy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Strategy",
+  },
   screenshots: {
     type: [String],
     default: [],
   },
 });
+
+// ✅ CRITICAL INDEXES for query performance
+tradeSchema.index({ userId: 1, accountId: 1, dateTime: -1 }); // Main query pattern
+tradeSchema.index({ userId: 1, tradeStatus: 1 }); // Filter by status
+tradeSchema.index({ userId: 1, symbol: 1 }); // Search by symbol
+tradeSchema.index({ userId: 1, tradeResult: 1 }); // Filter by result
+tradeSchema.index({ dateTime: -1 }); // Sorting
 
 const Trade = new mongoose.model("Trade", tradeSchema);
 

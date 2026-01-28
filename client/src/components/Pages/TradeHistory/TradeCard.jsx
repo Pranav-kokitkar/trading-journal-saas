@@ -27,6 +27,11 @@ export const TradeCard = ({ savedTrade }) => {
                 <div className={styles.belowsymbol}>
                   <p>{tradeData.marketType}</p>
                   <p>{date}</p>
+                  {tradeData.strategy && typeof tradeData.strategy === 'object' && (
+                    <p className={styles.strategyBadge}>
+                      📊 {tradeData.strategy.name}
+                    </p>
+                  )}
                 </div>
               </div>
 

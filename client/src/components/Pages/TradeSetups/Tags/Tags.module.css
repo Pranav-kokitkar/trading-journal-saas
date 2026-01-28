@@ -24,7 +24,7 @@
 }
 
 .heading h2 {
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   margin: 0;
   color: var(--text-primary);
   font-weight: 600;
@@ -175,8 +175,8 @@
 
 /* ===== Tags List ===== */
 .tagsList {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.75rem;
 }
 
@@ -265,34 +265,45 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(12, 22, 40, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: 1000;
   animation: fadeIn 0.2s ease-out;
+  padding: 1rem;
 }
 
 /* ===== Modal Container ===== */
 .modal {
   width: 100%;
-  max-width: 480px;
+  max-width: 500px;
   background: var(--gradient-card);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
-  border: 1px solid var(--border-light);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-medium);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.25s ease-out;
 }
 
-.modal h4 {
-  margin: 0 0 1.5rem 0;
-  font-size: 1.15rem;
+.modalTitle {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 1rem;
+  padding-bottom: 0.75rem;
+}
+
+/* Legacy h4 support */
+.modal h4 {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
 }
 
 /* ===== Modal Actions ===== */
@@ -300,37 +311,34 @@
   display: flex;
   gap: 0.75rem;
   justify-content: flex-end;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-subtle);
+  margin-top: 1.25rem;
 }
 
 .cancelBtn,
 .confirmBtn {
-  padding: 0.65rem 1.25rem;
+  padding: 0.65rem 1.5rem;
   border-radius: var(--radius-sm);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  border: none;
 }
 
 .cancelBtn {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.05);
   color: var(--muted);
   border: 1px solid var(--border-medium);
 }
 
 .cancelBtn:hover {
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
   border-color: var(--border-light);
-  background: rgba(255, 255, 255, 0.02);
 }
 
 .confirmBtn {
   background: var(--accent);
   color: var(--bg-primary);
-  border: none;
   box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
 }
 
@@ -413,6 +421,10 @@
     width: 32px;
     height: 32px;
   }
+
+  .tagsList {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 480px) {
@@ -422,5 +434,9 @@
 
   .heading p {
     font-size: 0.8rem;
+  }
+
+  .tagsList {
+    grid-template-columns: 1fr;
   }
 }

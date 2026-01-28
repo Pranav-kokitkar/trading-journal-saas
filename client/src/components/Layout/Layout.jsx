@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "./SideBar";
 import styles from "./Layout.module.css";
 import { UpgradeProModal } from "../modals/UpgradeProModal/UpgradeProModal";
@@ -12,6 +12,7 @@ export const Layout = () => {
   const [IsCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const { isPro, isAuthLoading, user } = useAuth();
+  const navigate = useNavigate();
 
   const handleCloseUpgrade = () => {
     localStorage.setItem("hasSeenUpgradeModal", "true");
@@ -78,6 +79,12 @@ export const Layout = () => {
         <CreateAccModal onClose={() => setIsCreateModalOpen(false)} />
       )}
       {isUpgradeOpen && <UpgradeProModal onClose={handleCloseUpgrade} />}
+      <button
+        className={styles.addTradeBtn}
+        onClick={() => navigate("/app/add-trade")}
+      >
+        +
+      </button>
     </div>
   );
 };

@@ -73,6 +73,11 @@
   border-left: 3px solid var(--accent);
 }
 
+/* ===== Section Spacing ===== */
+.sectionSpacing {
+  margin-bottom: 1.5rem;
+}
+
 /* ===== Input Group ===== */
 .inputGroup {
   display: flex;
@@ -381,10 +386,10 @@
 }
 
 /* ===================================
-   TAGS SECTION - ADD TRADE
+   TAGS & STRATEGY SECTION - ADD TRADE
    =================================== */
 
-/* Add Tags Button */
+/* Add Tags/Strategy Button */
 .addTagBtn {
   width: 100%;
   padding: 0.65rem 1rem;
@@ -405,7 +410,7 @@
   transform: translateY(-1px);
 }
 
-/* Tag Picker Dropdown */
+/* Tag/Strategy Picker Dropdown */
 .tagPicker {
   display: flex;
   flex-wrap: wrap;
@@ -459,9 +464,72 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+/* Strategy Buttons */
+.strategyUnselected {
+  background: transparent;
+  color: var(--accent);
+  border-color: var(--border-medium);
+  transform: scale(1);
+}
+
+.strategyUnselected:hover {
+  border-color: var(--accent);
+  background: rgba(246, 185, 59, 0.1);
+}
+
+.strategySelected {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.3);
+}
+
 .tagPicker button:hover {
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Helper Text ===== */
+.helperText {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-top: 0.35rem;
+  font-style: italic;
+}
+
+/* ===================================
+   STRATEGY DISPLAY IN TRADE DETAILS
+   =================================== */
+
+.selectedStrategyDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(246, 185, 59, 0.08);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+}
+
+.strategyLabel {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.strategyBadge {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  padding: 0.35rem 0.75rem;
+  background: rgba(246, 185, 59, 0.15);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--accent);
 }
 
 /* Remove Selected Tags Section */

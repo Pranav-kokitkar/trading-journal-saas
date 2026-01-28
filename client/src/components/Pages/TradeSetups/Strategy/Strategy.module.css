@@ -1,0 +1,430 @@
+/* ===================================
+   STRATEGY PAGE - THEMED
+   =================================== */
+
+/* ===== Page Wrapper ===== */
+.strategyPage {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+  min-height: 100vh;
+}
+
+/* ===== Main Content Container ===== */
+.mainContent {
+  width: 100%;
+  max-width: 980px;
+}
+
+/* ===== Page Heading ===== */
+.heading {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.heading h2 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.heading p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* ===== Create Form Card ===== */
+.createForm {
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.createForm h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
+
+/* ===== Form Group ===== */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formGroup input,
+.formGroup textarea {
+  padding: 0.65rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  resize: vertical;
+}
+
+.formGroup textarea {
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.5;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+}
+
+/* ===== Submit Button ===== */
+.submitBtn {
+  padding: 0.65rem 1.5rem;
+  background: var(--accent);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  margin-top: 0.5rem;
+}
+
+.submitBtn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  transform: translateY(-2px);
+}
+
+.submitBtn:active {
+  transform: translateY(0);
+}
+
+/* ===== Strategies Section ===== */
+.strategiesSection {
+  background: var(--gradient-card);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.strategiesSection h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
+
+/* ===== Loading / Empty States ===== */
+.loadingState,
+.noStrategies {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--muted);
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-light);
+  margin: 0;
+}
+
+.loadingState {
+  border-style: solid;
+}
+
+/* ===== Strategies List ===== */
+.strategiesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ===== Strategy Card ===== */
+.strategyCard {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  transition: all 0.25s ease;
+}
+
+.strategyCard:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== Strategy Card Header ===== */
+.strategyHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.strategyInfo {
+  flex: 1;
+}
+
+.strategyName {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.strategyIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--accent);
+}
+
+.strategyDescription {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ===== Strategy Actions ===== */
+.strategyActions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.editBtn,
+.deleteBtn {
+  padding: 0.45rem 0.9rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.editBtn {
+  background: rgba(246, 185, 59, 0.15);
+  color: var(--accent);
+  border: 1px solid var(--border-accent);
+}
+
+.editBtn:hover {
+  background: rgba(246, 185, 59, 0.25);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.deleteBtn {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: var(--error);
+  transform: translateY(-1px);
+}
+
+/* ===== Strategy Metadata ===== */
+.strategyMeta {
+  display: flex;
+  gap: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 0.75rem;
+}
+
+.metaItem {
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.metaIcon {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .strategyPage {
+    padding: 1rem;
+  }
+
+  .heading h2 {
+    font-size: 1.15rem;
+  }
+
+  .createForm,
+  .strategiesSection {
+    padding: 1rem;
+  }
+
+  .strategyHeader {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .strategyActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .strategyMeta {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .formGroup input,
+  .formGroup textarea {
+    font-size: 0.9rem;
+  }
+
+  .submitBtn {
+    width: 100%;
+  }
+
+  .strategyActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .editBtn,
+  .deleteBtn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ===================================
+   UPDATE MODAL STYLES
+   =================================== */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modalContent {
+  background: var(--gradient-card);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.modalTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  justify-content: flex-end;
+}
+
+.cancelBtn,
+.confirmBtn {
+  padding: 0.65rem 1.5rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelBtn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  border: 1px solid var(--border-medium);
+}
+
+.cancelBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-light);
+}
+
+.confirmBtn {
+  background: var(--accent);
+  color: var(--bg-primary);
+  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+}
+
+.confirmBtn:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+  .modalActions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelBtn,
+  .confirmBtn {
+    width: 100%;
+  }
+}

@@ -1,10 +1,7 @@
 const Tags = require("../models/tags-model");
 const User = require("../models/user-model");
 const Trade = require("../models/trade-model");
-const mongoose = require("mongoose");
-
-const FREE_TAG_LIMIT = 5;
-const PRO_TAG_LIMIT = 50;
+const { getMaxTags } = require("../config/planLimits");
 
 const createTag = async (req, res) => {
   try {
@@ -47,15 +44,13 @@ const createTag = async (req, res) => {
     });
 
     // 5. Enforce limits
-    if (!isPro && totalTags >= FREE_TAG_LIMIT) {
-      return res.status(403).json({
-        message: "Free plan tag limit reached. Upgrade to Pro.",
-      });
-    }
+    const maxTags = getMaxTags(isPro);
 
-    if (isPro && totalTags >= PRO_TAG_LIMIT) {
+    if (totalTags >= maxTags) {
       return res.status(403).json({
-        message: "Pro plan tag limit reached",
+        message: isPro
+          ? `Pro plan tag limit (${maxTags}) reached`
+          : `Free plan tag limit (${maxTags}) reached. Upgrade to Pro.`,
       });
     }
     const duplicateTag = await Tags.findOne({
@@ -84,7 +79,6 @@ const createTag = async (req, res) => {
     console.error("createTag error:", error);
     return res.status(500).json({
       message: "Server error, failed to create tag",
-      error: error.message || "Unknown error",
     });
   }
 };
@@ -106,7 +100,7 @@ const getAllTag = async (req, res) => {
       });
     }
 
-    const tags = await Tags.find({ userId, accountId });
+    const tags = await Tags.find({ userId, accountId }).sort({ createdAt: -1 });
     res.status(200).json(tags);
   } catch (error) {
     res.status(500).json({ message: "fialed to get all tags" });
