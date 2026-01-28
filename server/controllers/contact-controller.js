@@ -23,7 +23,7 @@ const contactForm = async (req, res) => {
           (error, uploadResult) => {
             if (error) return reject(error);
             resolve(uploadResult);
-          }
+          },
         );
 
         uploadStream.end(req.file.buffer);
@@ -37,7 +37,7 @@ const contactForm = async (req, res) => {
       email,
       subject,
       message,
-      screenshotUrl, 
+      screenshotUrl,
     });
 
     res.status(200).json({

@@ -1,6 +1,7 @@
 # 🐛 Bug Fix Summary - Auth & Controller Issues
 
 ## Issues Reported
+
 1. ✅ Strategy management: "Failed to fetch strategies"
 2. ✅ Notes: "Failed to get notes, try re-login"
 3. ✅ Duplicate toasts appearing
@@ -11,7 +12,8 @@
 
 The auth middleware optimization broke compatibility with some controllers:
 
-**Problem**: 
+**Problem**:
+
 - Auth middleware was setting `req.user._id` but NOT `req.user.id`
 - Some controllers use `req.user.id` (Strategy, Tags)
 - Some controllers use `req.userID` (Notes, Trades, Accounts)
@@ -20,22 +22,26 @@ The auth middleware optimization broke compatibility with some controllers:
 ## Fixes Applied
 
 ### 1. Auth Middleware Fix ✅
+
 **File**: `server/middleware/auth-middleware.js`
 
 **Change**: Added `id` property for compatibility
+
 ```javascript
 req.user = {
   _id: decoded.userId,
-  id: decoded.userId,  // ← Added this for compatibility
+  id: decoded.userId, // ← Added this for compatibility
   email: decoded.email,
   isAdmin: decoded.isAdmin,
 };
 ```
 
 ### 2. User Model Index Fix ✅
+
 **File**: `server/models/user-model.js`
 
 **Change**: Removed duplicate `unique: true` from schema field
+
 ```javascript
 email: {
   type: String,
@@ -50,12 +56,14 @@ email: {
 ### 3. Error Handling Improvements ✅
 
 **Files Changed**:
+
 - `server/controllers/notes-controller.js`
 - `server/controllers/tags-controller.js`
 - `server/controllers/contact-controller.js`
 - `server/middleware/admin-middleware.js`
 
 **Changes**:
+
 - Added `console.error` for better debugging
 - Changed contact form error from 400 to 500 for server errors
 - Fixed admin middleware to return 403 (Forbidden) instead of 400
@@ -95,11 +103,13 @@ email: {
 ## About Duplicate Toasts
 
 **Likely Causes**:
+
 1. React StrictMode in development (renders twice)
 2. Frontend making duplicate API calls
 3. Error boundary catching and re-throwing errors
 
 **How to Debug**:
+
 1. Check browser Network tab - see if request is made twice
 2. Check React StrictMode in `client/src/main.jsx`
 3. Check error handling in frontend components
@@ -109,11 +119,13 @@ email: {
 ## MongoDB Warning
 
 You may see this warning:
+
 ```
 Warning: Duplicate schema index on {"email":1} found
 ```
 
 **To Fix** (one time):
+
 1. Connect to MongoDB Atlas or Compass
 2. Go to `users` collection → Indexes
 3. Drop the duplicate index (keep the one created by schema.index())
@@ -124,6 +136,7 @@ Warning: Duplicate schema index on {"email":1} found
 ## Performance Still Optimized ✅
 
 Despite the fixes:
+
 - ✅ No DB query on auth (still using JWT only)
 - ✅ Connection pooling active
 - ✅ Indexes working
