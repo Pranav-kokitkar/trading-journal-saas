@@ -2,7 +2,8 @@
 A full-stack Trading Journal SaaS built with the MERN stack (MongoDB, Express.js, React, Node.js). This application allows traders to log trades, track PnL, manage multiple accounts, and analyze performance over time.
 
 ## Live Demo
-**Live URL:** https://trading-journal-saas.netlify.app/
+**Live URL:** https://logmytrade.netlify.app/
+> ⚠️ Note: The backend is hosted on a free tier, so the first request may take **20–40 seconds** due to server cold start.
 
 ## Screenshots
 
