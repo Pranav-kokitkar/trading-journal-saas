@@ -22,9 +22,30 @@ const paymentRoute = require("./routers/Payment-router");
 const exportRoute = require("./routers/Export-router");
 const tagsRoute = require("./routers/Tags-router");
 const strategyRoute = require("./routers/Strategy-router");
+const compareRoute = require("./routers/Compare-router");
 const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
+
+// CORS configuration - MUST be before other middleware
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://trading-journal-saas.netlify.app"],
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "HEAD", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Range", "X-Content-Range"],
+  maxAge: 86400, // 24 hours
+};
+
+app.use(cors(corsOptions));
+
+// Handle preflight requests for all routes
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
 
 // Security headers
 app.use(
@@ -37,9 +58,16 @@ app.use(
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
-  message: "Too many requests from this IP, please try again later",
+  message: {
+    message: "Too many requests from this IP, please try again later",
+  },
   standardHeaders: true,
   legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      message: "Too many requests from this IP, please try again later",
+    });
+  },
 });
 
 // Apply rate limiting to all routes
@@ -48,18 +76,13 @@ app.use(limiter);
 // Stricter rate limit for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5, // 5 login/register attempts per 15 minutes
-  message: "Too many authentication attempts, please try again later",
+  max: 20, // 20 login/register attempts per 15 minutes (increased for development)
+  handler: (req, res) => {
+    res.status(429).json({
+      message: "Too many authentication attempts, please try again later",
+    });
+  },
 });
-
-//cors
-const corsOptions = {
-  origin: ["http://localhost:5173", "https://trading-journal-saas.netlify.app"],
-  methods: "GET, POST, PATCH, DELETE, PUT, HEAD",
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
 
 app.use(express.json({ limit: "10mb" })); // Limit payload size
 
@@ -83,6 +106,7 @@ app.use("/api/payment", paymentRoute);
 app.use("/api/export", exportRoute);
 app.use("/api/tags", tagsRoute);
 app.use("/api/strategy", strategyRoute);
+app.use("/api/compare", compareRoute);
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;
