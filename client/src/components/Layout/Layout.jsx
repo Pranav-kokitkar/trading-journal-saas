@@ -82,8 +82,10 @@ export const Layout = () => {
       <button
         className={styles.addTradeBtn}
         onClick={() => navigate("/app/add-trade")}
+        aria-label="Add Trade"
+        title="Add New Trade"
       >
-        +
+        <span className={styles.plusIcon}>+</span>
       </button>
     </div>
   );

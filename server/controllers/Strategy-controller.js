@@ -41,6 +41,18 @@ const createStrategy = async (req, res) => {
 const getAllStrategies = async (req, res) => {
   try {
     const userId = req.user.id;
+    const { all } = req.query; // Check for ?all=true query parameter
+
+    if (all === "true") {
+      // Return all strategies for all user's accounts
+      const strategies = await Strategy.find({
+        userId,
+        $or: [{ status: { $exists: false } }, { status: { $ne: "archived" } }],
+      }).sort({ createdAt: -1 });
+      return res.status(200).json(strategies);
+    }
+
+    // Default: return only strategies for active account
     const user = await User.findById(userId).select("activeAccountId");
     if (!user) {
       return res.status(404).json({ message: "User not found" });

@@ -14,6 +14,69 @@ const ALLOWED_DIMENSIONS = [
 ];
 
 /**
+ * Generate chart data from trades
+ * @param {Array} trades - Array of trade documents (sorted by date)
+ * @returns {Object} Chart data object
+ */
+const generateChartData = (trades) => {
+  if (!trades || trades.length === 0) {
+    return {
+      equityCurve: [],
+      expectancyProgression: [],
+    };
+  }
+
+  // Filter only exited trades and sort by date
+  const exitedTrades = trades
+    .filter((t) => t.tradeStatus === "exited")
+    .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
+
+  let cumulativePnL = 0;
+  let cumulativeR = 0;
+  let runningWins = 0;
+  let runningLosses = 0;
+  let runningTotalPnL = 0;
+
+  const equityCurve = [];
+  const expectancyProgression = [];
+
+  exitedTrades.forEach((trade, index) => {
+    const pnl = trade.pnl || 0;
+    const rValue = trade.rr || 0;
+    
+    cumulativePnL += pnl;
+    cumulativeR += rValue;
+    runningTotalPnL += pnl;
+
+    if (trade.tradeResult === "win") {
+      runningWins++;
+    } else if (trade.tradeResult === "loss") {
+      runningLosses++;
+    }
+
+    const tradeNumber = index + 1;
+    const runningTotalTrades = tradeNumber;
+    const runningExpectancy = runningTotalTrades > 0 ? runningTotalPnL / runningTotalTrades : 0;
+
+    equityCurve.push({
+      tradeNumber,
+      cumulativePnL: parseFloat(cumulativePnL.toFixed(2)),
+      cumulativeR: parseFloat(cumulativeR.toFixed(2)),
+    });
+
+    expectancyProgression.push({
+      tradeNumber,
+      expectancy: parseFloat(runningExpectancy.toFixed(2)),
+    });
+  });
+
+  return {
+    equityCurve,
+    expectancyProgression,
+  };
+};
+
+/**
  * Calculate trading statistics from trades array
  * @param {Array} trades - Array of trade documents
  * @returns {Object} Statistics object
@@ -22,6 +85,8 @@ const calculateStats = (trades) => {
   if (!trades || trades.length === 0) {
     return {
       totalTrades: 0,
+      exitedTrades: 0,
+      liveTrades: 0,
       wins: 0,
       losses: 0,
       winRate: 0,
@@ -33,41 +98,77 @@ const calculateStats = (trades) => {
   }
 
   const totalTrades = trades.length;
+  let liveTrades = 0;
   let wins = 0;
   let losses = 0;
   let totalR = 0;
   let totalWinR = 0;
   let totalLossR = 0;
+  let totalPnL = 0;
+  let totalWinPnL = 0;
+  let totalLossPnL = 0;
 
   trades.forEach((trade) => {
+    // Skip live trades from statistics calculations
+    if (trade.tradeStatus === "live") {
+      liveTrades++;
+      return;
+    }
+
     const rValue = trade.rr || 0;
+    const pnlValue = trade.pnl || 0;
+    
     totalR += rValue;
+    totalPnL += pnlValue;
 
     if (trade.tradeResult === "win") {
       wins++;
       totalWinR += Math.abs(rValue);
+      totalWinPnL += Math.abs(pnlValue);
     } else if (trade.tradeResult === "loss") {
       losses++;
       totalLossR += Math.abs(rValue);
+      totalLossPnL += Math.abs(pnlValue);
     }
   });
 
-  const winRate = totalTrades > 0 ? (wins / totalTrades) * 100 : 0;
-  const avgR = totalTrades > 0 ? totalR / totalTrades : 0;
-  const expectancy = avgR;
-  const profitFactor =
-    totalLossR > 0 ? totalWinR / totalLossR : totalWinR > 0 ? Infinity : 0;
+  const exitedTrades = totalTrades - liveTrades;
+  const winRate = exitedTrades > 0 ? (wins / exitedTrades) * 100 : 0;
+  const avgR = exitedTrades > 0 ? totalR / exitedTrades : 0;
+  const expectancy = exitedTrades > 0 ? totalPnL / exitedTrades : 0;
+  const expectancyR = avgR;
+  const avgWin = wins > 0 ? totalWinR / wins : 0;
+  const avgWinPnL = wins > 0 ? totalWinPnL / wins : 0;
+  const avgLoss = losses > 0 ? totalLossR / losses : 0;
+  const avgLossPnL = losses > 0 ? totalLossPnL / losses : 0;
+  const riskRewardRatio = avgLoss > 0 ? avgWin / avgLoss : avgWin > 0 ? avgWin : 0;
+  
+  // Profit factor calculation
+  let profitFactor = 0;
+  if (totalLossR > 0) {
+    profitFactor = totalWinR / totalLossR;
+  } else if (totalWinR > 0) {
+    // All wins, no losses - set to a high number or infinity representation
+    profitFactor = 999; // Represents infinity/unlimited
+  }
 
   return {
     totalTrades,
+    exitedTrades,
+    liveTrades,
     wins,
     losses,
     winRate: parseFloat(winRate.toFixed(2)),
     totalR: parseFloat(totalR.toFixed(2)),
     avgR: parseFloat(avgR.toFixed(2)),
     expectancy: parseFloat(expectancy.toFixed(2)),
-    profitFactor:
-      profitFactor === Infinity ? "∞" : parseFloat(profitFactor.toFixed(2)),
+    expectancyR: parseFloat(expectancyR.toFixed(2)),
+    avgWin: parseFloat(avgWin.toFixed(2)),
+    avgWinPnL: parseFloat(avgWinPnL.toFixed(2)),
+    avgLoss: parseFloat(avgLoss.toFixed(2)),
+    avgLossPnL: parseFloat(avgLossPnL.toFixed(2)),
+    riskRewardRatio: parseFloat(riskRewardRatio.toFixed(2)),
+    profitFactor: parseFloat(profitFactor.toFixed(2)),
   };
 };
 
@@ -287,17 +388,19 @@ const Compare = async (req, res) => {
         .lean(),
     ]);
 
-    // Calculate statistics
+    // Calculate statistics and chart data
     const datasetA = {
       query: queryA,
       stats: calculateStats(tradesA),
       sampleSize: tradesA.length,
+      chartData: generateChartData(tradesA),
     };
 
     const datasetB = {
       query: queryB,
       stats: calculateStats(tradesB),
       sampleSize: tradesB.length,
+      chartData: generateChartData(tradesB),
     };
 
     // Return comparison results

@@ -79,6 +79,7 @@ const createTag = async (req, res) => {
     console.error("createTag error:", error);
     return res.status(500).json({
       message: "Server error, failed to create tag",
+      error: error.message || "Unknown error",
     });
   }
 };
@@ -86,6 +87,15 @@ const createTag = async (req, res) => {
 const getAllTag = async (req, res) => {
   try {
     const userId = req.userID;
+    const { all } = req.query; // Check for ?all=true query parameter
+
+    if (all === "true") {
+      // Return all tags for all user's accounts
+      const tags = await Tags.find({ userId }).sort({ createdAt: -1 });
+      return res.status(200).json(tags);
+    }
+
+    // Default: return only tags for active account
     const user = await User.findById(userId).select("activeAccountId");
 
     if (!user) {

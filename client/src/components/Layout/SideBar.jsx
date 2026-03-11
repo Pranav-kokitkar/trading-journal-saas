@@ -56,6 +56,11 @@ export const Sidebar = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink className={getNavLinkClass} to="/app/compare">
+              Compare
+            </NavLink>
+          </li>
+          <li>
             {isAdmin && (
               <NavLink className={getNavLinkClass} to="/admin">
                 Admin
