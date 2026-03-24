@@ -211,6 +211,9 @@ const getAllTrades = async (req, res) => {
 
       startTradeNumber,
       endTradeNumber,
+      accountId,
+      strategy,
+      tag,
     } = req.query;
 
     const skip = (Number(page) - 1) * Number(limit);
@@ -226,6 +229,27 @@ const getAllTrades = async (req, res) => {
     if (status) query.tradeStatus = status;
     if (result) query.tradeResult = result;
     if (direction) query.tradeDirection = direction;
+
+    if (accountId) {
+      if (!mongoose.Types.ObjectId.isValid(accountId)) {
+        return res.status(400).json({ message: "Invalid accountId" });
+      }
+      query.accountId = accountId;
+    }
+
+    if (strategy) {
+      if (!mongoose.Types.ObjectId.isValid(strategy)) {
+        return res.status(400).json({ message: "Invalid strategy" });
+      }
+      query.strategy = strategy;
+    }
+
+    if (tag) {
+      if (!mongoose.Types.ObjectId.isValid(tag)) {
+        return res.status(400).json({ message: "Invalid tag" });
+      }
+      query.tags = tag;
+    }
 
     if (pnlValue) {
       query.pnl = {
@@ -271,7 +295,7 @@ const getAllTrades = async (req, res) => {
 
     res.status(200).json({
       trades,
-      stats: { filteredTrades: totalTrades },
+      stats: { filteredTrades: totalTrades, totalTrades },
       pagination: {
         page: Number(page),
         limit: maxLimit,

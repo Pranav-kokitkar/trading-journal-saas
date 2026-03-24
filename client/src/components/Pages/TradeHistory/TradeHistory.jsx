@@ -12,6 +12,8 @@ const defaultFilters = {
   status: "",
   result: "",
   direction: "",
+  strategy: "",
+  tag: "",
   pnlOperator: ">",
   pnlValue: "",
   rrOperator: ">",
@@ -35,9 +37,11 @@ export const TradeHistory = () => {
   } = useTrades();
 
   const [filters, setFilters] = useState(defaultFilters);
+  const [strategies, setStrategies] = useState([]);
+  const [tags, setTags] = useState([]);
   const [showProTooltip, setShowProTooltip] = useState(null);
 
-  const { isAuthLoading, isPro } = useAuth();
+  const { isAuthLoading, isPro, authorizationToken } = useAuth();
   const { accounts } = useContext(AccountContext);
 
   /** ---------------- FILTER HANDLERS ---------------- */
@@ -62,10 +66,58 @@ export const TradeHistory = () => {
     setFilters(defaultFilters);
   };
 
+  const handleDateInputOpen = (e) => {
+    const input = e.currentTarget;
+    if (typeof input.showPicker === "function") {
+      try {
+        input.showPicker();
+      } catch {
+        // ignore if browser blocks programmatic open
+      }
+    }
+  };
+
   /** ---------------- FETCH ---------------- */
+  useEffect(() => {
+    if (!authorizationToken) return;
+
+    const fetchFilterData = async () => {
+      try {
+        const [strategyRes, tagRes] = await Promise.all([
+          fetch(`${import.meta.env.VITE_API_URL}/api/strategy?all=true`, {
+            headers: { Authorization: authorizationToken },
+          }),
+          fetch(`${import.meta.env.VITE_API_URL}/api/tags?all=true`, {
+            headers: { Authorization: authorizationToken },
+          }),
+        ]);
+
+        const [strategyData, tagData] = await Promise.all([
+          strategyRes.json(),
+          tagRes.json(),
+        ]);
+
+        if (strategyRes.ok) setStrategies(Array.isArray(strategyData) ? strategyData : []);
+        if (tagRes.ok) setTags(Array.isArray(tagData) ? tagData : []);
+      } catch (err) {
+        console.error("Failed to fetch strategy/tag filter data:", err);
+      }
+    };
+
+    fetchFilterData();
+  }, [authorizationToken]);
+
   useEffect(() => {
     refreshTrades(filters);
   }, [filters, page]);
+
+  const filteredStrategies = filters.accountId
+    ? strategies.filter((s) => s.accountId === filters.accountId)
+    : strategies;
+
+  const filteredTags = filters.accountId
+    ? tags.filter((t) => t.accountId === filters.accountId)
+    : tags;
 
   if (isAuthLoading) return <p>loading...</p>;
 
@@ -219,12 +271,16 @@ export const TradeHistory = () => {
                 name="startDate"
                 value={filters.startDate}
                 onChange={handleFilterChange}
+                onClick={handleDateInputOpen}
+                onFocus={handleDateInputOpen}
               />
               <input
                 type="date"
                 name="endDate"
                 value={filters.endDate}
                 onChange={handleFilterChange}
+                onClick={handleDateInputOpen}
+                onFocus={handleDateInputOpen}
               />
             </div>
 
@@ -243,6 +299,28 @@ export const TradeHistory = () => {
                 {accounts.map((acc) => (
                   <option key={acc._id} value={acc._id}>
                     {acc.name}
+                  </option>
+                ))}
+              </select>
+
+              <select
+                name="strategy"
+                value={filters.strategy}
+                onChange={handleFilterChange}
+              >
+                <option value="">All Strategies</option>
+                {filteredStrategies.map((s) => (
+                  <option key={s._id} value={s._id}>
+                    {s.name}
+                  </option>
+                ))}
+              </select>
+
+              <select name="tag" value={filters.tag} onChange={handleFilterChange}>
+                <option value="">All Tags</option>
+                {filteredTags.map((t) => (
+                  <option key={t._id} value={t._id}>
+                    {t.name}
                   </option>
                 ))}
               </select>

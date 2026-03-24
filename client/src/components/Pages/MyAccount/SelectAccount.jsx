@@ -123,7 +123,7 @@ export const SelectAccount = ({ accounts, createAcc }) => {
       <ConfirmationModal
         isOpen={isDeleteModalOpen}
         title="Delete This Account?"
-        message="Deleting this account will permanently remove all trades linked to it. This action cannot be undone."
+        message="Deleting this account will permanently remove all trades, strategies, and tags linked to it. Trades using those tags/strategies will be unlinked. This action cannot be undone."
         confirmText="Delete Account"
         cancelText="Cancel"
         onCancel={() => setIsDeleteModalOpen(false)}

@@ -2,6 +2,8 @@
 const Account = require("../models/account-model");
 const User = require("../models/user-model");
 const Trade = require("../models/trade-model");
+const Tags = require("../models/tags-model");
+const Strategy = require("../models/strategy-model");
 
 // POST /api/account
 const createAccount = async (req, res) => {
@@ -65,7 +67,7 @@ const createAccount = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { activeAccountId: account._id },
-      { new: true }
+      { new: true },
     ).select("name email initialCapital balance totalTrades activeAccountId");
 
     if (!updatedUser) {
@@ -104,11 +106,34 @@ const deleteAccountByID = async (req, res) => {
       return res.status(404).json({ message: "Account not found" });
     }
 
-    // 2. Delete the account
-    await Account.deleteOne({ _id: accountId });
-    await Trade.deleteMany({
-      accountId: accountId,
-    });
+    const [accountTags, accountStrategies] = await Promise.all([
+      Tags.find({ userId, accountId }).select("_id"),
+      Strategy.find({ userId, accountId }).select("_id"),
+    ]);
+
+    const tagIds = accountTags.map((tag) => tag._id);
+    const strategyIds = accountStrategies.map((strategy) => strategy._id);
+
+    if (tagIds.length > 0) {
+      await Trade.updateMany(
+        { userId, tags: { $in: tagIds } },
+        { $pull: { tags: { $in: tagIds } } },
+      );
+    }
+
+    if (strategyIds.length > 0) {
+      await Trade.updateMany(
+        { userId, strategy: { $in: strategyIds } },
+        { $unset: { strategy: 1 } },
+      );
+    }
+
+    await Promise.all([
+      Trade.deleteMany({ accountId: accountId }),
+      Tags.deleteMany({ userId, accountId }),
+      Strategy.deleteMany({ userId, accountId }),
+      Account.deleteOne({ _id: accountId }),
+    ]);
 
     // 3. Check if it was the active account
     const user = await User.findById(userId).select("activeAccountId");
@@ -221,7 +246,7 @@ const updateAccount = async (req, res) => {
     const updatedAccount = await Account.findByIdAndUpdate(
       user.activeAccountId,
       { $inc: incObj },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedAccount) {

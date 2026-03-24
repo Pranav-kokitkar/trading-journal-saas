@@ -1,6 +1,17 @@
 // Equity Curve
 export const getEquityCurveData = (trades) => {
-  return trades.map((t) => ({
+  const sortedTrades = [...(trades || [])].sort((a, b) => {
+    const tradeNumberA = Number(a?.tradeNumber);
+    const tradeNumberB = Number(b?.tradeNumber);
+
+    if (Number.isFinite(tradeNumberA) && Number.isFinite(tradeNumberB)) {
+      return tradeNumberA - tradeNumberB;
+    }
+
+    return new Date(a?.dateTime || 0) - new Date(b?.dateTime || 0);
+  });
+
+  return sortedTrades.map((t) => ({
     x: t.tradeNumber,
     y: parseFloat(t.balanceAfterTrade),
   }));

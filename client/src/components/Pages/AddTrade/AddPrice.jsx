@@ -54,7 +54,10 @@ export const AddPrice = ({ trade, handleChange }) => {
           onChange={handleChange}
           required={true}
         />
-        <div className={styles.row} style={{ marginBottom: "1rem" }}>
+        <div
+          className={styles.row}
+          style={{ marginBottom: "1rem", alignItems: "center" }}
+        >
           <label>
             <input
               type="radio"
@@ -62,7 +65,7 @@ export const AddPrice = ({ trade, handleChange }) => {
               value="dollar"
               checked={trade.riskType === "dollar"}
               onChange={handleChange}
-            />{" "}
+            />
             $ Risk
           </label>
           <label style={{ marginLeft: "1rem" }}>
@@ -72,7 +75,7 @@ export const AddPrice = ({ trade, handleChange }) => {
               value="percent"
               checked={trade.riskType === "percent"}
               onChange={handleChange}
-            />{" "}
+            />
             % Risk
           </label>
         </div>

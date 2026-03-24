@@ -75,7 +75,7 @@ export const TradeProvider = ({ children }) => {
         setTrades(data.trades);
         console.log("trades",data.trades)
         setTotalPages(data.pagination.totalPages);
-        setTotalTrades(data.stats.totalTrades);
+        setTotalTrades(data.stats?.totalTrades ?? data.stats?.filteredTrades ?? 0);
       }
     } catch (err) {
       console.error("fetch trades error", err);

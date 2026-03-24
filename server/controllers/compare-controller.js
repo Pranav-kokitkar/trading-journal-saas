@@ -43,7 +43,7 @@ const generateChartData = (trades) => {
   exitedTrades.forEach((trade, index) => {
     const pnl = trade.pnl || 0;
     const rValue = trade.rr || 0;
-    
+
     cumulativePnL += pnl;
     cumulativeR += rValue;
     runningTotalPnL += pnl;
@@ -56,7 +56,8 @@ const generateChartData = (trades) => {
 
     const tradeNumber = index + 1;
     const runningTotalTrades = tradeNumber;
-    const runningExpectancy = runningTotalTrades > 0 ? runningTotalPnL / runningTotalTrades : 0;
+    const runningExpectancy =
+      runningTotalTrades > 0 ? runningTotalPnL / runningTotalTrades : 0;
 
     equityCurve.push({
       tradeNumber,
@@ -117,7 +118,7 @@ const calculateStats = (trades) => {
 
     const rValue = trade.rr || 0;
     const pnlValue = trade.pnl || 0;
-    
+
     totalR += rValue;
     totalPnL += pnlValue;
 
@@ -141,8 +142,9 @@ const calculateStats = (trades) => {
   const avgWinPnL = wins > 0 ? totalWinPnL / wins : 0;
   const avgLoss = losses > 0 ? totalLossR / losses : 0;
   const avgLossPnL = losses > 0 ? totalLossPnL / losses : 0;
-  const riskRewardRatio = avgLoss > 0 ? avgWin / avgLoss : avgWin > 0 ? avgWin : 0;
-  
+  const riskRewardRatio =
+    avgLoss > 0 ? avgWin / avgLoss : avgWin > 0 ? avgWin : 0;
+
   // Profit factor calculation
   let profitFactor = 0;
   if (totalLossR > 0) {

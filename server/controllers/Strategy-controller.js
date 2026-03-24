@@ -1,5 +1,6 @@
 const User = require("../models/user-model");
 const Strategy = require("../models/strategy-model");
+const Trade = require("../models/trade-model");
 
 const createStrategy = async (req, res) => {
   try {
@@ -125,6 +126,16 @@ const deleteStrategy = async (req, res) => {
     if (strategy.accountId.toString() !== user.activeAccountId.toString()) {
       return res.status(403).json({ message: "Unauthorized" });
     }
+
+    await Trade.updateMany(
+      {
+        userId,
+        strategy: id,
+      },
+      {
+        $unset: { strategy: 1 },
+      },
+    );
 
     await Strategy.findByIdAndDelete(id);
 
