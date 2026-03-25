@@ -288,6 +288,30 @@
   cursor: not-allowed;
 }
 
+/* ===== Imported Trades Checkbox ===== */
+.importedTradesLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.importedTradesLabel input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.importedTradesLabel:hover {
+  color: var(--accent);
+}
+
 /* ===== Results Section ===== */
 .resultsSection {
   background: var(--gradient-card);

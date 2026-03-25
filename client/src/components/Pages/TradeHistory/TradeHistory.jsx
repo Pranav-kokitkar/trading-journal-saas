@@ -23,12 +23,15 @@ const defaultFilters = {
   startTradeNumber: "",
   endTradeNumber: "",
   accountId: "", // ✅ ONLY ADDITION
+  includeImported: true,
 };
 
 export const TradeHistory = () => {
   const {
     trades = [],
     refreshTrades,
+    includeImportedTrades,
+    setIncludeImportedTrades,
     page,
     setPage,
     totalPages,
@@ -63,7 +66,17 @@ export const TradeHistory = () => {
 
   const handleClearFilters = () => {
     setPage(1);
-    setFilters(defaultFilters);
+    setFilters({
+      ...defaultFilters,
+      includeImported: includeImportedTrades,
+    });
+  };
+
+  const handleIncludeImportedToggle = (e) => {
+    const checked = e.target.checked;
+    setIncludeImportedTrades(checked);
+    setPage(1);
+    setFilters((prev) => ({ ...prev, includeImported: checked }));
   };
 
   const handleDateInputOpen = (e) => {
@@ -106,6 +119,10 @@ export const TradeHistory = () => {
 
     fetchFilterData();
   }, [authorizationToken]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, includeImported: includeImportedTrades }));
+  }, [includeImportedTrades]);
 
   useEffect(() => {
     refreshTrades(filters);
@@ -329,6 +346,14 @@ export const TradeHistory = () => {
 
           <div className={styles.filter3}>
             <p>Showing {totalTrades} trades</p>
+            <label>
+              <input
+                type="checkbox"
+                checked={filters.includeImported}
+                onChange={handleIncludeImportedToggle}
+              />{" "}
+              Include Imported Trades
+            </label>
             <button type="button" onClick={handleClearFilters}>
               Clear Filters
             </button>

@@ -2,6 +2,17 @@ const Trade = require("../models/trade-model");
 const Account = require("../models/account-model");
 const mongoose = require("mongoose");
 
+const parseIncludeImported = (value, defaultValue = true) => {
+  if (value === undefined || value === null || value === "")
+    return defaultValue;
+  if (typeof value === "boolean") return value;
+
+  const normalized = String(value).trim().toLowerCase();
+  if (["false", "0", "no", "off"].includes(normalized)) return false;
+  if (["true", "1", "yes", "on"].includes(normalized)) return true;
+  return defaultValue;
+};
+
 // Allowed dimension keys for validation
 const ALLOWED_DIMENSIONS = [
   "accountId",
@@ -219,6 +230,10 @@ const buildQueryCondition = (key, value) => {
 const Compare = async (req, res) => {
   try {
     const { dimensions } = req.body;
+    const shouldIncludeImported = parseIncludeImported(
+      req.body?.includeImported,
+      true,
+    );
 
     // Validate user is authenticated
     const userId = req.userID || req.user?._id || req.user?.id;
@@ -287,6 +302,11 @@ const Compare = async (req, res) => {
     // Build query objects for datasets A and B
     const queryA = { userId };
     const queryB = { userId };
+
+    if (!shouldIncludeImported) {
+      queryA.isImported = false;
+      queryB.isImported = false;
+    }
 
     // Track account IDs for metadata
     let accountAId = null;

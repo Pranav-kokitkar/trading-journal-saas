@@ -3,6 +3,17 @@ const Trade = require("../models/trade-model");
 const cloudinary = require("../config/cloudinary");
 const { getMaxScreenshots } = require("../config/planLimits");
 
+const parseIncludeImported = (value, defaultValue = true) => {
+  if (value === undefined || value === null || value === "")
+    return defaultValue;
+  if (typeof value === "boolean") return value;
+
+  const normalized = String(value).trim().toLowerCase();
+  if (["false", "0", "no", "off"].includes(normalized)) return false;
+  if (["true", "1", "yes", "on"].includes(normalized)) return true;
+  return defaultValue;
+};
+
 const AddTrade = async (req, res) => {
   try {
     const userId = req.userID || (req.user && req.user._id);
@@ -214,6 +225,7 @@ const getAllTrades = async (req, res) => {
       accountId,
       strategy,
       tag,
+      includeImported,
     } = req.query;
 
     const skip = (Number(page) - 1) * Number(limit);
@@ -275,6 +287,11 @@ const getAllTrades = async (req, res) => {
       query.tradeNumber = {};
       if (startTradeNumber) query.tradeNumber.$gte = Number(startTradeNumber);
       if (endTradeNumber) query.tradeNumber.$lte = Number(endTradeNumber);
+    }
+
+    const shouldIncludeImported = parseIncludeImported(includeImported, true);
+    if (!shouldIncludeImported) {
+      query.isImported = false;
     }
 
     /** ---------------- QUERY DB ---------------- */

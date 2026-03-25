@@ -11,6 +11,7 @@ export const Login = () => {
     email: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
   const { storeTokenInLS } = useAuth();
   const { isLoggedIn } = useAuth();
@@ -30,6 +31,11 @@ export const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
@@ -60,6 +66,9 @@ export const Login = () => {
       }
     } catch (error) {
       console.log("error while login", error);
+      toast.error("An error occurred during login. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -115,8 +124,12 @@ export const Login = () => {
                 />
               </div>
 
-              <button className={styles.btn} type="submit">
-                Login
+              <button 
+                className={styles.btn} 
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? "Logging in..." : "Login"}
               </button>
 
               <div className={styles.row}>

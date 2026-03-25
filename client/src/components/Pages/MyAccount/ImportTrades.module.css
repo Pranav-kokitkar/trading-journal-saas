@@ -1,0 +1,146 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--gradient-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.header button {
+  border: 1px solid var(--border-medium);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+}
+
+.helpText {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
+}
+
+.warning {
+  font-size: 0.8rem;
+  color: var(--warning);
+  margin-bottom: 1rem;
+}
+
+.block {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.block h4 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.block input,
+.block textarea {
+  width: 100%;
+  border: 1px solid var(--border-medium);
+  background: var(--bg-tertiary);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.8rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.block textarea {
+  resize: vertical;
+  min-height: 130px;
+}
+
+.block button {
+  align-self: flex-start;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--bg-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.block button:disabled,
+.header button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error {
+  color: var(--error);
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+}
+
+.result {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.8rem;
+  margin-top: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.success {
+  color: var(--success);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.failedRows {
+  margin-top: 0.75rem;
+}
+
+.failedRows h4 {
+  margin: 0 0 0.4rem;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.failedRows ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+.failedRows li {
+  color: var(--muted);
+  margin-bottom: 0.25rem;
+}

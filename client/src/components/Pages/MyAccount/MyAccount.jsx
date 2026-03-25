@@ -8,15 +8,17 @@ import { SelectAccount } from "./SelectAccount";
 import { CreateAccModal } from "../../modals/CreateAccModal/CreateAccModal";
 import { exportTrades } from "../../../services/exportService";
 import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
+import { ImportTrades } from "./ImportTrades";
 
 export const MyAccount = () => {
   const { getUser } = useContext(UserContext);
   const [darkTheme, setDarkTheme] = useState(true);
-  const { logoutUser } = useAuth();
+  const { logoutUser, authorizationToken } = useAuth();
   const { accounts, accountDetails } =
     useContext(AccountContext);
   const [IsCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const [tempCapital, setTempCapital] = useState("");
 
@@ -107,17 +109,30 @@ export const MyAccount = () => {
           </div>
         </div>
 
-        {/* Export Data */}
-        <div className={styles.sectionbox}>
-          <h3>Export Trading Data</h3>
-          <p>
-            Download your complete trading journal with all trades and account
-            information.
-          </p>
-          <div className={styles.btngroup}>
-            <button onClick={() => handleExport("csv")}>Export as CSV</button>
+        {/* Export & Import Data */}
+        <div className={styles.actionRow}>
+          <div className={styles.sectionbox}>
+            <h3>Export Trading Data</h3>
+            <p>
+              Download your complete trading journal with all trades and account
+              information.
+            </p>
+            <div className={styles.btngroup}>
+              <button onClick={() => handleExport("csv")}>Export as CSV</button>
+              <button onClick={() => handleExport("json")}>Export as JSON</button>
+            </div>
+          </div>
 
-            <button onClick={() => handleExport("json")}>Export as JSON</button>
+          <div className={styles.sectionbox}>
+            <h3>Import Trading Data</h3>
+            <p>
+              Upload CSV or JSON trades to add them to your selected account.
+            </p>
+            <div className={styles.btngroup}>
+              <button onClick={() => setIsImportModalOpen(true)}>
+                Import Trades
+              </button>
+            </div>
           </div>
         </div>
 
@@ -178,6 +193,13 @@ export const MyAccount = () => {
               onCancel={() => setIsLogoutModalOpen(false)}
               onConfirm={confirmLogout}
             />
+
+      <ImportTrades
+        isOpen={isImportModalOpen}
+        onClose={() => setIsImportModalOpen(false)}
+        accountId={accountDetails?._id}
+        authorizationToken={authorizationToken}
+      />
     </section>
   );
 };

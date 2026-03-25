@@ -30,6 +30,7 @@ const tradeSchema = new mongoose.Schema({
   tradeResult: { type: String, default: "" },
   riskAmount: { type: Number, default: 0 },
   riskPercent: { type: Number, default: 0 },
+  isImported: { type: Boolean, default: false },
   balanceAfterTrade: { type: Number, default: 0 },
   tradeNumber: { type: Number, default: 0 },
 
@@ -58,6 +59,7 @@ tradeSchema.index({ userId: 1, tradeStatus: 1 }); // Filter by status
 tradeSchema.index({ userId: 1, symbol: 1 }); // Search by symbol
 tradeSchema.index({ userId: 1, tradeResult: 1 }); // Filter by result
 tradeSchema.index({ dateTime: -1 }); // Sorting
+tradeSchema.index({ userId: 1, accountId: 1, isImported: 1, dateTime: -1 });
 
 const Trade = new mongoose.model("Trade", tradeSchema);
 

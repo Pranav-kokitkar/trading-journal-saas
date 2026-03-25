@@ -49,9 +49,13 @@ export const AccountProvider = ({ children }) => {
       if (response.ok) {
         setAccountDetails(res_data);
       } else {
-        toast.error("failed to get account details");
+        setAccountDetails(null);
+        if (response.status !== 404) {
+          toast.error(res_data?.message || "failed to get account details");
+        }
       }
     } catch (error) {
+      setAccountDetails(null);
       toast.error("error to fetch account details");
     }
   };

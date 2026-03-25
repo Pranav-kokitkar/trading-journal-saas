@@ -12,6 +12,7 @@ export const Register = () => {
     email: "",
     password: "",
   });
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const confirmPasswordRef = useRef();
   const { storeTokenInLS } = useAuth();
@@ -31,12 +32,18 @@ export const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (isLoading) return;
+    
     const confirmPass = confirmPasswordRef.current.value;
 
     if (user.password !== confirmPass) {
       toast.error("Passwords do not match");
       return;
     }
+    
+    setIsLoading(true);
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/auth/register`,
@@ -69,6 +76,8 @@ export const Register = () => {
     } catch (error) {
       console.log("error while register", error);
       toast.error("Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -151,8 +160,12 @@ export const Register = () => {
                 />
               </div>
 
-              <button className={styles.btn} type="submit">
-                Create Account
+              <button 
+                className={styles.btn} 
+                type="submit"
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating Account..." : "Create Account"}
               </button>
 
               <div className={styles.row}>

@@ -116,16 +116,18 @@ const DirectionChart = ({ trades }) => {
               contentStyle={{
                 backgroundColor: "#0f172a",
                 border: "1px solid rgba(255,255,255,0.08)",
-                color: "#fff",
+                borderRadius: "4px",
+                padding: "8px 12px",
               }}
-              formatter={(value, name, props) => {
-                // value is numeric percent, show with % in tooltip
-                return [`${value}%`, "Success Rate"];
-              }}
+              formatter={(value) => [`${value}%`, "Win Rate"]}
               labelFormatter={(label, payload) => {
-                const total = payload?.payload?.total ?? 0;
-                return `Direction: ${label} (Total: ${total})`;
+                if (!payload || !payload[0]) return label;
+                const total = payload[0].payload?.total ?? 0;
+                const directionLabel = label === "Long" ? "Long" : "Short";
+                return `${directionLabel} (Total: ${total})`;
               }}
+              wrapperStyle={{ color: "#fff" }}
+              labelStyle={{ color: "#fff" }}
             />
             <Bar dataKey="successRate" radius={[6, 6, 0, 0]}>
               {data.map((entry, index) => (
@@ -143,10 +145,10 @@ const DirectionChart = ({ trades }) => {
 
       <div className={styles.quickdata}>
         <p>
-          L - Win Rate: {longTotal ? Number(longSuccessRate.toFixed(1)) : 0}%
+          Long Win Rate: {longTotal ? Number(longSuccessRate.toFixed(1)) : 0}%
         </p>
         <p>
-          S - Win Rate: {shortTotal ? Number(shortSuccessRate.toFixed(1)) : 0}%
+          Short Win Rate: {shortTotal ? Number(shortSuccessRate.toFixed(1)) : 0}%
         </p>
       </div>
     </div>

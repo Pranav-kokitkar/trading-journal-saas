@@ -21,6 +21,7 @@ export const TradeProvider = ({ children }) => {
   const [totalTrades, setTotalTrades] = useState(0);
   const [loading, setLoading] = useState(true);
   const [accountTrades, setAccountTrades] = useState([]);
+  const [includeImportedTrades, setIncludeImportedTrades] = useState(true);
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
@@ -50,16 +51,39 @@ export const TradeProvider = ({ children }) => {
 
   const { authorizationToken, isLoggedIn } = useAuth();
 
+  const parseIncludeImported = (value, defaultValue = true) => {
+    if (value === undefined || value === null || value === "") return defaultValue;
+    if (typeof value === "boolean") return value;
+
+    const normalized = String(value).trim().toLowerCase();
+    if (["false", "0", "no", "off"].includes(normalized)) return false;
+    if (["true", "1", "yes", "on"].includes(normalized)) return true;
+    return defaultValue;
+  };
+
   async function getAllTrades(filters = {}) {
     if (!isLoggedIn || !authorizationToken) return;
 
     try {
       setLoading(true);
 
+      // If filters override page/limit, use those; otherwise use state
+      const queryPage = filters.page !== undefined ? filters.page : page;
+      const queryLimit = filters.limit !== undefined ? filters.limit : limit;
+      const shouldIncludeImported = parseIncludeImported(
+        filters.includeImported,
+        includeImportedTrades,
+      );
+
       const params = new URLSearchParams({
-        page,
-        limit,
-        ...filters,
+        page: queryPage,
+        limit: queryLimit,
+        includeImported: shouldIncludeImported ? "true" : "false",
+        ...Object.fromEntries(
+          Object.entries(filters).filter(
+            ([k]) => k !== "page" && k !== "limit" && k !== "includeImported",
+          ),
+        ),
       }).toString();
 
       const response = await fetch(
@@ -81,6 +105,60 @@ export const TradeProvider = ({ children }) => {
       console.error("fetch trades error", err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function getAllAccountTrades(targetAccountId = accountDetails?._id, options = {}) {
+    if (!isLoggedIn || !authorizationToken) return;
+
+    if (!targetAccountId) {
+      setAccountTrades([]);
+      return;
+    }
+
+    try {
+      const shouldIncludeImported = parseIncludeImported(
+        options.includeImported,
+        includeImportedTrades,
+      );
+
+      const allTrades = [];
+      const pageLimit = 50;
+      let currentPage = 1;
+      let totalPagesToFetch = 1;
+
+      do {
+        const params = new URLSearchParams({
+          page: currentPage,
+          limit: pageLimit,
+          accountId: targetAccountId,
+          includeImported: shouldIncludeImported ? "true" : "false",
+        }).toString();
+
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/trades?${params}`,
+          {
+            headers: { Authorization: authorizationToken },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data?.message || "Failed to fetch account trades");
+        }
+
+        const pageTrades = Array.isArray(data?.trades) ? data.trades : [];
+        allTrades.push(...pageTrades);
+
+        totalPagesToFetch = Number(data?.pagination?.totalPages || 1);
+        currentPage += 1;
+      } while (currentPage <= totalPagesToFetch);
+
+      setAccountTrades(allTrades);
+    } catch (err) {
+      console.error("fetch account trades error", err);
+      setAccountTrades([]);
     }
   }
 
@@ -135,6 +213,9 @@ export const TradeProvider = ({ children }) => {
       if (response.ok) {
         toast.success("Trade added succesfully");
         await getAllTrades();
+        await getAllAccountTrades(
+          normalizedTrade?.accountId || accountDetails?._id,
+        );
 
         // Update account details after successful add
         try {
@@ -220,6 +301,7 @@ export const TradeProvider = ({ children }) => {
 
       console.log("closeTradeByID response:", response.status, data);
       await getAllTrades();
+      await getAllAccountTrades(accountDetails?._id);
 
       if (response.ok) {
         toast.success("Trade closed sucessfully");
@@ -269,6 +351,7 @@ export const TradeProvider = ({ children }) => {
             const pnlToAdjust = -parseFloat(pnl || 0) || 0;
             await updateAccount({ pnl: pnlToAdjust, deltaTrades: -1 });
             await getAllTrades();
+            await getAllAccountTrades(accountDetails?._id);
           }
         } catch (err) {
           console.error("updateAccount failed on delete", err);
@@ -285,28 +368,18 @@ export const TradeProvider = ({ children }) => {
     if (isLoggedIn && authorizationToken) {
       getAllTrades();
     }
-  }, [isLoggedIn, authorizationToken]);
+  }, [isLoggedIn, authorizationToken, includeImportedTrades]);
   
   useEffect(() => {
-    if (!accountDetails?._id) {
+    if (!isLoggedIn || !authorizationToken) {
       setAccountTrades([]);
       return;
     }
 
-    const filtered = trades.filter((t) => {
-      if (!t.accountId) return false;
-
-      const tradeAccountId =
-        typeof t.accountId === "object" && t.accountId !== null
-          ? t.accountId._id
-          : t.accountId;
-
-      return String(tradeAccountId) === String(accountDetails._id);
+    getAllAccountTrades(accountDetails?._id, {
+      includeImported: includeImportedTrades,
     });
-
-
-    setAccountTrades(filtered);
-  }, [trades, accountDetails]);
+  }, [isLoggedIn, authorizationToken, accountDetails?._id, includeImportedTrades]);
 
   return (
     <TradeContext.Provider
@@ -316,9 +389,12 @@ export const TradeProvider = ({ children }) => {
         trade,
         setTrade,
         refreshTrades: getAllTrades,
+        refreshAllAccountTrades: getAllAccountTrades,
         closeTradeByID,
         deleteTradeByID,
         accountTrades,
+        includeImportedTrades,
+        setIncludeImportedTrades,
         page,
         setPage,
         loading,

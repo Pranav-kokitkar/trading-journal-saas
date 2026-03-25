@@ -76,7 +76,7 @@ app.use(limiter);
 // Stricter rate limit for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20, // 20 login/register attempts per 15 minutes (increased for development)
+  max: 50, // 50 login/register attempts per 15 minutes (allows reasonable user interactions)
   handler: (req, res) => {
     res.status(429).json({
       message: "Too many authentication attempts, please try again later",

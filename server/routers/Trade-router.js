@@ -12,7 +12,14 @@ const {
   updateTradeScreenshots,
   deleteTradeScreenshot,
 } = require("../controllers/trade-controller");
+const {
+  importTradesController,
+} = require("../controllers/import-trades-controller");
 const router = express.Router();
+
+router
+  .route("/import")
+  .post(authMiddleware, upload.single("file"), importTradesController);
 
 router
   .route("/")
