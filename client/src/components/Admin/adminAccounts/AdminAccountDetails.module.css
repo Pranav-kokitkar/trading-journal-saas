@@ -1,7 +1,7 @@
 .page {
   padding: 1.5rem;
   min-height: 100vh;
-  color: #eaeaea;
+  color: var(--text-primary);
 }
 
 /* Header */
@@ -21,7 +21,7 @@
 .accountName {
   font-size: 1.35rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 /* Status */
@@ -34,18 +34,18 @@
 }
 
 .active {
-  background-color: rgba(246, 185, 59, 0.15);
+  background-color: var(--accent-subtle);
   color: var(--accent);
 }
 
 .archived {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--bg-hover);
   color: var(--muted);
 }
 
 .disabled {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background-color: var(--color-loss-subtle);
+  color: var(--color-loss);
 }
 
 /* Summary */
@@ -57,10 +57,10 @@
 }
 
 .summaryCard {
-  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  background: linear-gradient(180deg, var(--bg-level-1), var(--bg-level-0));
   border-radius: 12px;
   padding: 1rem;
-  border: 1px solid rgba(246, 185, 59, 0.15);
+  border: 1px solid var(--accent-subtle);
 }
 
 .summaryCard span {
@@ -78,17 +78,17 @@
 /* Sections */
 .tradesSection,
 .performanceSection {
-  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  background: linear-gradient(180deg, var(--bg-level-1), var(--bg-level-0));
   border-radius: 14px;
   padding: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--bg-level-3);
   margin-bottom: 2.5rem;
 }
 
 .sectionTitle {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
   margin-bottom: 0.75rem;
 }
 
@@ -106,10 +106,10 @@
 
 /* Trade card */
 .tradeCard {
-  background: #0f1a2f;
+  background: var(--bg-level-1);
   border-radius: 12px;
   padding: 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--border-strong);
   transition: all 0.25s ease;
 }
 
@@ -129,7 +129,7 @@
 .symbol {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .direction {
@@ -148,16 +148,16 @@
 
 .win {
   background-color: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
+  color: var(--color-profit);
 }
 
 .loss {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  background-color: var(--color-loss-subtle);
+  color: var(--color-loss);
 }
 
 .be {
-  background-color: rgba(246, 185, 59, 0.15);
+  background-color: var(--accent-subtle);
   color: var(--accent);
 }
 
@@ -185,16 +185,16 @@
 
 .metrics strong {
   font-size: 0.8rem;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 /* PnL */
 .pnlPositive {
-  color: #22c55e;
+  color: var(--color-profit);
 }
 
 .pnlNegative {
-  color: #ef4444;
+  color: var(--color-loss);
 }
 
 /* Footer */
@@ -209,7 +209,7 @@
 /* Buttons */
 .backBtn {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid var(--border-strong);
   color: var(--muted);
   padding: 0.4rem 0.75rem;
   border-radius: 8px;
@@ -218,14 +218,14 @@
 }
 
 .backBtn:hover {
-  color: #ffffff;
+  color: var(--text-primary);
   border-color: var(--accent);
 }
 
 .editBtn {
   background-color: var(--accent);
   border: none;
-  color: #111827;
+  color: var(--text-inverse);
   padding: 0.45rem 1rem;
   border-radius: 8px;
   font-size: 0.75rem;
@@ -253,3 +253,5 @@
     grid-template-columns: 1fr;
   }
 }
+
+

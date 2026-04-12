@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
-import { toast } from "react-toastify";
+import { toastHelper } from "../../../utils/toastHelper";
 import { TradeContext } from "../../../store/TradeContext";
 import { AccountContext } from "../../../context/AccountContext";
 
@@ -39,7 +39,7 @@ export const Register = () => {
     const confirmPass = confirmPasswordRef.current.value;
 
     if (user.password !== confirmPass) {
-      toast.error("Passwords do not match");
+      toastHelper.error("Passwords do not match");
       return;
     }
     
@@ -61,7 +61,7 @@ export const Register = () => {
         storeTokenInLS(res_data.token);
         refreshTrades();
         getAllAccounts();
-        toast.success("Registration successful");
+        toastHelper.success("Registration successful");
         setUser({
           name: "",
           email: "",
@@ -69,13 +69,13 @@ export const Register = () => {
         });
         navigate("/app/dashboard");
       } else {
-        toast.error(
+        toastHelper.error(
           res_data.extraDetails ? res_data.extraDetails : res_data.message
         );
       }
     } catch (error) {
       console.log("error while register", error);
-      toast.error("Registration failed. Please try again.");
+      toastHelper.error("Registration failed. Please try again");
     } finally {
       setIsLoading(false);
     }

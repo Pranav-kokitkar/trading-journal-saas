@@ -2,8 +2,11 @@ import React from "react";
 import styles from "./UpgradeProModal.module.css";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useBodyScrollLock } from "../../../hooks/useBodyScrollLock";
 
 export const UpgradeProModal = ({onClose }) => {
+  useBodyScrollLock(true);
+
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === "Escape") {

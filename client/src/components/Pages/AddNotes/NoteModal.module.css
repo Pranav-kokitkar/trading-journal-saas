@@ -20,13 +20,13 @@
 
 /* ===== Modal Content Box ===== */
 .modalContent {
-  background: var(--gradient-card);
+  background: var(--surface-card-strong);
   width: 560px;
   max-width: 92%;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: 1.5rem;
-  border: 1px solid var(--border-light);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-elevated);
   animation: slideUp 0.25s ease-out;
   display: flex;
   flex-direction: column;
@@ -51,10 +51,10 @@
 
 .editTitleInput {
   flex: 1;
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-sm);
+  padding: 0 0.75rem;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
   font-size: 1rem;
   font-weight: 600;
@@ -65,14 +65,14 @@
 .editTitleInput:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 .modalCloseButton {
   background: transparent;
   border: none;
   font-size: 1.5rem;
-  color: var(--muted);
+  color: var(--text-muted);
   cursor: pointer;
   padding: 0.25rem;
   width: 32px;
@@ -80,7 +80,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
   flex-shrink: 0;
   margin-left: 1rem;
@@ -88,7 +88,7 @@
 
 .modalCloseButton:hover {
   color: var(--error);
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--color-loss-subtle);
 }
 
 /* ===== Body Section ===== */
@@ -109,10 +109,10 @@
   width: 100%;
   min-height: 180px;
   padding: 0.75rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--bg-tertiary);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
   font-size: 0.85rem;
   font-family: inherit;
   resize: vertical;
@@ -122,7 +122,7 @@
 .editTextArea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 /* ===== Scrollbar ===== */
@@ -158,9 +158,10 @@
 .deleteButton,
 .saveButton,
 .cancelButton {
-  padding: 0.6rem 1.25rem;
+  padding: 0 1.25rem;
+  height: 42px;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -169,14 +170,14 @@
 
 /* Edit Button */
 .editButton {
-  background: var(--accent);
-  color: var(--bg-primary);
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  box-shadow: var(--btn-primary-shadow);
 }
 
 .editButton:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  background: var(--btn-primary-bg-hover);
+  box-shadow: 0 18px 34px rgba(110, 124, 255, 0.3);
   transform: translateY(-2px);
 }
 
@@ -188,34 +189,34 @@
 }
 
 .deleteButton:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--color-loss-subtle);
   border-color: var(--error);
 }
 
 /* Save Button */
 .saveButton {
-  background: var(--success);
-  color: white;
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+  background: rgba(61, 214, 166, 0.16);
+  color: var(--color-profit);
+  box-shadow: 0 14px 24px rgba(61, 214, 166, 0.14);
 }
 
 .saveButton:hover {
-  background: #1ea34d;
-  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+  background: rgba(61, 214, 166, 0.24);
+  box-shadow: 0 18px 30px rgba(61, 214, 166, 0.2);
   transform: translateY(-2px);
 }
 
 /* Cancel Button */
 .cancelButton {
   background: transparent;
-  color: var(--muted);
+  color: var(--text-secondary);
   border: 1px solid var(--border-medium);
 }
 
 .cancelButton:hover {
   color: var(--text-primary);
   border-color: var(--border-light);
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 /* ===== Animations ===== */

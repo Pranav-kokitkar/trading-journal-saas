@@ -4,8 +4,11 @@ import styles from "./CreateAccModal.module.css";
 import { useAuth } from "../../../store/Auth";
 import { UserContext } from "../../../context/UserContext";
 import { AccountContext } from "../../../context/AccountContext";
+import { useBodyScrollLock } from "../../../hooks/useBodyScrollLock";
 
 export const CreateAccModal = ({onClose}) => {
+  useBodyScrollLock(true);
+
   const { authorizationToken } = useAuth();
   const { userDetails, setUserDetails } = useContext(UserContext);
 

@@ -376,6 +376,7 @@ const normalizeTrade = (row, defaultMarketType = DEFAULT_MARKET_TYPE) => {
   const strategyName = normalizeName(
     getFirstValue(row, ["strategy", "setup", "statergy"]),
   );
+  const sessionName = normalizeName(getFirstValue(row, ["session", "sess"]));
 
   const exitedPrice = deriveExitedPrice({
     row,
@@ -409,6 +410,7 @@ const normalizeTrade = (row, defaultMarketType = DEFAULT_MARKET_TYPE) => {
       dateTime: dateResult.value,
       tagNames,
       strategyName,
+      sessionName,
       tradeNotes: String(
         getFirstValue(row, ["tradeNotes", "notes", "note"]) || "",
       ).trim(),

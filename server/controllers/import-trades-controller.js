@@ -232,6 +232,7 @@ const importTradesController = async (req, res) => {
             dateTime: normalized.dateTime,
             tags: tagIds,
             strategy: strategyId,
+            session: normalized.sessionName || "",
             tradeStatus: normalized.tradeStatus,
             tradeResult: normalized.tradeResult,
             isImported: true,

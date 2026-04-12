@@ -19,7 +19,7 @@
   max-width: 420px;
   border-radius: var(--radius);
   padding: 20px;
-  border: 1px solid rgba(246, 185, 59, 0.25);
+  border: 1px solid var(--accent-subtle);
 }
 
 /* ---------- HEADER ---------- */
@@ -34,7 +34,7 @@
 .title {
   font-size: 18px;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -54,11 +54,11 @@
 
 .input,
 .select {
-  background-color: #0f1724;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: var(--bg-level-1);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 10px 12px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 14px;
   outline: none;
 }
@@ -79,7 +79,7 @@
 
 .cancelBtn {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--border-strong);
   color: var(--muted);
   padding: 8px 14px;
   border-radius: 8px;
@@ -87,14 +87,14 @@
 }
 
 .cancelBtn:hover {
-  color: #ffffff;
+  color: var(--text-primary);
   border-color: rgba(255, 255, 255, 0.3);
 }
 
 .saveBtn {
   background-color: var(--accent);
   border: none;
-  color: #111827;
+  color: var(--text-inverse);
   padding: 8px 16px;
   border-radius: 8px;
   font-weight: 600;
@@ -104,3 +104,5 @@
 .saveBtn:hover {
   background-color: var(--accent2);
 }
+
+

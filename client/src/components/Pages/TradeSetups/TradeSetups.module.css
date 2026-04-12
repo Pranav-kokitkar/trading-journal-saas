@@ -25,7 +25,7 @@
 }
 
 .pageTitle span {
-  background: linear-gradient(90deg, var(--accent), #f5a623);
+  background: linear-gradient(90deg, var(--accent), var(--accent-dim));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -57,7 +57,7 @@
 
 .tabButton:hover {
   color: var(--text-secondary);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-level-1);
 }
 
 .tabButton.active {
@@ -113,3 +113,5 @@
     font-size: 0.8rem;
   }
 }
+
+

@@ -12,8 +12,18 @@ import {
 } from "recharts";
 import { PerformanceContext } from "../../../context/PerformanceContext";
 
+const chartVar = (name, fallback) => {
+  if (typeof window === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value || fallback;
+};
+
 const RiskChart = ({ trades }) => {
   const { performance } = useContext(PerformanceContext);
+  const accentColor = chartVar("--accent-primary", "var(--accent-primary)");
+  const neutralColor = chartVar("--color-neutral", "var(--color-neutral)");
 
   const data = trades.map((trade, index) => ({
     tradeNumber: index + 1,
@@ -36,7 +46,7 @@ const RiskChart = ({ trades }) => {
             data={data}
             margin={{ top: 20, right: 20, left: 20, bottom: 10 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartVar("--chart-grid", "var(--chart-grid)")} />
             <XAxis
               dataKey="tradeNumber"
               label={{ value: "Trade #", position: "insideBottom", offset: -5 }}
@@ -49,6 +59,11 @@ const RiskChart = ({ trades }) => {
               domain={["auto", "auto"]}
             />
             <Tooltip
+              contentStyle={{
+                backgroundColor: chartVar("--chart-tooltip-bg", "var(--chart-tooltip-bg)"),
+                border: `1px solid ${chartVar("--chart-tooltip-border", "var(--chart-tooltip-border)")}`,
+                borderRadius: "12px",
+              }}
               formatter={(value, name) =>
                 name === "riskPercent"
                   ? [`${value}%`, "Risk (%)"]
@@ -60,7 +75,7 @@ const RiskChart = ({ trades }) => {
             <Line
               type="monotone"
               dataKey="riskAmount"
-              stroke="#ff9800"
+              stroke={neutralColor}
               strokeWidth={2}
               dot={showDots}
               activeDot={{ r: 6 }}
@@ -69,7 +84,7 @@ const RiskChart = ({ trades }) => {
             <Line
               type="monotone"
               dataKey="riskPercent"
-              stroke="#2196f3"
+              stroke={accentColor}
               strokeWidth={2}
               dot={showDots}
               activeDot={{ r: 6 }}

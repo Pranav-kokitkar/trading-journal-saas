@@ -5,14 +5,15 @@
 /* ===== Page Container ===== */
 .container {
   min-height: 100vh;
-  padding: 1.5rem;
+  padding: clamp(20px, 2vw, 32px);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .containerbg {
-  background: linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
+  background:
+    var(--bg-app-vignette), linear-gradient(180deg, #070b12 0%, #0a101a 100%);
 }
 
 /* ===== Hero / Content Section ===== */
@@ -22,30 +23,36 @@
   max-width: 980px;
 }
 
+.hero > h2,
+.hero > p {
+  margin-inline: auto;
+}
+
 /* ===== Title ===== */
 .title {
-  font-size: 2.5rem;
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: 1rem;
   color: var(--text-primary);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.04em;
 }
 
 .title span {
-  background: linear-gradient(90deg, var(--accent), #f5a623);
+  background: linear-gradient(90deg, var(--accent), var(--accent-dim));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .subtitle {
-  font-size: 0.95rem;
-  color: var(--muted);
+  font-size: 0.98rem;
+  color: var(--text-secondary);
   margin-bottom: 2rem;
   max-width: 720px;
   margin-inline: auto;
   line-height: 1.6;
+  text-align: center;
 }
 
 /* ===== Form Container ===== */
@@ -54,11 +61,11 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  background: var(--gradient-card);
+  background: var(--surface-card-strong);
   padding: 1.5rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-elevated);
   text-align: left;
 }
 
@@ -77,7 +84,7 @@
   gap: 0.4rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   min-width: 200px;
@@ -86,11 +93,11 @@
 /* ===== Inputs & Textarea ===== */
 .input,
 .textarea {
-  padding: 0.65rem 0.9rem;
-  border-radius: var(--radius-sm);
+  padding: 0 0.95rem;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--bg-tertiary);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
   font-size: 0.85rem;
   font-family: inherit;
   transition: all 0.2s ease;
@@ -98,20 +105,20 @@
 
 .input::placeholder,
 .textarea::placeholder {
-  color: var(--muted);
-  opacity: 0.5;
+  color: var(--text-muted);
+  opacity: 0.72;
 }
 
 .input:focus,
 .textarea:focus {
   outline: none;
   border-color: var(--accent);
-  background: var(--bg-secondary);
-  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 .input:read-only {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-level-1);
   cursor: not-allowed;
   opacity: 0.7;
 }
@@ -131,7 +138,7 @@
   letter-spacing: 0;
   margin-top: 0.25rem;
   padding: 0.4rem 0.6rem;
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--color-loss-subtle);
   border-radius: var(--radius-sm);
   border-left: 3px solid var(--error);
 }
@@ -156,10 +163,11 @@
 }
 
 .uploadBtn {
-  background: var(--bg-tertiary);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-medium);
-  padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-sm);
+  padding: 0 1.25rem;
+  height: 42px;
+  border-radius: var(--radius-pill);
   color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 600;
@@ -173,15 +181,16 @@
 .uploadBtn:hover {
   border-color: var(--accent);
   color: var(--accent);
-  background: rgba(246, 185, 59, 0.05);
+  background: var(--accent-subtle);
 }
 
 .removeBtn {
   background: transparent;
   border: 1px solid var(--border-medium);
-  color: var(--muted);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  padding: 0 1rem;
+  height: 40px;
+  border-radius: var(--radius-pill);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -191,7 +200,7 @@
 .removeBtn:hover {
   border-color: var(--error);
   color: var(--error);
-  background: rgba(239, 68, 68, 0.05);
+  background: var(--color-loss-subtle);
 }
 
 .hint {
@@ -200,7 +209,7 @@
 }
 
 .muted {
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.75rem;
   line-height: 1.4;
 }
@@ -215,21 +224,22 @@
 }
 
 .primaryBtn {
-  padding: 0.75rem 2rem;
-  background: var(--accent);
-  color: var(--bg-primary);
-  border-radius: var(--radius-sm);
+  padding: 0 2rem;
+  height: 46px;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border-radius: var(--radius-pill);
   border: none;
   font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  box-shadow: var(--btn-primary-shadow);
 }
 
 .primaryBtn:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  background: var(--btn-primary-bg-hover);
+  box-shadow: 0 18px 34px rgba(110, 124, 255, 0.3);
   transform: translateY(-2px);
 }
 
@@ -238,7 +248,7 @@
   margin-top: auto;
   text-align: center;
   font-size: 0.8rem;
-  color: var(--muted);
+  color: var(--text-muted);
   padding: 1.5rem 0;
 }
 

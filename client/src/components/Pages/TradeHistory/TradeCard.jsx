@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styles from "./TradeHistory.module.css";
+import styles from "../../../styles/tradehistory.module.css";
 import { NavLink } from "react-router-dom";
 
 export const TradeCard = ({ savedTrade }) => {
@@ -18,7 +18,7 @@ export const TradeCard = ({ savedTrade }) => {
         const date =
           tradeData.dateNtime ?? tradeData.dateTime ?? tradeData.date ?? "";
         return (
-          <NavLink key={id} to={`/app/trade/${id}`}>
+          <NavLink key={id} to={`/app/trade/${id}`} className={styles.tradeLink}>
             <div className={styles.tradecard}>
               <div className={styles.logo}>📈</div>
 

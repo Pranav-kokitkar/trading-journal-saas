@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Sidebar } from "./SideBar";
 import styles from "./Layout.module.css";
 import { UpgradeProModal } from "../modals/UpgradeProModal/UpgradeProModal";
@@ -13,6 +13,7 @@ export const Layout = () => {
 
   const { isPro, isAuthLoading, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleCloseUpgrade = () => {
     localStorage.setItem("hasSeenUpgradeModal", "true");
@@ -20,6 +21,11 @@ export const Layout = () => {
   };
 
   const closeSidebar = () => setIsOpen(false);
+
+  // Close sidebar when route changes
+  useEffect(() => {
+    closeSidebar();
+  }, [location.pathname]);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -63,7 +69,7 @@ export const Layout = () => {
 
       {/* Sidebar - class changes based on isOpen state */}
       <aside className={`${styles.sidebar} ${isOpen ? styles.show : ""}`}>
-        <Sidebar />
+        <Sidebar onClose={closeSidebar} />
       </aside>
 
       {/* Overlay - only renders when sidebar is open */}

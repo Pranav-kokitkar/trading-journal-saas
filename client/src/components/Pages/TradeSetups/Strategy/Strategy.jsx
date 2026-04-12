@@ -3,9 +3,10 @@ import toast from "react-hot-toast";
 import { useAuth } from "../../../../store/Auth";
 import { ConfirmationModal } from "../../../modals/ConfirmationModal/ConfirmationModal";
 import styles from "./Strategy.module.css";
+import { getMaxStrategies } from "../../../../config/planLimits";
 
 export const Strategy = () => {
-  const { authorizationToken } = useAuth();
+  const { authorizationToken, isPro } = useAuth();
 
   const [strategy, setStrategy] = useState({
     name: "",
@@ -34,6 +35,16 @@ export const Strategy = () => {
 
     if (!strategy.name.trim()) {
       toast.error("Strategy name is required");
+      return;
+    }
+
+    const maxStrategies = getMaxStrategies(isPro);
+    if (strategies.length >= maxStrategies) {
+      toast.error(
+        isPro
+          ? `Pro plan strategy limit (${maxStrategies}) reached`
+          : `Free plan strategy limit (${maxStrategies}) reached. Upgrade to Pro.`
+      );
       return;
     }
 
@@ -181,7 +192,7 @@ export const Strategy = () => {
 
   /* -------------------- UI -------------------- */
   return (
-    <div className={styles.strategyPage}>
+    <div className={`${styles.strategyPage} app-page`}>
       <div className={styles.mainContent}>
         {/* Page Heading */}
         <div className={styles.heading}>

@@ -70,14 +70,14 @@ export const AddNotes = () => {
   }, []);
 
   return (
-    <section className={styles.addnotescontainer}>
+    <section className={`${styles.addnotescontainer} app-page`}>
       <div className={styles.mainContent}>
         {/* Page Heading - Consistent with other pages */}
-        <div className={styles.heading}>
-          <h2 className={styles.title}>
-                    Notes
-                  </h2>
-          <p>Create and manage your trading notes and ideas</p>
+        <div className={`${styles.heading} app-page-heading`}>
+          <h2 className="app-page-title">
+            Trading <span>Notes</span>
+          </h2>
+          <p className="app-page-subtitle">Create and manage your trading notes and ideas</p>
         </div>
 
         {/* Add Note Form Card */}

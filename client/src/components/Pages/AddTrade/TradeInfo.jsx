@@ -162,6 +162,28 @@ export const TradeInfo = ({
         )}
       </div>
 
+      {/* ---------------- SESSION (DROPDOWN) ---------------- */}
+
+      <div className={styles.sectionSpacing}>
+        <div className={styles.inputGroup}>
+          <label htmlFor="session">Trading Session (Optional)</label>
+          <select
+            id="session"
+            name="session"
+            value={trade.session || ""}
+            onChange={handleChange}
+          >
+            <option value="">-- Select Session --</option>
+            <option value="london">London</option>
+            <option value="newyork">New York</option>
+            <option value="asia">Asian</option>
+            <option value="sydney">Sydney</option>
+            <option value="tokyo">Tokyo</option>
+            <option value="european">European</option>
+          </select>
+        </div>
+      </div>
+
       {/* ---------------- SCREENSHOTS ---------------- */}
 
       <div className={`${styles.col2} ${styles.sectionSpacing}`}>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./adminusermodal.module.css";
+import { useBodyScrollLock } from "../../../hooks/useBodyScrollLock";
 
 export const UserEditModal = ({
   userDetails,
@@ -8,6 +9,8 @@ export const UserEditModal = ({
   onClose,
   getUserData,
 }) => {
+  useBodyScrollLock(true);
+
   const [isEditing, setIsEditing] = useState(false);
   const [updatedUser, setUpdatedUser] = useState({
     name: "",

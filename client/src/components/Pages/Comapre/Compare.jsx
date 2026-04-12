@@ -10,6 +10,7 @@ import { DatasetCard } from "./DatasetCard";
 import { ComparisonCharts } from "./ComparisonCharts";
 import { useCompareData } from "./useCompareData";
 import { compareDatasets } from "./compareApi";
+import { getMaxCompareDimensions } from "../../../config/planLimits";
 import {
   formatMetricValue,
   mergeEquityCurveData,
@@ -32,9 +33,10 @@ const STATUS_OPTIONS = ["live", "exited"];
 const MARKET_TYPE_OPTIONS = ["forex", "crypto", "stocks"];
 
 export const Compare = () => {
-  const { authorizationToken } = useAuth();
+  const { authorizationToken, isPro } = useAuth();
   const { accountDetails } = useContext(AccountContext);
   const { accounts, strategies, tags, loadingData } = useCompareData(authorizationToken);
+  const maxCompareDimensions = getMaxCompareDimensions(isPro);
 
   const [selectedDimensions, setSelectedDimensions] = useState([]);
   const [dimensionValues, setDimensionValues] = useState({});
@@ -50,6 +52,15 @@ export const Compare = () => {
       delete newValues[dimensionKey];
       setDimensionValues(newValues);
     } else {
+      if (selectedDimensions.length >= maxCompareDimensions) {
+        toast.error(
+          isPro
+            ? `You can compare up to ${maxCompareDimensions} dimensions.`
+            : "Buy Pro to add more comparison dimensions."
+        );
+        return;
+      }
+
       let newDimensions;
       let newValues = { ...dimensionValues };
 
@@ -414,12 +425,12 @@ export const Compare = () => {
   };
 
   return (
-    <div className={styles.comparePage}>
+    <div className={`${styles.comparePage} app-page`}>
       <div className={styles.mainContent}>
         {/* Page Heading */}
-        <div className={styles.heading}>
-          <h2>Compare Datasets</h2>
-          <p>
+        <div className={`${styles.heading} app-page-heading`}>
+          <h2 className="app-page-title">Compare <span>Datasets</span></h2>
+          <p className="app-page-subtitle">
             Select dimensions to compare two different datasets of your trades and analyze
             performance differences
           </p>

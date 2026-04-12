@@ -5,11 +5,25 @@ import { AccountContext } from "../../../context/AccountContext";
 
 export const AddPrice = ({ trade, handleChange }) => {
   const { accountDetails } = useContext(AccountContext);
+  const riskTypeLabel =
+    trade.riskType === "percent"
+      ? "Risk (%):"
+      : trade.riskType === "lots"
+      ? "Lots:"
+      : "Risk Amount:";
+
+  const riskTypePlaceholder =
+    trade.riskType === "percent"
+      ? "Enter risk %"
+      : trade.riskType === "lots"
+      ? "Enter lot size"
+      : "Enter risk amount";
+
   return (
     <div className={styles.card}>
       <h3>Price & Risk</h3>
       <p className={styles.subText}>
-        Account Balance: ${accountDetails?.currentBalance}
+        Account Balance: ${accountDetails?.currentBalance?.toFixed(2)}
       </p>
 
       <div className={styles.row}>
@@ -44,12 +58,10 @@ export const AddPrice = ({ trade, handleChange }) => {
           required={true}
         />
         <InputField
-          label="Risk Amount:"
+          label={riskTypeLabel}
           type="number"
-          placeholder="Enter risk amount"
+          placeholder={riskTypePlaceholder}
           name="riskAmount"
-          min="0"
-          max={trade.accountBalance}
           value={trade.riskAmount}
           onChange={handleChange}
           required={true}
@@ -77,6 +89,16 @@ export const AddPrice = ({ trade, handleChange }) => {
               onChange={handleChange}
             />
             % Risk
+          </label>
+          <label style={{ marginLeft: "1rem" }}>
+            <input
+              type="radio"
+              name="riskType"
+              value="lots"
+              checked={trade.riskType === "lots"}
+              onChange={handleChange}
+            />
+            Lots
           </label>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./confirmationModal.module.css";
+import { useBodyScrollLock } from "../../../hooks/useBodyScrollLock";
 
 export const ConfirmationModal = ({
   isOpen,
@@ -10,6 +11,8 @@ export const ConfirmationModal = ({
   onConfirm,
   onCancel,
 }) => {
+  useBodyScrollLock(isOpen);
+
   if (!isOpen) return null;
 
   return (

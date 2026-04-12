@@ -23,13 +23,18 @@ const exportRoute = require("./routers/Export-router");
 const tagsRoute = require("./routers/Tags-router");
 const strategyRoute = require("./routers/Strategy-router");
 const compareRoute = require("./routers/Compare-router");
+const analyticsRoute = require("./routers/Analytics-router");
 const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
 
 // CORS configuration - MUST be before other middleware
 const corsOptions = {
-  origin: ["http://localhost:5173", "https://trading-journal-saas.netlify.app"],
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://trading-journal-saas.netlify.app",
+  ],
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "HEAD", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -107,6 +112,7 @@ app.use("/api/export", exportRoute);
 app.use("/api/tags", tagsRoute);
 app.use("/api/strategy", strategyRoute);
 app.use("/api/compare", compareRoute);
+app.use("/api/analytics", analyticsRoute);
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;

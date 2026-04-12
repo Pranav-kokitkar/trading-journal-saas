@@ -13,8 +13,18 @@ import {
 } from "recharts";
 import { PerformanceContext } from "../../../context/PerformanceContext";
 
+const chartVar = (name, fallback) => {
+  if (typeof window === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value || fallback;
+};
+
 const PnLChart = ({ trades }) => {
   const { performance } = useContext(PerformanceContext);
+  const profitColor = chartVar("--color-profit", "var(--color-profit)");
+  const lossColor = chartVar("--color-loss", "var(--color-loss)");
 
   const data = trades.map((trade, index) => ({
     tradeNumber: index + 1,
@@ -33,7 +43,10 @@ const PnLChart = ({ trades }) => {
             data={data}
             margin={{ top: 20, right: 30, left: 10, bottom: 10 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              stroke={chartVar("--chart-grid", "var(--chart-grid)")}
+            />
             <XAxis
               dataKey="tradeNumber"
               label={{ value: "Trade #", position: "insideBottom", offset: -5 }}
@@ -45,6 +58,11 @@ const PnLChart = ({ trades }) => {
               tick={{ fontSize: 12 }}
             />
             <Tooltip
+              contentStyle={{
+                backgroundColor: chartVar("--chart-tooltip-bg", "var(--chart-tooltip-bg)"),
+                border: `1px solid ${chartVar("--chart-tooltip-border", "var(--chart-tooltip-border)")}`,
+                borderRadius: "12px",
+              }}
               formatter={(value) => [
                 `${value >= 0 ? "+" : ""}$${value}`,
                 "PnL",
@@ -55,7 +73,7 @@ const PnLChart = ({ trades }) => {
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.pnl >= 0 ? "#4caf50" : "#f44336"}
+                  fill={entry.pnl >= 0 ? profitColor : lossColor}
                 />
               ))}
             </Bar>

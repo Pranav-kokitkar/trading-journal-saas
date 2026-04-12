@@ -34,7 +34,7 @@
 
 /* Note card */
 .noteCard {
-  background: #0b1220;
+  background: var(--bg-level-1);
   padding: 14px;
   margin-bottom: 50px;
   border-radius: 10px;
@@ -67,3 +67,5 @@
     width: 95%;
   }
 }
+
+

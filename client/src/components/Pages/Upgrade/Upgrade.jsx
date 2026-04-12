@@ -78,7 +78,7 @@ export const Upgrade = () => {
           }
         },
         theme: {
-          color: "#f6b93b",
+          color: "#6e7cff",
         },
       };
 
@@ -91,11 +91,11 @@ export const Upgrade = () => {
   };
 
   return (
-    <div className={styles.upgradePage}>
+    <div className={`${styles.upgradePage} app-page`}>
       {/* Page Header */}
-      <header className={styles.header}>
-        <h1>Upgrade to Pro</h1>
-        <p>
+      <header className={`${styles.header} app-page-heading`}>
+        <h1 className="app-page-title">Upgrade <span>to Pro</span></h1>
+        <p className="app-page-subtitle">
           Unlock advanced journaling tools and performance insights to trade
           with clarity.
         </p>

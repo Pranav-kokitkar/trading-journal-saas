@@ -7,14 +7,14 @@ import { getMaxTags } from "../../../../config/planLimits";
 
 export const Tags = () => {
   const TAG_COLORS = [
-    "#f6b93b", // Accent Golden
-    "#22c55e", // Success Green
-    "#ef4444", // Error Red
-    "#3b82f6", // Blue
-    "#a855f7", // Purple
-    "#f97316", // Orange
-    "#14b8a6", // Teal
-    "#64a0ff", // Light Blue
+    "#6e7cff", // Accent Blue
+    "#3dd6a6", // Success Green
+    "#ff7f87", // Soft Red
+    "#59a8ff", // Blue
+    "#a78bfa", // Violet
+    "#f59e0b", // Amber
+    "#2dd4bf", // Teal
+    "#8da7ff", // Light Blue
   ];
 
   const [tag, setTag] = useState({ name: "", colour: "" });
@@ -176,7 +176,7 @@ export const Tags = () => {
   /* -------------------- UI -------------------- */
 
   return (
-    <div className={styles.tagsPage}>
+    <div className={`${styles.tagsPage} app-page`}>
       <div className={styles.mainContent}>
         {/* Page Heading */}
         <div className={styles.heading}>

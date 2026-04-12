@@ -5,12 +5,16 @@ export const PLAN_LIMITS = {
   FREE: {
     MAX_SCREENSHOTS: 2,
     MAX_ACCOUNTS: 1,
-    MAX_TAGS: 5,
+    MAX_TAGS: 3,
+    MAX_STRATEGIES: 2,
+    MAX_COMPARE_DIMENSIONS: 1,
   },
   PRO: {
     MAX_SCREENSHOTS: 5,
     MAX_ACCOUNTS: 10,
-    MAX_TAGS: 50,
+    MAX_TAGS: 40,
+    MAX_STRATEGIES: 30,
+    MAX_COMPARE_DIMENSIONS: 7,
   },
 };
 
@@ -32,4 +36,16 @@ export const getMaxAccounts = (isPro) => {
 
 export const getMaxTags = (isPro) => {
   return isPro ? PLAN_LIMITS.PRO.MAX_TAGS : PLAN_LIMITS.FREE.MAX_TAGS;
+};
+
+export const getMaxStrategies = (isPro) => {
+  return isPro
+    ? PLAN_LIMITS.PRO.MAX_STRATEGIES
+    : PLAN_LIMITS.FREE.MAX_STRATEGIES;
+};
+
+export const getMaxCompareDimensions = (isPro) => {
+  return isPro
+    ? PLAN_LIMITS.PRO.MAX_COMPARE_DIMENSIONS
+    : PLAN_LIMITS.FREE.MAX_COMPARE_DIMENSIONS;
 };

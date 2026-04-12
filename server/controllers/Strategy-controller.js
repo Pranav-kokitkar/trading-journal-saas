@@ -1,6 +1,7 @@
 const User = require("../models/user-model");
 const Strategy = require("../models/strategy-model");
 const Trade = require("../models/trade-model");
+const { getMaxStrategies } = require("../config/planLimits");
 
 const createStrategy = async (req, res) => {
   try {
@@ -27,6 +28,27 @@ const createStrategy = async (req, res) => {
         message: "No active account selected",
       });
     }
+
+    const isPro =
+      user.plan === "pro" &&
+      user.planExpiresAt &&
+      new Date(user.planExpiresAt) > new Date();
+
+    const maxStrategies = getMaxStrategies(isPro);
+    const strategyCount = await Strategy.countDocuments({
+      userId,
+      accountId,
+      $or: [{ status: { $exists: false } }, { status: { $ne: "archived" } }],
+    });
+
+    if (strategyCount >= maxStrategies) {
+      return res.status(403).json({
+        message: isPro
+          ? `Pro plan strategy limit (${maxStrategies}) reached`
+          : `Free plan strategy limit (${maxStrategies}) reached. Upgrade to Pro.`,
+      });
+    }
+
     await Strategy.create({
       userId,
       accountId,

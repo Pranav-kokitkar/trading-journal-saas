@@ -32,6 +32,7 @@ const AddTrade = async (req, res) => {
       rr,
       pnl,
       tradeResult,
+      riskType,
       riskAmount,
       riskPercent,
       balanceAfterTrade,
@@ -151,6 +152,12 @@ const AddTrade = async (req, res) => {
     }
 
     /* ---------------- SAVE TRADE ---------------- */
+    const normalizedRiskType = ["dollar", "percent", "lots"].includes(
+      (riskType || "").toString().trim().toLowerCase(),
+    )
+      ? (riskType || "").toString().trim().toLowerCase()
+      : "dollar";
+
     const tradeToSave = {
       userId,
       accountId: new mongoose.Types.ObjectId(accountId),
@@ -161,6 +168,7 @@ const AddTrade = async (req, res) => {
       stoplossPrice: Number(stoplossPrice),
       takeProfitPrice:
         takeProfitPrice == null ? undefined : Number(takeProfitPrice),
+      riskType: normalizedRiskType,
 
       exitedPrice: Array.isArray(parsedExitedPrice)
         ? parsedExitedPrice.map((e) => ({

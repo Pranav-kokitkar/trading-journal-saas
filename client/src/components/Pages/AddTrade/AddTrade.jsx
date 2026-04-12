@@ -10,7 +10,7 @@ import { calculateTradeValues } from "../../../utils/tradeUtils";
 import { useAuth } from "../../../store/Auth";
 import { useTrades } from "../../../store/TradeContext";
 import { PerformanceContext } from "../../../context/PerformanceContext";
-import { toast } from "react-toastify";
+import { toastHelper } from "../../../utils/toastHelper";
 import { AccountContext } from "../../../context/AccountContext";
 
 export const AddTrade = () => {
@@ -39,6 +39,7 @@ export const AddTrade = () => {
     tradeNumber: "",
     dateNtime: "",
     tradeNotes: "",
+    session: "",
     tags: [],
     strategy: "",
   });
@@ -145,6 +146,7 @@ export const AddTrade = () => {
       dateTime: isoDate,
       tradeNotes: trade.tradeNotes || "",
       tradeStatus: normalizedStatus,
+      session: (trade.session || "").toString().trim().toLowerCase(),
       accountId,
       tags: trade.tags || [],
       strategy: trade.strategy || undefined,
@@ -171,22 +173,12 @@ export const AddTrade = () => {
     try {
       await addTradeFromContext(normalizedTrade, screenshots);
     } catch (err) {
-      toast.error("Failed to add trade", {
-        position: "top-right",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toastHelper.error("Failed to add trade");
     }
   };
 
   return (
-    <section className={styles.addtrade}>
+    <section className={`${styles.addtrade} app-page`}>
       <form onSubmit={handleSubmit}>
         <PageHeading />
         <TradeDetails trade={trade} handleChange={handleChange} />
@@ -213,11 +205,11 @@ export const AddTrade = () => {
 };
 
 const PageHeading = () => (
-  <div className={styles.heading}>
-    <h2 className={styles.title}>
+  <div className={`${styles.heading} app-page-heading`}>
+    <h2 className={`${styles.title} app-page-title`}>
               Add <span>Trade</span>
             </h2>
-    <p>Fill this to add new trade to your journal</p>
+    <p className="app-page-subtitle">Fill this to add new trade to your journal</p>
   </div>
 );
 

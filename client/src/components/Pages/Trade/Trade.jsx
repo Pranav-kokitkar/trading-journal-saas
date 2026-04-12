@@ -6,7 +6,7 @@ import { CloseTrade } from "./CloseTrade";
 import { calculateTradeOnExit } from "../../../utils/tradeUtils";
 import { TradeContext, useTrades } from "../../../store/TradeContext";
 import { useAuth } from "../../../store/Auth";
-import { toast } from "react-toastify";
+import { toastHelper } from "../../../utils/toastHelper";
 import { AccountContext } from "../../../context/AccountContext";
 import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
 import { getMaxScreenshots } from "../../../config/planLimits";
@@ -275,27 +275,9 @@ export const Trade = () => {
       if (response.ok) {
         setIsEditingNote(false);
         refreshTrades();
-        toast.success("Note Updated", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toastHelper.success("Note Updated");
       } else {
-        toast.error("Failed to update note", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toastHelper.error("Failed to update note");
       }
     } catch (error) {
       console.log(error);
@@ -354,35 +336,13 @@ export const Trade = () => {
           setFetchedTrade(updated);
         }
 
-        toast.success("Tags Updated", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toastHelper.success("Tags Updated");
       } else {
-        toast.error("Failed to update tags", {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        toastHelper.error("Failed to update tags");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error updating tags", {
-        position: "top-right",
-        autoClose: 2000,
-        theme: "dark",
-      });
+      toastHelper.error("Error updating tags");
     }
   };
 
@@ -434,35 +394,19 @@ export const Trade = () => {
           setFetchedTrade(updated);
         }
 
-        toast.success("Screenshot deleted", {
-          position: "top-right",
-          autoClose: 2000,
-          theme: "dark",
-        });
+        toastHelper.success("Screenshot deleted");
       } else {
-        toast.error("Failed to delete screenshot", {
-          position: "top-right",
-          autoClose: 2000,
-          theme: "dark",
-        });
+        toastHelper.error("Failed to delete screenshot");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error deleting screenshot", {
-        position: "top-right",
-        autoClose: 2000,
-        theme: "dark",
-      });
+      toastHelper.error("Error deleting screenshot");
     }
   };
 
   const saveScreenshots = async () => {
     if (newScreenshots.length === 0) {
-      toast.error("Please select at least one screenshot", {
-        position: "top-right",
-        autoClose: 2000,
-        theme: "dark",
-      });
+      toastHelper.error("Please select at least one screenshot");
       return;
     }
 
@@ -493,25 +437,13 @@ export const Trade = () => {
           setFetchedTrade(updated);
         }
 
-        toast.success("Screenshots added", {
-          position: "top-right",
-          autoClose: 2000,
-          theme: "dark",
-        });
+        toastHelper.success("Screenshots added");
       } else {
-        toast.error("Failed to add screenshots", {
-          position: "top-right",
-          autoClose: 2000,
-          theme: "dark",
-        });
+        toastHelper.error("Failed to add screenshots");
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error adding screenshots", {
-        position: "top-right",
-        autoClose: 2000,
-        theme: "dark",
-      });
+      toastHelper.error("Error adding screenshots");
     }
   };
 
@@ -532,10 +464,6 @@ export const Trade = () => {
   const pnlColor = trade.pnl >= 0 ? "positive" : "negative";
   const directionColor =
     trade.tradedirection?.toLowerCase() === "long" ? "long" : "short";
-
-  console.log(trade);
-
-  console
 
   return (
     <section className={styles.trade}>

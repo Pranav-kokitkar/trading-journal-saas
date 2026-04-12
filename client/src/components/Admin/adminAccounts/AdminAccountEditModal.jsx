@@ -1,11 +1,14 @@
 import { useState } from "react";
 import styles from "./AdminAccountEditModal.module.css";
+import { useBodyScrollLock } from "../../../hooks/useBodyScrollLock";
 export const AdminAccountEditModal = ({
   EditAccount,
   onClose,
   name,
   status,
 }) => {
+  useBodyScrollLock(true);
+
   
   const [updatedData, setUpdatedData] = useState({
     name: name,

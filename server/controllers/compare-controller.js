@@ -1,6 +1,8 @@
 const Trade = require("../models/trade-model");
 const Account = require("../models/account-model");
 const mongoose = require("mongoose");
+const User = require("../models/user-model");
+const { getMaxCompareDimensions } = require("../config/planLimits");
 
 const parseIncludeImported = (value, defaultValue = true) => {
   if (value === undefined || value === null || value === "")
@@ -263,6 +265,25 @@ const Compare = async (req, res) => {
       return res.status(400).json({
         message: "At least one dimension required for comparison",
         allowedKeys: ALLOWED_DIMENSIONS,
+      });
+    }
+
+    const user = await User.findById(userId).select("plan planExpiresAt");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isPro =
+      user.plan === "pro" &&
+      user.planExpiresAt &&
+      new Date(user.planExpiresAt) > new Date();
+
+    const maxCompareDimensions = getMaxCompareDimensions(isPro);
+    if (dimensionKeys.length > maxCompareDimensions) {
+      return res.status(403).json({
+        message: isPro
+          ? `You can compare up to ${maxCompareDimensions} dimensions.`
+          : "Buy Pro to add more comparison dimensions.",
       });
     }
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import styles from "./TradeHistory.module.css";
+import styles from "../../../styles/tradehistory.module.css";
 import { useTrades } from "../../../store/TradeContext";
 import { TradeCard } from "./TradeCard";
 import { Pagination } from "../../Pagination";

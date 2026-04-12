@@ -1,8 +1,11 @@
 import { useState } from "react";
 import styles from "./NoteModal.module.css";
 import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
+import { useBodyScrollLock } from "../../../hooks/useBodyScrollLock";
 
 export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
+  useBodyScrollLock(Boolean(note));
+
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [updatedNote, setUpdatedNote] = useState({

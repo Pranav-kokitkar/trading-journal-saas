@@ -1,5 +1,5 @@
 // src/components/Pages/Dashboard/Dashboard.jsx
-import React, { useContext } from "react";
+import { useContext } from "react";
 import styles from "./dashboard.module.css";
 import EquityCurveChart from "./EquityCurveChart";
 import WinLossChart from "./WinLossChart";
@@ -27,8 +27,6 @@ export const Dashboard = () => {
     loading: chartsLoading = false,
   } = useTrades() || {};
 
-  console.log(performance);
-
   // Accept both "closed" and "exited" as finished trades (case-insensitive)
   const finishedStatuses = new Set(["closed", "exited"]);
 
@@ -45,29 +43,34 @@ export const Dashboard = () => {
   }
 
   return (
-    <section className={styles.dashboard}>
+    <section className={`${styles.dashboard} app-page`}>
       <TradingDashboard accountDetails={accountDetails} performance={performance} />
 
-      <h1>
-        Trading <span className={styles.span}>Performance</span>{" "}
-      </h1>
-      <label>
-        <input
-          type="checkbox"
-          checked={Boolean(includeImportedTrades)}
-          onChange={(e) =>
-            typeof setIncludeImportedTrades === "function" &&
-            setIncludeImportedTrades(e.target.checked)
-          }
-        />{" "}
-        Include Imported Trades
-      </label>
+      <div className={styles.sectionHeader}>
+        <h2>
+          Trading <span className={styles.span}>Performance</span>
+        </h2>
+        <div className={styles.controlsBar}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={Boolean(includeImportedTrades)}
+              onChange={(e) =>
+                typeof setIncludeImportedTrades === "function" &&
+                setIncludeImportedTrades(e.target.checked)
+              }
+            />
+            <span>Include Imported Trades</span>
+          </label>
+        </div>
+      </div>
+
       <div className={styles.tradingperformance}>
         <div className={styles.chartCard}>
           <h3>Equity Curve</h3>
           {chartsLoading ? (
-            <div style={{ padding: "20px", textAlign: "center" }}>
-              <p style={{ color: "#999" }}>Loading chart data...</p>
+            <div className={styles.chartLoading}>
+              <p className={styles.chartLoadingText}>Loading chart data...</p>
             </div>
           ) : (
             <EquityCurveChart trades={closedTrades} />
@@ -77,8 +80,8 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>Win / Loss</h3>
           {chartsLoading ? (
-            <div style={{ padding: "20px", textAlign: "center" }}>
-              <p style={{ color: "#999" }}>Loading chart data...</p>
+            <div className={styles.chartLoading}>
+              <p className={styles.chartLoadingText}>Loading chart data...</p>
             </div>
           ) : (
             <WinLossChart trades={closedTrades} />
@@ -88,8 +91,8 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>PnL Per Trade</h3>
           {chartsLoading ? (
-            <div style={{ padding: "20px", textAlign: "center" }}>
-              <p style={{ color: "#999" }}>Loading chart data...</p>
+            <div className={styles.chartLoading}>
+              <p className={styles.chartLoadingText}>Loading chart data...</p>
             </div>
           ) : (
             <PnLChart trades={closedTrades} />
@@ -99,8 +102,8 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>Risk Overview</h3>
           {chartsLoading ? (
-            <div style={{ padding: "20px", textAlign: "center" }}>
-              <p style={{ color: "#999" }}>Loading chart data...</p>
+            <div className={styles.chartLoading}>
+              <p className={styles.chartLoadingText}>Loading chart data...</p>
             </div>
           ) : (
             <RiskChart trades={closedTrades} />
@@ -110,8 +113,8 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>Direction Success</h3>
           {chartsLoading ? (
-            <div style={{ padding: "20px", textAlign: "center" }}>
-              <p style={{ color: "#999" }}>Loading chart data...</p>
+            <div className={styles.chartLoading}>
+              <p className={styles.chartLoadingText}>Loading chart data...</p>
             </div>
           ) : (
             <DirectionChart trades={closedTrades} />
@@ -125,8 +128,8 @@ export const Dashboard = () => {
 
 const TradingDashboard = ({ accountDetails, performance }) => {
   return (
-    <div>
-      <h1>
+    <header className={`${styles.pageHero} app-page-heading`}>
+      <h1 className="app-page-title">
         Trading <span className={styles.span}>Dashboard</span>
       </h1>
       <div className={styles.tradingdata}>
@@ -236,6 +239,6 @@ const TradingDashboard = ({ accountDetails, performance }) => {
           </h3>
         </div>
       </div>
-    </div>
+    </header>
   );
 };

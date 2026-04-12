@@ -7,10 +7,10 @@ export const TradeSetups = () => {
   const [activeTab, setActiveTab] = useState("tags");
 
   return (
-    <section className={styles.tradeSetupsPage}>
+    <section className={`${styles.tradeSetupsPage} app-page`}>
       {/* Page Header */}
-      <div className={styles.pageHeader}>
-        <h1 className={styles.pageTitle}>
+      <div className={`${styles.pageHeader} app-page-heading`}>
+        <h1 className="app-page-title">
           Trade <span>Setups</span>{" "}
         </h1>
       </div>

@@ -6,7 +6,7 @@
 .myaccount {
   display: flex;
   justify-content: center;
-  padding: 1.5rem;
+  padding: clamp(20px, 2vw, 32px);
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -14,11 +14,14 @@
 /* ===== Main Content Container ===== */
 .mainContent {
   width: 100%;
-  max-width: 980px;
+  max-width: 1080px;
 }
 
 /* ===== Page Heading (consistent with other pages) ===== */
 .myaccountpageheading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 1rem;
   margin-bottom: 1.5rem;
@@ -26,34 +29,36 @@
 }
 
 .title {
-  font-size: 2.5rem;
+  font-size: clamp(28px, 2.4vw, 40px);
   font-weight: 600;
   line-height: 1.2;
   margin-bottom: 1rem;
   color: var(--text-primary);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.04em;
 }
 
 .title span {
-  background: linear-gradient(90deg, var(--accent), #f5a623);
+  background: linear-gradient(90deg, var(--accent), var(--accent-dim));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .myaccountpageheading p {
-  color: var(--muted);
-  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
   margin-top: 0.5rem;
+  text-align: center;
 }
 
 /* ===== Account Overview Section ===== */
 .accountdatacontainer {
-  background: var(--gradient-card);
+  background: var(--surface-card);
   padding: 1.25rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   margin-bottom: 1.5rem;
   border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
 }
 
 .accountdatacontainer h3 {
@@ -66,17 +71,16 @@
 }
 
 .accountdata {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .accountbox {
-  flex: 1;
   min-width: 180px;
-  background: var(--bg-secondary);
+  background: rgba(255, 255, 255, 0.03);
   padding: 1rem;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   text-align: center;
   border: 1px solid var(--border-medium);
   transition: all 0.25s ease;
@@ -85,12 +89,12 @@
 .accountbox:hover {
   border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(246, 185, 59, 0.12);
+  box-shadow: 0 18px 34px rgba(110, 124, 255, 0.14);
 }
 
 .accountbox p {
   font-size: 0.7rem;
-  color: var(--muted);
+  color: var(--text-muted);
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -100,17 +104,18 @@
 .accountbox h3 {
   margin-top: 0.5rem;
   font-size: 1.2rem;
-  color: var(--accent);
+  color: var(--accent-bright);
   font-weight: 600;
 }
 
 /* ===== Section Boxes ===== */
 .sectionbox {
-  background: var(--gradient-card);
+  background: var(--surface-card);
   padding: 1.25rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   margin-bottom: 1.5rem;
   border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
 }
 
 .sectionbox h3 {
@@ -130,7 +135,7 @@
 }
 
 .sectionbox p {
-  color: var(--muted);
+  color: var(--text-secondary);
   font-size: 0.85rem;
   line-height: 1.6;
   margin: 0;
@@ -152,21 +157,22 @@
 }
 
 .btngroup button {
-  padding: 0.65rem 1.25rem;
-  background: var(--accent);
-  color: var(--bg-primary);
+  padding: 0 1.25rem;
+  height: 42px;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  box-shadow: var(--btn-primary-shadow);
 }
 
 .btngroup button:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  background: var(--btn-primary-bg-hover);
+  box-shadow: 0 18px 34px rgba(110, 124, 255, 0.3);
   transform: translateY(-2px);
 }
 
@@ -228,11 +234,11 @@
 
 /* ===== Danger Zone ===== */
 .dangerzone {
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  border: 1px solid rgba(255, 127, 135, 0.28);
   background: linear-gradient(
     180deg,
-    rgba(239, 68, 68, 0.05),
-    rgba(239, 68, 68, 0.02)
+    rgba(255, 127, 135, 0.06),
+    rgba(255, 127, 135, 0.03)
   );
 }
 
@@ -257,32 +263,34 @@
 }
 
 .dangerbtn {
-  background: var(--error);
-  color: white;
+  background: rgba(255, 127, 135, 0.16);
+  color: var(--error);
   border: none;
-  padding: 0.65rem 1.25rem;
-  border-radius: var(--radius-sm);
+  padding: 0 1.25rem;
+  height: 42px;
+  border-radius: var(--radius-pill);
   margin-top: 1rem;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.85rem;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+  box-shadow: none;
 }
 
 .dangerbtn:hover {
-  background: #c62828;
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+  background: rgba(255, 127, 135, 0.24);
+  box-shadow: none;
   transform: translateY(-2px);
 }
 
 /* ===== Update Capital (if needed) ===== */
 .updatecapitalcontainer {
-  background: var(--gradient-card);
+  background: var(--surface-card);
   padding: 1.25rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   margin-bottom: 1.5rem;
   border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
 }
 
 .updatecapitalcontainer h3 {
@@ -303,11 +311,11 @@
 
 .inlineform input {
   flex: 0 1 220px;
-  padding: 0.65rem 0.9rem;
-  border-radius: var(--radius-sm);
+  padding: 0 0.9rem;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--bg-tertiary);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
   font-size: 0.85rem;
   font-family: inherit;
   transition: all 0.2s ease;
@@ -316,27 +324,49 @@
 .inlineform input:focus {
   outline: none;
   border-color: var(--accent);
-  background: var(--bg-secondary);
-  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 .inlineform button {
-  padding: 0.65rem 1.25rem;
-  background: var(--accent);
-  color: var(--bg-primary);
+  padding: 0 1.25rem;
+  height: 42px;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  box-shadow: var(--btn-primary-shadow);
 }
 
 .inlineform button:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  background: var(--btn-primary-bg-hover);
+  box-shadow: 0 18px 34px rgba(110, 124, 255, 0.3);
   transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .accountdata {
+    grid-template-columns: 1fr;
+  }
+
+  .actionRow {
+    grid-template-columns: 1fr;
+  }
+
+  .inlineform {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inlineform input,
+  .inlineform button {
+    flex: 1 1 auto;
+    width: 100%;
+  }
 }
 
 .warning {
@@ -344,8 +374,8 @@
   color: var(--warning);
   margin-top: 0.5rem;
   padding: 0.5rem 0.75rem;
-  background: rgba(246, 185, 59, 0.08);
-  border-radius: var(--radius-sm);
+  background: var(--warning-subtle);
+  border-radius: var(--radius-md);
   border-left: 3px solid var(--accent);
 }
 
@@ -363,10 +393,6 @@
 
   .actionRow {
     grid-template-columns: 1fr;
-  }
-
-  .accountdata {
-    flex-direction: column;
   }
 
   .accountbox {

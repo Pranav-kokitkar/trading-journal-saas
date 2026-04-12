@@ -4,7 +4,7 @@
 .page {
   padding: 1.5rem;
   min-height: 100vh;
-  color: #eaeaea;
+  color: var(--text-primary);
 }
 
 /* ===============================
@@ -13,7 +13,7 @@
 .loading {
   padding: 3rem;
   text-align: center;
-  color: #f5c56b;
+  color: var(--accent-bright);
 }
 
 /* ===============================
@@ -34,12 +34,12 @@
 .userName {
   font-size: 1.4rem;
   font-weight: 600;
-  color: #f5c56b;
+  color: var(--accent-bright);
 }
 
 .email {
   font-size: 0.85rem;
-  color: #9aa4b2;
+  color: var(--text-secondary);
 }
 
 /* ===============================
@@ -55,12 +55,12 @@
 
 .admin {
   background-color: rgba(34, 197, 94, 0.15);
-  color: #22c55e;
+  color: var(--color-profit);
 }
 
 .user {
-  background-color: rgba(245, 197, 107, 0.15);
-  color: #f5c56b;
+  background-color: var(--accent-subtle);
+  color: var(--accent-bright);
 }
 
 /* ===============================
@@ -68,8 +68,8 @@
 ================================ */
 .backBtn {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #9aa4b2;
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
   padding: 0.45rem 0.8rem;
   border-radius: 8px;
   font-size: 0.75rem;
@@ -77,13 +77,13 @@
 }
 
 .backBtn:hover {
-  border-color: #f5c56b;
-  color: #ffffff;
+  border-color: var(--accent-bright);
+  color: var(--text-primary);
 }
 
 .editBtn {
-  background-color: #f5c56b;
-  color: #0b1220;
+  background-color: var(--accent-bright);
+  color: var(--bg-level-1);
   border: none;
   padding: 0.45rem 1rem;
   border-radius: 8px;
@@ -103,20 +103,20 @@
 }
 
 .summaryCard {
-  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  background: linear-gradient(180deg, var(--bg-level-1), var(--bg-level-0));
   border-radius: 12px;
   padding: 1rem;
-  border: 1px solid rgba(245, 197, 107, 0.15);
+  border: 1px solid var(--accent-subtle);
 }
 
 .summaryCard span {
   font-size: 0.75rem;
-  color: #9aa4b2;
+  color: var(--text-secondary);
 }
 
 .summaryCard h3 {
   font-size: 0.95rem;
-  color: #f5c56b;
+  color: var(--accent-bright);
   margin-top: 0.35rem;
   word-break: break-all;
 }
@@ -125,21 +125,21 @@
    ACCOUNTS SECTION
 ================================ */
 .accountsSection {
-  background: linear-gradient(180deg, #0f1a2f, #0c1628);
+  background: linear-gradient(180deg, var(--bg-level-1), var(--bg-level-0));
   border-radius: 14px;
   padding: 1.4rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--bg-level-3);
 }
 
 .sectionTitle {
   font-size: 1rem;
   font-weight: 600;
-  color: #f5c56b;
+  color: var(--accent-bright);
   margin-bottom: 1.2rem;
 }
 
 .placeholder {
-  color: #9aa4b2;
+  color: var(--text-secondary);
   font-size: 0.85rem;
 }
 
@@ -156,16 +156,16 @@
    ACCOUNT CARD
 ================================ */
 .accountCard {
-  background-color: #0f1a2f;
+  background-color: var(--bg-level-1);
   padding: 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border-default);
   cursor: pointer;
   transition: all 0.25s ease;
 }
 
 .accountCard:hover {
-  border-color: rgba(245, 197, 107, 0.35);
+  border-color: var(--accent-glow);
   transform: translateY(-2px);
 }
 
@@ -178,12 +178,12 @@
 .accountName {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .subText {
   font-size: 0.7rem;
-  color: #9aa4b2;
+  color: var(--text-secondary);
 }
 
 /* ===============================
@@ -198,12 +198,12 @@
 
 .metrics span {
   font-size: 0.7rem;
-  color: #9aa4b2;
+  color: var(--text-secondary);
 }
 
 .metrics strong {
   font-size: 0.9rem;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 /* ===============================
@@ -223,3 +223,5 @@
     grid-template-columns: 1fr;
   }
 }
+
+

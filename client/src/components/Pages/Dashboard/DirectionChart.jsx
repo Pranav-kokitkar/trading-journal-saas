@@ -13,6 +13,14 @@ import {
   Cell,
 } from "recharts";
 
+const chartVar = (name, fallback) => {
+  if (typeof window === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value || fallback;
+};
+
 /**
  * Helper: read a property from a trade object trying multiple key variants.
  * Usage: read(trade, "tradeDirection", "tradedirection")
@@ -83,13 +91,13 @@ const DirectionChart = ({ trades }) => {
       direction: "Long",
       successRate: Number(longSuccessRate.toFixed(1)),
       total: longTotal,
-      fill: "#4caf50",
+      fill: chartVar("--color-profit", "var(--color-profit)"),
     },
     {
       direction: "Short",
       successRate: Number(shortSuccessRate.toFixed(1)),
       total: shortTotal,
-      fill: "#f44336",
+      fill: chartVar("--color-loss", "var(--color-loss)"),
     },
   ];
 
@@ -100,23 +108,23 @@ const DirectionChart = ({ trades }) => {
             data={data}
             margin={{ top: 20, right: 20, left: 20, bottom: 10 }}
           >
-            <CartesianGrid stroke="rgba(255,255,255,0.08)" />
+            <CartesianGrid stroke={chartVar("--chart-grid", "var(--chart-grid)")} />
             <XAxis
               dataKey="direction"
-              stroke="#9aa4b2"
+              stroke={chartVar("--text-muted", "var(--text-muted)")}
               tick={{ fontSize: 12 }}
             />
             <YAxis
               domain={[0, 100]}
               tickFormatter={(val) => `${val}%`}
-              stroke="#9aa4b2"
+              stroke={chartVar("--text-muted", "var(--text-muted)")}
               tick={{ fontSize: 12 }}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#0f172a",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "4px",
+                backgroundColor: chartVar("--chart-tooltip-bg", "var(--chart-tooltip-bg)"),
+                border: `1px solid ${chartVar("--chart-tooltip-border", "var(--chart-tooltip-border)")}`,
+                borderRadius: "12px",
                 padding: "8px 12px",
               }}
               formatter={(value) => [`${value}%`, "Win Rate"]}
@@ -126,8 +134,8 @@ const DirectionChart = ({ trades }) => {
                 const directionLabel = label === "Long" ? "Long" : "Short";
                 return `${directionLabel} (Total: ${total})`;
               }}
-              wrapperStyle={{ color: "#fff" }}
-              labelStyle={{ color: "#fff" }}
+              wrapperStyle={{ color: chartVar("--text-primary", "var(--text-primary)") }}
+              labelStyle={{ color: chartVar("--text-primary", "var(--text-primary)") }}
             />
             <Bar dataKey="successRate" radius={[6, 6, 0, 0]}>
               {data.map((entry, index) => (
@@ -137,7 +145,10 @@ const DirectionChart = ({ trades }) => {
                 dataKey="total"
                 position="top"
                 formatter={(val) => (val > 0 ? `Total: ${val}` : "")}
-                style={{ fill: "#ffffff", fontWeight: "bold" }}
+                style={{
+                  fill: chartVar("--text-primary", "var(--text-primary)"),
+                  fontWeight: 500,
+                }}
               />
             </Bar>
           </BarChart>

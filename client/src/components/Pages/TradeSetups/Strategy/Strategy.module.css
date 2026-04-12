@@ -100,7 +100,7 @@
   outline: none;
   border-color: var(--accent);
   background: var(--bg-secondary);
-  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 /* ===== Submit Button ===== */
@@ -114,13 +114,13 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  box-shadow: 0 4px 12px var(--accent-subtle);
   margin-top: 0.5rem;
 }
 
 .submitBtn:hover {
   background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  box-shadow: 0 6px 20px var(--accent-glow);
   transform: translateY(-2px);
 }
 
@@ -152,7 +152,7 @@
   font-size: 0.9rem;
   color: var(--muted);
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-level-1);
   border-radius: var(--radius-md);
   border: 1px dashed var(--border-light);
   margin: 0;
@@ -240,25 +240,25 @@
 }
 
 .editBtn {
-  background: rgba(246, 185, 59, 0.15);
+  background: var(--accent-subtle);
   color: var(--accent);
   border: 1px solid var(--border-accent);
 }
 
 .editBtn:hover {
-  background: rgba(246, 185, 59, 0.25);
+  background: var(--accent-subtle);
   border-color: var(--accent);
   transform: translateY(-1px);
 }
 
 .deleteBtn {
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--color-loss-subtle);
   color: var(--error);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid var(--color-loss-subtle);
 }
 
 .deleteBtn:hover {
-  background: rgba(239, 68, 68, 0.2);
+  background: var(--color-loss-subtle);
   border-color: var(--error);
   transform: translateY(-1px);
 }
@@ -402,19 +402,19 @@
 }
 
 .cancelBtn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-hover);
   border-color: var(--border-light);
 }
 
 .confirmBtn {
   background: var(--accent);
   color: var(--bg-primary);
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  box-shadow: 0 4px 12px var(--accent-subtle);
 }
 
 .confirmBtn:hover {
   background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  box-shadow: 0 6px 20px var(--accent-glow);
   transform: translateY(-2px);
 }
 
@@ -428,3 +428,5 @@
     width: 100%;
   }
 }
+
+

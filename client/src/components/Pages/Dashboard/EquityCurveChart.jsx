@@ -13,6 +13,14 @@ import {
 import { getEquityCurveData } from "../../../utils/chartData";
 import { PerformanceContext } from "../../../context/PerformanceContext";
 
+const chartVar = (name, fallback) => {
+  if (typeof window === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value || fallback;
+};
+
 const EquityCurveChart = ({ trades }) => {
   const data = getEquityCurveData(trades);
   const { performance } = useContext(PerformanceContext);
@@ -31,7 +39,10 @@ const EquityCurveChart = ({ trades }) => {
           data={data}
           margin={{ top: 20, right: 30, left: 10, bottom: 10 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+          <CartesianGrid
+            strokeDasharray="3 3"
+            stroke={chartVar("--chart-grid", "var(--chart-grid)")}
+          />
           <XAxis
             dataKey="x"
             label={{ value: "Trade #", position: "insideBottom", offset: -5 }}
@@ -48,13 +59,18 @@ const EquityCurveChart = ({ trades }) => {
             domain={["auto", "auto"]}
           />
           <Tooltip
+            contentStyle={{
+              backgroundColor: chartVar("--chart-tooltip-bg", "var(--chart-tooltip-bg)"),
+              border: `1px solid ${chartVar("--chart-tooltip-border", "var(--chart-tooltip-border)")}`,
+              borderRadius: "12px",
+            }}
             formatter={(value) => [`$${value}`, "Balance"]}
             labelFormatter={(label) => `Trade #${label}`}
           />
           <Line
             type="monotone"
             dataKey="y"
-            stroke="#4f46e5"
+            stroke={chartVar("--accent-primary", "var(--accent-primary)")}
             strokeWidth={2}
             dot={showDots}
             activeDot={{ r: 6 }}

@@ -1,0 +1,194 @@
+.page {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.heading {
+  margin-bottom: var(--space-1);
+}
+
+.insightsCard {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+}
+
+.best,
+.worst {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.best {
+  color: var(--text-profit);
+}
+
+.worst {
+  color: var(--text-loss);
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.tab,
+.activeTab {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-4);
+  height: var(--btn-height);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
+}
+
+.tab {
+  color: var(--text-secondary);
+  background: var(--btn-secondary-bg);
+}
+
+.tab:hover {
+  background: var(--btn-secondary-bg-hover);
+}
+
+.activeTab {
+  color: var(--nav-item-active-text);
+  border-color: var(--nav-item-active-border);
+  background: var(--nav-item-active-bg);
+  font-weight: var(--weight-medium);
+}
+
+.filtersCard {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+}
+
+.filtersCard select,
+.filtersCard input,
+.filtersCard button {
+  min-height: var(--input-height);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  color: var(--input-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.filtersCard button {
+  cursor: pointer;
+  font-weight: var(--weight-medium);
+}
+
+.tableCard,
+.chartCard {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--surface-card);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-card);
+}
+
+.tableWrap {
+  overflow: auto;
+}
+
+.tableWrap table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 740px;
+}
+
+.tableWrap th,
+.tableWrap td {
+  text-align: left;
+  padding: var(--space-3) var(--space-2);
+  border-bottom: 1px solid var(--table-border);
+  font-size: var(--text-sm);
+}
+
+.tableWrap th {
+  color: var(--table-header-text);
+  font-weight: var(--weight-medium);
+}
+
+.state {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.positive {
+  color: var(--text-profit);
+  font-weight: var(--weight-medium);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.negative {
+  color: var(--text-loss);
+  font-weight: var(--weight-medium);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.chartCard h3 {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-md);
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.legendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--chart-series-accent);
+}
+
+.state,
+.tableWrap td,
+.tableWrap th {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .filtersCard {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .filtersCard {
+    grid-template-columns: 1fr;
+  }
+}

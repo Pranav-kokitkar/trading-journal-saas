@@ -4,10 +4,21 @@ import styles from "./dashboard.module.css";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { PerformanceContext } from "../../../context/PerformanceContext";
 
-const COLORS = ["#4caf50", "#f44336", "#ff9800"]; // Wins, Losses, Breakeven
+const chartVar = (name, fallback) => {
+  if (typeof window === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim();
+  return value || fallback;
+};
 
 const WinLossChart = ({ trades }) => {
   const { performance } = useContext(PerformanceContext);
+  const colors = [
+    chartVar("--color-profit", "var(--color-profit)"),
+    chartVar("--color-loss", "var(--color-loss)"),
+    chartVar("--accent-primary", "var(--accent-primary)"),
+  ];
 
   if (trades.length === 0) {
     return <p>No trades available for win/loss chart.</p>;
@@ -43,11 +54,16 @@ const WinLossChart = ({ trades }) => {
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={colors[index % colors.length]}
                 />
               ))}
             </Pie>
             <Tooltip
+              contentStyle={{
+                backgroundColor: chartVar("--chart-tooltip-bg", "var(--chart-tooltip-bg)"),
+                border: `1px solid ${chartVar("--chart-tooltip-border", "var(--chart-tooltip-border)")}`,
+                borderRadius: "12px",
+              }}
               formatter={(value, name) => [`${value}`, name]}
               // labelFormatter is optional for PieChart
             />

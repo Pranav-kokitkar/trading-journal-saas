@@ -1,8 +1,8 @@
 /* Root */
 .dashboard {
-  padding: 1.5rem;
+  padding: clamp(20px, 2vw, 32px);
   min-height: 100vh;
-  color: #eaeaea;
+  color: var(--text-primary);
 }
 
 /* Header */
@@ -11,9 +11,9 @@
 }
 
 .header h2 {
-  font-size: 1.4rem;
+  font-size: clamp(28px, 2.2vw, 36px);
   font-weight: 600;
-  color: #f5c56b; /* Gold */
+  color: var(--text-primary);
 }
 
 /* Cards grid */
@@ -25,16 +25,17 @@
 
 /* Card */
 .card {
-  background: linear-gradient(180deg, #0f1a2f, #0c1628);
-  border-radius: 12px;
+  background: var(--surface-card);
+  border-radius: var(--radius-xl);
   padding: 1rem 1.2rem;
-  border: 1px solid rgba(245, 197, 107, 0.12);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
   transition: all 0.2s ease;
 }
 
 .card:hover {
   transform: translateY(-2px);
-  border-color: rgba(245, 197, 107, 0.35);
+  border-color: var(--border-accent);
 }
 
 /* Label */
@@ -42,7 +43,7 @@
   font-size: 0.72rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #9aa4b2;
+  color: var(--text-secondary);
   margin-bottom: 0.35rem;
 }
 
@@ -50,16 +51,17 @@
 .value {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #f5c56b; /* Gold */
+  color: var(--accent-bright);
 }
 
 /* Chart Card */
 .chartCard {
   margin-top: 2rem;
   padding: 1.2rem;
-  background: linear-gradient(180deg, #0f1a2f, #0c1628);
-  border-radius: 14px;
-  border: 1px solid rgba(245, 197, 107, 0.15);
+  background: var(--surface-card);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
 }
 
 /* Chart Title */
@@ -67,17 +69,17 @@
   margin-bottom: 1rem;
   font-size: 1rem;
   font-weight: 600;
-  color: #f5c56b;
+  color: var(--text-primary);
 }
 
 .loading {
-  color: #f5c56b;
+  color: var(--text-secondary);
   padding: 2rem;
   font-size: 1rem;
 }
 
 .emptyState {
-  color: #9aa4b2;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   padding: 1.5rem 0;
   text-align: center;

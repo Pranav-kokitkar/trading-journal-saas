@@ -28,7 +28,7 @@
   padding: 16px 18px;
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--bg-level-3);
 }
 
 .subject {
@@ -85,14 +85,14 @@
   background: rgba(255, 255, 255, 0.03);
   padding: 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--bg-level-2);
 }
 
 /* Screenshot */
 .screenshot img {
   width: 100%;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--bg-level-3);
 }
 
 /* STATUS ROW */
@@ -110,7 +110,7 @@
   font-size: 13px;
   font-weight: 600;
   color: white;
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: var(--bg-level-2);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   outline: none;
@@ -140,26 +140,26 @@
   border: none;
   cursor: pointer;
   background: linear-gradient(90deg, var(--accent), var(--accent2));
-  color: #071226;
+  color: var(--text-inverse);
   white-space: nowrap;
 }
 
 /* Dropdown options */
 .statusSelect option {
-  background-color: #0b1220; /* dark background */
-  color: #ffffff; /* white text */
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 /* Selected option (important for some browsers) */
 .statusSelect option:checked {
-  background-color: var(--accent);
-  color: #071226;
+  background-color: #e2e8f0;
+  color: #0f172a;
 }
 
 /* Hovered option (Firefox support) */
 .statusSelect option:hover {
-  background-color: rgba(99, 102, 241, 0.25);
-  color: #ffffff;
+  background-color: #f1f5f9;
+  color: #0f172a;
 }
 
 /* ✅ RESPONSIVE */

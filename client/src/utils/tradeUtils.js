@@ -27,10 +27,25 @@ export const calculateTradeOnExit = ({
 
   const riskAmount = Number(updatedTrade.riskAmount) || 0;
   const riskType = updatedTrade.riskType || "dollar";
+  const marketType = (updatedTrade.marketType || "").toString().toLowerCase();
+  const priceDiff = Math.abs(entry - stoploss);
+
+  const getActualRisk = () => {
+    if (riskType === "percent") {
+      return (riskAmount / 100) * accountBalance;
+    }
+
+    if (riskType === "lots") {
+      if (marketType !== "forex" || priceDiff <= 0) return 0;
+      const FOREX_STANDARD_LOT_UNITS = 100000;
+      return riskAmount * FOREX_STANDARD_LOT_UNITS * priceDiff;
+    }
+
+    return riskAmount;
+  };
 
   // Actual Risk
-  const actualRisk =
-    riskType === "percent" ? (riskAmount / 100) * accountBalance : riskAmount;
+  const actualRisk = getActualRisk();
 
   // ===== RR Calculation (weighted exit) =====
   let rr = 0;
@@ -67,7 +82,6 @@ export const calculateTradeOnExit = ({
   }
 
   // Risk Amount
-  const priceDiff = Math.abs(entry - stoploss);
   const riskamount = priceDiff > 0 ? parseFloat(actualRisk.toFixed(2)) : 0;
 
   // PnL Calculation (volume-aware)
@@ -122,6 +136,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
   const tradeStatus = trade.tradeStatus || "";
   const symbol = (trade.symbol || "").toString().toUpperCase();
   const riskType = trade.riskType || "dollar";
+  const priceDiff = Math.abs(entry - stoploss);
 
   const requiredFields = {
     entry,
@@ -171,8 +186,20 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
 
   // ===== Adjust risk amount based on $ / % =====
   let actualRisk = Number(riskAmount);
+  let riskTypeError = "";
+
   if (riskType === "percent" && accountBalance) {
     actualRisk = (riskAmount / 100) * accountBalance;
+  } else if (riskType === "lots") {
+    if (marketType !== "forex") {
+      riskTypeError = "Lots risk type is only supported for Forex trades.";
+      actualRisk = 0;
+    } else if (priceDiff > 0) {
+      const FOREX_STANDARD_LOT_UNITS = 100000;
+      actualRisk = riskAmount * FOREX_STANDARD_LOT_UNITS * priceDiff;
+    } else {
+      actualRisk = 0;
+    }
   }
 
   // ===== Potential Loss =====
@@ -195,7 +222,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
       if (pips <= 0) lossError = "Invalid Entry/Stoploss for Forex.";
     }
 
-    if (!lossError) {
+    if (!lossError && !riskTypeError) {
       if (calculatedLoss > accountBalance) calculatedLoss = accountBalance;
       riskamount = calculatedLoss.toFixed(2);
       if (actualRisk > accountBalance) {
@@ -203,6 +230,8 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
       } else if (actualRisk > 0.2 * accountBalance) {
         lossWarning = "Warning: Risk exceeds 20% of account balance.";
       }
+    } else if (riskTypeError) {
+      lossError = riskTypeError;
     }
   } else if (!lossError && !missingFields.includes("marketType")) {
     lossError = "Enter Entry, Stoploss, and Risk Amount.";
@@ -218,7 +247,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
   } else if (tradeStatus === "exited" && trade.exitedPrice?.length > 0) {
     const totalVolume = trade.exitedPrice.reduce(
       (sum, lvl) => sum + Number(lvl.volume || 0),
-      0
+      0,
     );
 
     if (totalVolume !== 100) {

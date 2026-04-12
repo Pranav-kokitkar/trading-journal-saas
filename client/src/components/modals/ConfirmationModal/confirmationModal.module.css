@@ -69,7 +69,7 @@
 .cancelBtn:hover {
   color: var(--text-primary);
   border-color: var(--border-light);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-level-1);
 }
 
 /* ===== Confirm Button ===== */
@@ -83,12 +83,12 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.25);
+  box-shadow: 0 4px 12px var(--accent-subtle);
 }
 
 .confirmBtn:hover {
   background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.35);
+  box-shadow: 0 6px 20px var(--accent-glow);
   transform: translateY(-2px);
 }
 
@@ -145,3 +145,5 @@
     justify-content: center;
   }
 }
+
+

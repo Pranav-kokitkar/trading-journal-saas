@@ -59,18 +59,18 @@ export const MyAccount = () => {
   };
 
   return (
-    <section className={styles.myaccount}>
+    <section className={`${styles.myaccount} app-page`}>
       {IsCreateModalOpen && (
         <CreateAccModal onClose={() => setIsCreateModalOpen(false)} />
       )}
 
       <div className={styles.mainContent}>
         {/* Page Heading - Consistent with other pages */}
-        <div className={styles.myaccountpageheading}>
-          <h2 className={styles.title}>
+        <div className={`${styles.myaccountpageheading} app-page-heading`}>
+          <h2 className="app-page-title">
             My <span>Account</span>
           </h2>
-          <p>Manage your trading accounts, preferences, and data</p>
+          <p className="app-page-subtitle">Manage your trading accounts, preferences, and data</p>
         </div>
 
         {/* Account Selector */}

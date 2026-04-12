@@ -6,7 +6,7 @@
 .addtrade {
   display: flex;
   justify-content: center;
-  padding: 1.5rem;
+  padding: clamp(20px, 2vw, 32px);
   min-height: 100vh;
   gap: 2rem;
   flex-wrap: wrap;
@@ -15,7 +15,7 @@
 /* ===== Form Container ===== */
 .addtrade form {
   width: 100%;
-  max-width: 980px;
+  max-width: 1080px;
   box-sizing: border-box;
 }
 
@@ -26,27 +26,28 @@
   margin-bottom: 1.5rem;
 }
 
-.heading h3 {
-  font-size: 1.35rem;
+.title {
+  font-size: clamp(28px, 2.4vw, 40px);
   margin: 0;
   color: var(--text-primary);
   font-weight: 600;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.04em;
 }
 
 .heading p {
-  color: var(--muted);
-  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
   margin-top: 0.5rem;
 }
 
 /* ===== Card Layout (Matches Admin Panel) ===== */
 .card {
-  background: var(--gradient-card);
+  background: var(--surface-card);
   padding: 1.25rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   margin-bottom: 1.25rem;
   border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
   transition: border-color 0.25s ease;
 }
 
@@ -68,7 +69,7 @@
   color: var(--muted);
   margin-bottom: 1rem;
   padding: 0.5rem 0.75rem;
-  background: rgba(246, 185, 59, 0.08);
+  background: var(--accent-subtle);
   border-radius: var(--radius-sm);
   border-left: 3px solid var(--accent);
 }
@@ -88,7 +89,7 @@
 .inputGroup label {
   margin-bottom: 0.4rem;
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -98,11 +99,11 @@
 .inputGroup input,
 .inputGroup select,
 .inputGroup textarea {
-  padding: 0.65rem 0.9rem;
-  border-radius: var(--radius-sm);
+  padding: 0 0.9rem;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--bg-tertiary);
-  color: var(--text);
+  background: var(--surface-card);
+  color: var(--text-primary);
   font-size: 0.85rem;
   font-family: inherit;
   transition: all 0.2s ease;
@@ -110,8 +111,8 @@
 
 .inputGroup input::placeholder,
 .inputGroup textarea::placeholder {
-  color: var(--muted);
-  opacity: 0.5;
+  color: var(--text-muted);
+  opacity: 0.72;
 }
 
 .inputGroup input:focus,
@@ -119,12 +120,52 @@
 .inputGroup textarea:focus {
   outline: none;
   border-color: var(--accent);
-  background: var(--bg-secondary);
-  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+  background: var(--surface-card-strong);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 .inputGroup select {
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  color-scheme: dark;
+  background-color: var(--surface-card);
+  background-image: linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+  background-position: calc(100% - 12px) center;
+  background-size: 8px 8px;
+  background-repeat: no-repeat;
+  padding-right: 28px;
+}
+
+.inputGroup select option,
+.inputGroup select optgroup {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+.inputGroup select:hover {
+  background-color: var(--surface-card-strong);
+  background-image: linear-gradient(
+    135deg,
+    var(--accent-bright) 50%,
+    transparent 50%
+  );
+  background-position: calc(100% - 12px) center;
+  background-size: 8px 8px;
+  background-repeat: no-repeat;
+}
+
+.inputGroup select:focus {
+  background-color: var(--surface-card-strong);
+  background-image: linear-gradient(
+    135deg,
+    var(--accent-bright) 50%,
+    transparent 50%
+  );
+  background-position: calc(100% - 12px) center;
+  background-size: 8px 8px;
+  background-repeat: no-repeat;
 }
 
 /* ===== Layout Helpers ===== */
@@ -186,13 +227,37 @@
   color: var(--text-primary);
 }
 
+/* ===== Radio Buttons in Card (Price & Risk Section) ===== */
+.card input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  margin-right: 0.4rem;
+  margin-top: 0.2rem;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.card label {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.card label:hover {
+  color: var(--text-primary);
+}
+
 /* ===== Warning Text ===== */
 .warning {
   color: var(--accent);
   font-size: 0.75rem;
   margin-bottom: 0.75rem;
   padding: 0.5rem 0.75rem;
-  background: rgba(246, 185, 59, 0.08);
+  background: var(--accent-subtle);
   border-radius: var(--radius-sm);
   border-left: 3px solid var(--accent);
 }
@@ -201,8 +266,8 @@
 .exitedSection {
   margin-top: 1rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: var(--radius-sm);
+  background: var(--bg-level-1);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
 }
 
@@ -231,11 +296,11 @@
 /* ===== Add Button (for exit levels) ===== */
 .addButton {
   width: 100%;
-  padding: 0.65rem;
+  padding: 0.7rem;
   background: transparent;
   border: 1px dashed var(--border-medium);
-  border-radius: var(--radius-sm);
-  color: var(--muted);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -246,7 +311,7 @@
 .addButton:hover {
   border-color: var(--accent);
   color: var(--accent);
-  background: rgba(246, 185, 59, 0.05);
+  background: var(--accent-subtle);
 }
 
 /* ===== Buttons Container ===== */
@@ -259,9 +324,10 @@
 }
 
 .btncontainer button {
-  padding: 0.65rem 1.5rem;
+  padding: 0 1.5rem;
+  height: 46px;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -272,28 +338,28 @@
 
 /* Reset button */
 .btncontainer button[type="reset"] {
-  background: transparent;
-  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
   border: 1px solid var(--border-medium);
 }
 
 .btncontainer button[type="reset"]:hover {
   border-color: var(--error);
   color: var(--error);
-  background: rgba(239, 68, 68, 0.05);
+  background: var(--color-loss-subtle);
 }
 
 /* Submit button */
 .btncontainer button[type="submit"] {
-  background: var(--accent);
-  color: var(--bg-primary);
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   font-weight: 700;
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.2);
+  box-shadow: var(--btn-primary-shadow);
 }
 
 .btncontainer button[type="submit"]:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 6px 20px rgba(246, 185, 59, 0.3);
+  background: var(--btn-primary-bg-hover);
+  box-shadow: 0 18px 34px rgba(110, 124, 255, 0.3);
   transform: translateY(-2px);
 }
 
@@ -307,7 +373,7 @@
 .textareaGroup label {
   margin-bottom: 0.4rem;
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -317,10 +383,10 @@
   min-height: 120px;
   resize: vertical;
   padding: 0.75rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--bg-tertiary);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
   font-size: 0.85rem;
   font-family: inherit;
   transition: all 0.2s ease;
@@ -329,8 +395,8 @@
 .textareaGroup textarea:focus {
   outline: none;
   border-color: var(--accent);
-  background: var(--bg-secondary);
-  box-shadow: 0 0 0 3px rgba(246, 185, 59, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
 /* ===== File Input Styling ===== */
@@ -342,7 +408,7 @@
 
 .col2 > div label {
   font-size: 0.75rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -350,10 +416,10 @@
 
 .col2 input[type="file"] {
   padding: 0.5rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: var(--bg-tertiary);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -406,7 +472,7 @@
 
 .addTagBtn:hover {
   border-color: var(--accent);
-  background: rgba(246, 185, 59, 0.05);
+  background: var(--accent-subtle);
   transform: translateY(-1px);
 }
 
@@ -416,7 +482,7 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-level-1);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   margin-bottom: 1rem;
@@ -474,7 +540,7 @@
 
 .strategyUnselected:hover {
   border-color: var(--accent);
-  background: rgba(246, 185, 59, 0.1);
+  background: var(--accent-subtle);
 }
 
 .strategySelected {
@@ -482,7 +548,7 @@
   color: var(--bg-primary);
   border-color: var(--accent);
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(246, 185, 59, 0.3);
+  box-shadow: 0 4px 12px var(--accent-glow);
 }
 
 .tagPicker button:hover {
@@ -508,7 +574,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  background: rgba(246, 185, 59, 0.08);
+  background: var(--accent-subtle);
   border: 1px solid var(--border-accent);
   border-radius: var(--radius-sm);
   margin-bottom: 1rem;
@@ -527,7 +593,7 @@
   font-weight: 600;
   color: var(--accent);
   padding: 0.35rem 0.75rem;
-  background: rgba(246, 185, 59, 0.15);
+  background: var(--accent-subtle);
   border-radius: var(--radius-full);
   border: 1px solid var(--accent);
 }

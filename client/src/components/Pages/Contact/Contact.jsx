@@ -118,11 +118,11 @@ export const Contact = () => {
       {!isLoggedIn ? <Navbar /> : ""}
 
       <main className={styles.hero}>
-        <h2 className={styles.title}>
+        <h2 className="app-page-title">
           Contact <span>Support</span>
         </h2>
 
-        <p className={styles.subtitle}>
+        <p className="app-page-subtitle">
           Found a bug or need help? Send us a message and a brief description —
           attaching a screenshot helps us reproduce the issue faster.
         </p>

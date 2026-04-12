@@ -6,7 +6,7 @@
 .layout {
   display: flex;
   min-height: 100vh;
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 /* ===== Sidebar (Desktop Default) ===== */
@@ -19,7 +19,7 @@
 .outlet {
   flex: 1;
   overflow-y: auto;
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 /* ===== Mobile Header (Hidden on Desktop) ===== */
@@ -49,15 +49,14 @@
 }
 
 .hamburger:hover span {
-  background: var(--accent);
+  background: var(--accent-primary);
 }
 
 .mobileHeader h3 {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: var(--text-lg);
+  font-weight: 500;
   color: var(--text-primary);
-  letter-spacing: -0.3px;
 }
 
 /* ===== Overlay (Hidden by Default) ===== */
@@ -66,51 +65,43 @@
 }
 
 .title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: var(--text-xl);
+  font-weight: 500;
   line-height: 1.2;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 var(--space-sm) 0;
   color: var(--text-primary);
-  letter-spacing: -0.5px;
 }
 
 .title span {
-  background: linear-gradient(90deg, var(--accent), #f5a623);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--accent-primary);
 }
 
 .addTradeBtn {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 64px;
-  height: 64px;
+  bottom: calc(var(--space-lg) + 2px);
+  right: calc(var(--space-lg) + 2px);
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), #f5a623);
-  color: #fff;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
   border: none;
-  box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.15),
-    0 2px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background-color 150ms ease,
+    opacity 150ms ease;
 }
 
 .addTradeBtn:hover {
-  transform: scale(1.1) rotate(90deg);
-  box-shadow:
-    0 8px 25px rgba(0, 0, 0, 0.2),
-    0 4px 12px rgba(0, 0, 0, 0.15);
+  background: var(--btn-primary-hover);
 }
 
 .addTradeBtn:active {
-  transform: scale(0.95) rotate(90deg);
+  opacity: 0.9;
 }
 
 .plusIcon {
@@ -135,16 +126,16 @@
     left: 0;
     right: 0;
     z-index: 200;
-    background: var(--gradient-card);
+    background: rgba(9, 13, 22, 0.92);
     border-bottom: 1px solid var(--border-subtle);
-    padding: 1rem 1.25rem;
+    padding: var(--space-md);
     align-items: center;
-    gap: 1rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    gap: var(--space-md);
+    backdrop-filter: blur(16px);
   }
 
   .mobileHeader h3 {
-    font-size: 1.7rem;
+    font-size: var(--text-lg);
   }
 
   /* Hide Sidebar by Default on Mobile */
@@ -172,7 +163,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--overlay-backdrop);
     backdrop-filter: blur(4px);
     z-index: 500;
     cursor: pointer;
@@ -180,7 +171,7 @@
 
   /* Add padding to main content for mobile header */
   .outlet {
-    padding-top: 60px;
+    padding-top: 72px;
   }
 }
 

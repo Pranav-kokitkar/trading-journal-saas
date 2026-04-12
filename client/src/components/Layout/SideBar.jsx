@@ -1,8 +1,8 @@
 import styles from "./SideBar.module.css";
-import {NavLink, Link} from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../store/Auth";
 
-export const Sidebar = () => {
+export const Sidebar = ({ onClose }) => {
 
   const { user, isAdmin, isPro, isAuthLoading } = useAuth();
 
@@ -26,43 +26,48 @@ export const Sidebar = () => {
       <nav className={styles.nav}>
         <ul>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/dashboard">
+            <NavLink className={getNavLinkClass} to="/app/dashboard" onClick={onClose}>
               Dashboard
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/trade-history">
+            <NavLink className={getNavLinkClass} to="/app/trade-history" onClick={onClose}>
               Trade History
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/add-notes">
+            <NavLink className={getNavLinkClass} to="/app/add-notes" onClick={onClose}>
               Notes
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/contact">
+            <NavLink className={getNavLinkClass} to="/app/contact" onClick={onClose}>
               Contact
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/trade-setups">
+            <NavLink className={getNavLinkClass} to="/app/trade-setups" onClick={onClose}>
               Trade Setups
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/upgrade">
+            <NavLink className={getNavLinkClass} to="/app/upgrade" onClick={onClose}>
               Upgrade
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/compare">
+            <NavLink className={getNavLinkClass} to="/app/compare" onClick={onClose}>
               Compare
             </NavLink>
           </li>
           <li>
+            <NavLink className={getNavLinkClass} to="/app/analytics" onClick={onClose}>
+              Analytics
+            </NavLink>
+          </li>
+          <li>
             {isAdmin && (
-              <NavLink className={getNavLinkClass} to="/admin">
+              <NavLink className={getNavLinkClass} to="/admin" onClick={onClose}>
                 Admin
               </NavLink>
             )}
@@ -71,15 +76,13 @@ export const Sidebar = () => {
       </nav>
 
       {/* Bottom User Info */}
-      <Link to="/app/my-account">
-        <div className={styles.user}>
-          <div className={styles.avatar}>U</div>
-          <div>
-            <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
-            <span className={styles.subText}>Your Account</span>
-          </div>
-          {!isAuthLoading && isPro && <p className={styles.proBadge}>PRO</p>}
+      <Link to="/app/my-account" className={styles.user}>
+        <div className={styles.avatar}>U</div>
+        <div className={styles.userMeta}>
+          <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
+          <span className={styles.subText}>Your Account</span>
         </div>
+        {!isAuthLoading && isPro && <p className={styles.proBadge}>PRO</p>}
       </Link>
     </div>
   );
