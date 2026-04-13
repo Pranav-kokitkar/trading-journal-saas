@@ -227,6 +227,12 @@
   /* overlays */
   --overlay-backdrop: rgba(0, 0, 0, 0.55);
 
+  /* skeletons */
+  --skeleton-bg: rgba(255, 255, 255, 0.06);
+  --skeleton-shimmer: rgba(255, 255, 255, 0.12);
+  --skeleton-border: rgba(255, 255, 255, 0.08);
+  --skeleton-radius: var(--radius-md);
+
   /* compatibility aliases used by existing modules */
   --bg-primary: #0a0f18;
   --bg-secondary: var(--bg-level-1);

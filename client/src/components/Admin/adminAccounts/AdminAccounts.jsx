@@ -3,6 +3,7 @@ import { useAdminAccounts } from "../store/AdminAccountsContext";
 import styles from "./AdminAccounts.module.css";
 import { Pagination } from "../../Pagination";
 import { useEffect, useState } from "react";
+import { SkeletonCard, SkeletonTableRow, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AdminAccounts = () => {
   const {
@@ -38,7 +39,16 @@ export const AdminAccounts = () => {
   };
 
   if (loading) {
-    return <p className={styles.loading}>Loading accounts...</p>;
+    return (
+      <section className={styles.page}>
+        <SkeletonText lines={1} width="240px" height={28} />
+        <div className={styles.statsGrid}>
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -81,7 +91,11 @@ export const AdminAccounts = () => {
 
       {/* Accounts */}
       {loadingAccounts ? (
-        <p className={styles.loading}>Loading accounts...</p>
+        <div>
+          {Array.from({ length: 5 }).map((_, index) => (
+            <SkeletonTableRow key={`admin-account-skeleton-${index}`} columns={4} />
+          ))}
+        </div>
       ) : (
         <DisplayAccounts accounts={accounts} />
       )}

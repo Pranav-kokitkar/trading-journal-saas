@@ -4,6 +4,7 @@ import { useAdminUsers } from "../store/AdminUserContext";
 import { Pagination } from "../../Pagination";
 import { AdminDisplayUsers } from "./AdminDisplayUsers";
 import { useState, useEffect } from "react";
+import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AdminUser = () => {
   const {
@@ -38,7 +39,15 @@ export const AdminUser = () => {
   }, [searchInput]);
 
   if (loading) {
-    return <p className={styles.loading}>Loading users...</p>;
+    return (
+      <section className={styles.adminUsers}>
+        <SkeletonText lines={1} width="240px" height={28} />
+        <div className={styles.statsGrid}>
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+        </div>
+      </section>
+    );
   }
 
   return (

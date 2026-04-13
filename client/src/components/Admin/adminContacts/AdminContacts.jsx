@@ -3,6 +3,7 @@ import styles from "./AdminContacts.module.css";
 import { AdminContactModal } from "./AdminContactModal";
 import { useAdminContacts } from "../store/AdminContactsContext";
 import { Pagination } from "../../Pagination";
+import { SkeletonCard, SkeletonTableRow, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AdminContacts = () => {
   const {
@@ -46,7 +47,22 @@ export const AdminContacts = () => {
   };
 
   if (loading) {
-    return <p className={styles.empty}>Loading...</p>;
+    return (
+      <section className={styles.container}>
+        <div className={styles.header}>
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+        </div>
+        <SkeletonText lines={1} width="320px" />
+        <div className={styles.list}>
+          <SkeletonCard rows={3} withHeader />
+          <SkeletonCard rows={3} withHeader />
+          <SkeletonCard rows={3} withHeader />
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -111,7 +127,11 @@ export const AdminContacts = () => {
       {/* Contacts List */}
       <div className={styles.list}>
         {loadingContacts ? (
-          <p>loading...</p>
+          <div className={styles.contactsListSkeleton}>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <SkeletonTableRow key={`contact-skeleton-${index}`} columns={3} />
+            ))}
+          </div>
         ) : (
           <DisplayContacts
             contacts={contacts}

@@ -45,6 +45,12 @@
   font-size: 0.95rem;
 }
 
+.compareLoadingCards {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
 /* ===== Compare Form Card ===== */
 .compareForm {
   background: var(--surface-card);
@@ -294,6 +300,13 @@
 .compareBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.compareButtonSkeleton {
+  width: 140px;
+  margin: 0 auto;
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* ===== Imported Trades Checkbox ===== */

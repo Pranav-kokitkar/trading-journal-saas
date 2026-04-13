@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../store/Auth";
 import styles from "./AdminTradeDetails.module.css";
+import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AdminTradeDetails = () => {
   const { id } = useParams();
@@ -40,9 +41,15 @@ export const AdminTradeDetails = () => {
 
   if (loading){
       return (
-        <div className={styles.header}>
-          <p className={styles.loading}>Loading...</p>
-        </div>
+        <section className={styles.container}>
+          <div className={styles.header}>
+            <SkeletonText lines={1} width="220px" height={22} />
+          </div>
+          <div className={styles.grid}>
+            <SkeletonCard rows={3} withHeader />
+            <SkeletonCard rows={3} withHeader />
+          </div>
+        </section>
       );
     }
 

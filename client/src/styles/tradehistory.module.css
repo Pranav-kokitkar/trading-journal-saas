@@ -218,6 +218,33 @@
   font-size: var(--text-xs);
 }
 
+.headingSkeleton {
+  max-width: 320px;
+}
+
+.filterSkeletonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.filterSkeletonField {
+  flex: 1;
+  min-width: 140px;
+}
+
+.summarySkeleton {
+  min-height: 40px;
+  padding: 0;
+}
+
+.tradeListSkeleton {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2) var(--space-4);
+}
+
 @media (max-width: 768px) {
   .tardehistory {
     padding: var(--space-4);

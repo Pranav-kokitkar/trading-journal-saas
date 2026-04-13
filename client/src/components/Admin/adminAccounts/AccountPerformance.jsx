@@ -11,6 +11,7 @@ import {
   Bar,
   Cell,
 } from "recharts";
+import { SkeletonCard, SkeletonChart, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AccountPerformance = ({ data }) => {
   // STEP B: Date formatter (only required addition)
@@ -23,7 +24,25 @@ export const AccountPerformance = ({ data }) => {
   };
 
   if (!data) {
-    return <p className={styles.loading}>Loading performance...</p>;
+    return (
+      <section className={styles.dashboard}>
+        <header className={styles.header}>
+          <SkeletonText lines={1} width="240px" height={24} />
+          <SkeletonText lines={1} width="320px" />
+        </header>
+
+        <div className={styles.cardsGrid}>
+          {Array.from({ length: 8 }).map((_, index) => (
+            <SkeletonCard key={`performance-skeleton-card-${index}`} rows={1} withHeader />
+          ))}
+        </div>
+
+        <div className={styles.chartCard}>
+          <SkeletonText lines={1} width="180px" />
+          <SkeletonChart height={300} />
+        </div>
+      </section>
+    );
   }
   const hasPnLData =
     data.charts?.pnlPerDay && data.charts.pnlPerDay.length > 0;

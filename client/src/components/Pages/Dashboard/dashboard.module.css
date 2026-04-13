@@ -241,6 +241,21 @@
   font-size: var(--text-sm);
 }
 
+.skeletonTitle {
+  max-width: 320px;
+}
+
+.metricSkeletonCard {
+  min-height: 74px;
+}
+
+.toggleSkeleton {
+  min-width: 220px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: var(--radius-pill);
+}
+
 @media (max-width: 1024px) {
   .tradingdata {
     grid-template-columns: 1fr;

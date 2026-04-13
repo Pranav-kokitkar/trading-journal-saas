@@ -13,6 +13,7 @@ import { FiActivity, FiTrendingUp, FiTarget } from "react-icons/fi";
 import { FaTrophy, FaPercentage } from "react-icons/fa";
 import { UserContext } from "../../../context/UserContext";
 import { AccountContext } from "../../../context/AccountContext";
+import { SkeletonCard, SkeletonChart, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const Dashboard = () => {
   const { userDetails } = useContext(UserContext);
@@ -39,7 +40,7 @@ export const Dashboard = () => {
 
 
   if (!userDetails) {
-    return <p>loading...</p>;
+    return <DashboardLoadingState />;
   }
 
   return (
@@ -69,9 +70,7 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>Equity Curve</h3>
           {chartsLoading ? (
-            <div className={styles.chartLoading}>
-              <p className={styles.chartLoadingText}>Loading chart data...</p>
-            </div>
+            <SkeletonChart height={280} showLegend={false} />
           ) : (
             <EquityCurveChart trades={closedTrades} />
           )}
@@ -80,9 +79,7 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>Win / Loss</h3>
           {chartsLoading ? (
-            <div className={styles.chartLoading}>
-              <p className={styles.chartLoadingText}>Loading chart data...</p>
-            </div>
+            <SkeletonChart height={280} showLegend={false} />
           ) : (
             <WinLossChart trades={closedTrades} />
           )}
@@ -91,9 +88,7 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>PnL Per Trade</h3>
           {chartsLoading ? (
-            <div className={styles.chartLoading}>
-              <p className={styles.chartLoadingText}>Loading chart data...</p>
-            </div>
+            <SkeletonChart height={280} showLegend={false} />
           ) : (
             <PnLChart trades={closedTrades} />
           )}
@@ -102,9 +97,7 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>Risk Overview</h3>
           {chartsLoading ? (
-            <div className={styles.chartLoading}>
-              <p className={styles.chartLoadingText}>Loading chart data...</p>
-            </div>
+            <SkeletonChart height={280} showLegend={false} />
           ) : (
             <RiskChart trades={closedTrades} />
           )}
@@ -113,15 +106,50 @@ export const Dashboard = () => {
         <div className={styles.chartCard}>
           <h3>Direction Success</h3>
           {chartsLoading ? (
-            <div className={styles.chartLoading}>
-              <p className={styles.chartLoadingText}>Loading chart data...</p>
-            </div>
+            <SkeletonChart height={280} showLegend={false} />
           ) : (
             <DirectionChart trades={closedTrades} />
           )}
         </div>
       </div>
 
+    </section>
+  );
+};
+
+const DashboardLoadingState = () => {
+  return (
+    <section className={`${styles.dashboard} app-page`}>
+      <header className={`${styles.pageHero} app-page-heading`}>
+        <SkeletonText className={styles.skeletonTitle} lines={1} width="260px" height={28} />
+
+        <div className={styles.tradingdata}>
+          <div className={styles.tradingdatal}>
+            <SkeletonCard className={styles.metricSkeletonCard} rows={1} withHeader={false} />
+            <SkeletonCard className={styles.metricSkeletonCard} rows={1} withHeader={false} />
+            <SkeletonCard className={styles.metricSkeletonCard} rows={1} withHeader={false} />
+            <SkeletonCard className={styles.metricSkeletonCard} rows={1} withHeader={false} />
+          </div>
+
+          <div className={styles.tradingdatar}>
+            <SkeletonText lines={6} width={["55%", "100%", "92%", "100%", "86%", "72%"]} />
+          </div>
+        </div>
+      </header>
+
+      <div className={styles.sectionHeader}>
+        <SkeletonText lines={1} width="220px" height={24} />
+        <SkeletonCard className={styles.toggleSkeleton} rows={1} withHeader={false} />
+      </div>
+
+      <div className={styles.tradingperformance}>
+        {Array.from({ length: 5 }).map((_, index) => (
+          <div key={`dashboard-skeleton-chart-${index}`} className={styles.chartCard}>
+            <SkeletonText lines={1} width="50%" height={18} />
+            <SkeletonChart height={280} showLegend={false} />
+          </div>
+        ))}
+      </div>
     </section>
   );
 };

@@ -128,6 +128,12 @@
   margin-bottom: 24px;
 }
 
+.contactsListSkeleton {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+}
+
 /* =========================
    Contact Card
 ========================= */
@@ -268,5 +274,3 @@
     min-width: unset;
   }
 }
-
-

@@ -10,6 +10,7 @@ import { toastHelper } from "../../../utils/toastHelper";
 import { AccountContext } from "../../../context/AccountContext";
 import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
 import { getMaxScreenshots } from "../../../config/planLimits";
+import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const Trade = () => {
   const { accountDetails, updateAccount } = useContext(AccountContext);
@@ -140,7 +141,14 @@ export const Trade = () => {
     };
   }, [id, trade, triedRefresh, refreshTrades]);
 
-  if (isLoading && !trade) return <p>Loading trade…</p>;
+  if (isLoading && !trade) {
+    return (
+      <section className={`${styles.trade} app-page`}>
+        <SkeletonText lines={1} width="220px" height={24} />
+        <SkeletonCard rows={4} withHeader />
+      </section>
+    );
+  }
   if (!trade) return <p>Trade not found</p>;
 
   // --- Exit Handlers ---

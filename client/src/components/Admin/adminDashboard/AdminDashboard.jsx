@@ -7,6 +7,7 @@ import { AdminTradesSection } from "./AdminTradesSection";
 import { AdminContactsSection } from "./AdminContactsSection";
 
 import styles from "./AdminDashboard.module.css";
+import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -45,7 +46,21 @@ export const AdminDashboard = () => {
   }, [authorizationToken]);
 
   if (loading) {
-    return <p className={styles.loading}>Loading dashboard...</p>;
+    return (
+      <section className={styles.dashboard}>
+        <header className={styles.header}>
+          <SkeletonText lines={1} width="280px" height={30} />
+          <SkeletonText lines={1} width="320px" />
+        </header>
+
+        <div className={styles.cardsGrid}>
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+        </div>
+      </section>
+    );
   }
 
   return (

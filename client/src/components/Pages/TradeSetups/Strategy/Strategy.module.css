@@ -162,6 +162,17 @@
   border-style: solid;
 }
 
+.strategySkeletonList {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.strategySkeletonCard {
+  background: var(--bg-secondary);
+}
+
 /* ===== Strategies List ===== */
 .strategiesList {
   display: flex;
@@ -428,5 +439,3 @@
     width: 100%;
   }
 }
-
-

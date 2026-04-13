@@ -5,6 +5,7 @@ import { TradeCard } from "./TradeCard";
 import { Pagination } from "../../Pagination";
 import { useAuth } from "../../../store/Auth";
 import { AccountContext } from "../../../context/AccountContext";
+import { SkeletonCard, SkeletonInput, SkeletonTableRow, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 const defaultFilters = {
   symbol: "",
@@ -136,7 +137,9 @@ export const TradeHistory = () => {
     ? tags.filter((t) => t.accountId === filters.accountId)
     : tags;
 
-  if (isAuthLoading) return <p>loading...</p>;
+  if (isAuthLoading) {
+    return <TradeHistoryLoadingState />;
+  }
 
   return (
     <section id="trade-history" className={styles.tardehistory}>
@@ -360,7 +363,15 @@ export const TradeHistory = () => {
           </div>
         </div>
 
-        {loading ? <p>Loading trades...</p> : <TradeCard savedTrade={trades} />}
+        {loading ? (
+          <div className={styles.tradeListSkeleton}>
+            {Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonTableRow key={`trade-row-skeleton-${index}`} columns={5} />
+            ))}
+          </div>
+        ) : (
+          <TradeCard savedTrade={trades} />
+        )}
 
         <Pagination
           page={page}
@@ -371,3 +382,40 @@ export const TradeHistory = () => {
     </section>
   );
 };
+
+const TradeHistoryLoadingState = () => (
+  <section id="trade-history" className={styles.tardehistory}>
+    <div className={styles.heading}>
+      <SkeletonText className={styles.headingSkeleton} lines={1} width="240px" height={34} />
+      <SkeletonText lines={1} width="320px" />
+    </div>
+
+    <div className={styles.tradehistorycontainer}>
+      <div className={styles.filter}>
+        <SkeletonText lines={1} width="220px" height={18} />
+
+        <div className={styles.filterSkeletonRow}>
+          <SkeletonInput className={styles.filterSkeletonField} />
+          <SkeletonInput className={styles.filterSkeletonField} />
+          <SkeletonInput className={styles.filterSkeletonField} />
+          <SkeletonInput className={styles.filterSkeletonField} />
+          <SkeletonInput className={styles.filterSkeletonField} />
+        </div>
+
+        <div className={styles.filterSkeletonRow}>
+          <SkeletonInput className={styles.filterSkeletonField} />
+          <SkeletonInput className={styles.filterSkeletonField} />
+          <SkeletonInput className={styles.filterSkeletonField} />
+        </div>
+
+        <SkeletonCard className={styles.summarySkeleton} rows={1} withHeader={false} />
+      </div>
+
+      <div className={styles.tradeListSkeleton}>
+        {Array.from({ length: 6 }).map((_, index) => (
+          <SkeletonTableRow key={`trade-auth-skeleton-${index}`} columns={5} />
+        ))}
+      </div>
+    </div>
+  </section>
+);

@@ -5,6 +5,7 @@ import { useAuth } from "../../../store/Auth";
 import toast from "react-hot-toast";
 import { TradeContext } from "../../../store/TradeContext";
 import { AccountContext } from "../../../context/AccountContext";
+import { SkeletonInput } from "../../ui/skeleton/Skeleton";
 
 export const Login = () => {
   const [user, setUser] = useState({
@@ -129,7 +130,7 @@ export const Login = () => {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                {isLoading ? <SkeletonInput className={styles.buttonSkeleton} height={14} /> : "Login"}
               </button>
 
               <div className={styles.row}>

@@ -17,6 +17,7 @@ import {
   mergeExpectancyData,
   getDimensionLabel,
 } from "./utils";
+import { SkeletonCard, SkeletonInput, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 const AVAILABLE_DIMENSIONS = [
   { key: "accountId", label: "Account", type: "select" },
@@ -439,7 +440,11 @@ export const Compare = () => {
         {/* Loading State */}
         {loadingData ? (
           <div className={styles.loadingState}>
-            <p>Loading data...</p>
+            <SkeletonText lines={1} width="160px" />
+            <div className={styles.compareLoadingCards}>
+              <SkeletonCard rows={3} withHeader />
+              <SkeletonCard rows={3} withHeader />
+            </div>
           </div>
         ) : (
           <>
@@ -467,7 +472,11 @@ export const Compare = () => {
             onClick={handleCompare}
             disabled={!isCompareEnabled() || isComparing}
           >
-            {isComparing ? "Comparing..." : "Compare Datasets"}
+            {isComparing ? (
+              <SkeletonInput className={styles.compareButtonSkeleton} height={14} />
+            ) : (
+              "Compare Datasets"
+            )}
           </button>
 
           <label className={styles.importedTradesLabel}>

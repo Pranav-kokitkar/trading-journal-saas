@@ -5,6 +5,7 @@ import styles from "./AdminAccountDetails.module.css";
 import { AdminAccountEditModal } from "./AdminAccountEditModal";
 import { AccountPerformance } from "./AccountPerformance";
 import {Pagination} from "../../Pagination"
+import { SkeletonCard, SkeletonTableRow, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AdminAccountDetails = () => {
   const [accountDetails, setAccountDetails] = useState(null);
@@ -142,7 +143,25 @@ export const AdminAccountDetails = () => {
   },[page]);
 
   if (loading) {
-    return <p>Loading....</p>;
+    return (
+      <section className={styles.page}>
+        <SkeletonText lines={1} width="260px" height={28} />
+
+        <div className={styles.summaryGrid}>
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+        </div>
+
+        <div className={styles.tradesSection}>
+          <SkeletonText lines={1} width="120px" />
+          {Array.from({ length: 4 }).map((_, index) => (
+            <SkeletonTableRow key={`admin-account-trade-skeleton-${index}`} columns={4} />
+          ))}
+        </div>
+      </section>
+    );
   }
 
   return (

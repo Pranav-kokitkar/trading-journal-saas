@@ -162,6 +162,13 @@
   transform: none;
 }
 
+.saveButtonSkeleton {
+  width: 92px;
+  margin: 0 auto;
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* ===== Animations ===== */
 @keyframes fadeIn {
   from {
@@ -200,5 +207,3 @@
     font-size: 1.25rem;
   }
 }
-
-

@@ -4,6 +4,7 @@ import { useAuth } from "../../../store/Auth";
 import styles from "./AdminUserDetails.module.css";
 import { useAdminUsers } from "../store/AdminUserContext";
 import { UserEditModal } from "./UserEditModal";
+import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AdminUserDetails = () => {
   const { id } = useParams();
@@ -61,7 +62,16 @@ export const AdminUserDetails = () => {
   }, [id, authorizationToken]);
 
   if (loading) {
-    return <p className={styles.loading}>Loading user details...</p>;
+    return (
+      <section className={styles.page}>
+        <SkeletonText lines={1} width="260px" height={24} />
+        <div className={styles.summaryGrid}>
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+          <SkeletonCard rows={1} withHeader />
+        </div>
+      </section>
+    );
   }
 
   if (!userDetails) {

@@ -3,6 +3,7 @@ import { Pagination } from "../../Pagination";
 import { useAdminTrades } from "../store/AdminTradesContext";
 import { AdminDisplayTrades } from "./AdminDisplayTrades";
 import styles from "./AdminTrades.module.css";
+import { SkeletonCard, SkeletonTableRow, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 export const AdminTrades = () => {
   const {
@@ -43,7 +44,16 @@ export const AdminTrades = () => {
   };
 
   if (loading) {
-    return <div className={styles.loading}>Loading trades...</div>;
+    return (
+      <section className={styles.container}>
+        <SkeletonText lines={1} width="220px" height={28} />
+        <div className={styles.statsGrid}>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <SkeletonCard key={`admin-trade-stat-skeleton-${index}`} rows={1} withHeader />
+          ))}
+        </div>
+      </section>
+    );
   }
 
   return (
@@ -146,7 +156,11 @@ export const AdminTrades = () => {
       {/* Trades List */}
       <div className={styles.listSection}>
         {loadingTrades ? (
-          <p className={styles.loading}>Loading trades...</p>
+          <div>
+            {Array.from({ length: 6 }).map((_, index) => (
+              <SkeletonTableRow key={`admin-trade-row-skeleton-${index}`} columns={6} />
+            ))}
+          </div>
         ) : (
           <AdminDisplayTrades trades={trades} />
         )}

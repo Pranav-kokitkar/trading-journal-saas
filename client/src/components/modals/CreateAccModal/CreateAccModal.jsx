@@ -5,6 +5,7 @@ import { useAuth } from "../../../store/Auth";
 import { UserContext } from "../../../context/UserContext";
 import { AccountContext } from "../../../context/AccountContext";
 import { useBodyScrollLock } from "../../../hooks/useBodyScrollLock";
+import { SkeletonInput } from "../../ui/skeleton/Skeleton";
 
 export const CreateAccModal = ({onClose}) => {
   useBodyScrollLock(true);
@@ -149,7 +150,7 @@ export const CreateAccModal = ({onClose}) => {
             onClick={handleSave}
             disabled={loading}
           >
-            {loading ? "Saving..." : "Save"}
+            {loading ? <SkeletonInput className={styles.saveButtonSkeleton} height={14} /> : "Save"}
           </button>
         </div>
       </div>

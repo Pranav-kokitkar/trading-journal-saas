@@ -17,19 +17,125 @@
   box-shadow: var(--shadow-card);
 }
 
-.best,
-.worst {
+.insightsHeading {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.insightList {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.insightItem {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.insightIcon {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  margin-top: 7px;
+  background: var(--text-secondary);
+}
+
+.insightBody {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.insightTitle,
+.insightDescription,
+.insightSuggestion {
   margin: 0;
   font-size: var(--text-sm);
+}
+
+.insightTitle {
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+}
+
+.insightDescription {
+  color: var(--text-secondary);
+}
+
+.insightSuggestion {
   font-weight: var(--weight-medium);
 }
 
-.best {
+.insightSuccess .insightIcon {
+  background: var(--text-profit);
+}
+
+.insightKey {
+  border-width: 2px;
+}
+
+.insightKey .insightIcon {
+  width: 12px;
+  height: 12px;
+  background: var(--accent-primary);
+}
+
+.insightKey .insightTitle {
+  font-size: var(--text-md);
+}
+
+.insightKey .insightSuggestion {
+  color: var(--accent-primary);
+}
+
+.insightDanger .insightIcon {
+  background: var(--text-loss);
+}
+
+.insightWarning .insightIcon {
+  background: var(--accent-primary);
+}
+
+.insightInfo .insightIcon {
+  background: var(--chart-series-accent);
+}
+
+.insightSuccess .insightSuggestion {
   color: var(--text-profit);
 }
 
-.worst {
+.insightDanger .insightSuggestion {
   color: var(--text-loss);
+}
+
+.insightWarning .insightSuggestion {
+  color: var(--accent-primary);
+}
+
+.insightInfo .insightSuggestion {
+  color: var(--chart-series-accent);
+}
+
+.insightToggle {
+  justify-self: start;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 0 var(--space-3);
+  min-height: var(--btn-height);
+  color: var(--text-secondary);
+  background: var(--btn-secondary-bg);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.insightToggle:hover {
+  background: var(--btn-secondary-bg-hover);
 }
 
 .tabs {
@@ -179,6 +285,15 @@
 .tableWrap td,
 .tableWrap th {
   white-space: nowrap;
+}
+
+.analyticsTableSkeleton {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.analyticsChartSkeleton {
+  margin-top: var(--space-2);
 }
 
 @media (max-width: 768px) {

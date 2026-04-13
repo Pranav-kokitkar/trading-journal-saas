@@ -201,6 +201,13 @@
   transform: none;
 }
 
+.buttonSkeleton {
+  width: 140px;
+  margin: 0 auto;
+  border-color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
+}
+
 /* ===== Bottom Row ===== */
 .row {
   display: flex;

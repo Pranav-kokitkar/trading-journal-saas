@@ -4,6 +4,7 @@ import { useAuth } from "../../../../store/Auth";
 import { ConfirmationModal } from "../../../modals/ConfirmationModal/ConfirmationModal";
 import styles from "./Strategy.module.css";
 import { getMaxStrategies } from "../../../../config/planLimits";
+import { SkeletonCard, SkeletonText } from "../../../ui/skeleton/Skeleton";
 
 export const Strategy = () => {
   const { authorizationToken, isPro } = useAuth();
@@ -236,7 +237,14 @@ export const Strategy = () => {
           <h3>Your Strategies</h3>
 
           {loadingStrategies ? (
-            <p className={styles.loadingState}>Loading strategies...</p>
+            <div className={styles.loadingState}>
+              <SkeletonText lines={1} width="180px" />
+              <div className={styles.strategySkeletonList}>
+                <SkeletonCard className={styles.strategySkeletonCard} rows={2} withHeader />
+                <SkeletonCard className={styles.strategySkeletonCard} rows={2} withHeader />
+                <SkeletonCard className={styles.strategySkeletonCard} rows={2} withHeader />
+              </div>
+            </div>
           ) : strategies.length === 0 ? (
             <p className={styles.noStrategies}>
               No strategies yet. Create your first strategy above!

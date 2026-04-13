@@ -5,6 +5,7 @@ import { useAuth } from "../../../store/Auth";
 import { toastHelper } from "../../../utils/toastHelper";
 import { TradeContext } from "../../../store/TradeContext";
 import { AccountContext } from "../../../context/AccountContext";
+import { SkeletonInput } from "../../ui/skeleton/Skeleton";
 
 export const Register = () => {
   const [user, setUser] = useState({
@@ -165,7 +166,7 @@ export const Register = () => {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating Account..." : "Create Account"}
+                {isLoading ? <SkeletonInput className={styles.buttonSkeleton} height={14} /> : "Create Account"}
               </button>
 
               <div className={styles.row}>

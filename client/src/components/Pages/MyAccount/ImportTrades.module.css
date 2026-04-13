@@ -105,6 +105,12 @@
   cursor: not-allowed;
 }
 
+.importButtonSkeleton {
+  width: 100px;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.16);
+}
+
 .error {
   color: var(--error);
   font-size: 0.85rem;
@@ -144,5 +150,3 @@
   color: var(--muted);
   margin-bottom: 0.25rem;
 }
-
-

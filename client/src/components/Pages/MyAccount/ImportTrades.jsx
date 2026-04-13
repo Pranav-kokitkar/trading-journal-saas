@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTrades } from "../../../store/TradeContext";
 import styles from "./ImportTrades.module.css";
+import { SkeletonInput } from "../../ui/skeleton/Skeleton";
 
 export const ImportTrades = ({
   isOpen,
@@ -170,7 +171,7 @@ export const ImportTrades = ({
             onClick={importCsv}
             disabled={loading || !accountId}
           >
-            {loading ? "Importing..." : "Upload CSV"}
+            {loading ? <SkeletonInput className={styles.importButtonSkeleton} height={14} /> : "Upload CSV"}
           </button>
         </div>
 
@@ -188,7 +189,7 @@ export const ImportTrades = ({
             onClick={importJson}
             disabled={loading || !accountId}
           >
-            {loading ? "Importing..." : "Import JSON"}
+            {loading ? <SkeletonInput className={styles.importButtonSkeleton} height={14} /> : "Import JSON"}
           </button>
         </div>
 
