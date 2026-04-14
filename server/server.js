@@ -33,6 +33,7 @@ const corsOptions = {
   origin: [
     "http://localhost:5173",
     "http://localhost:5174",
+    "https://logmytrade.netlify.app",
     "https://trading-journal-saas.netlify.app",
   ],
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "HEAD", "OPTIONS"],
