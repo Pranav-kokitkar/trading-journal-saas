@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/auth/user`,
+        `${import.meta.env.VITE_API_URL}/auth/user`,
         {
           method: "GET",
           headers: {
