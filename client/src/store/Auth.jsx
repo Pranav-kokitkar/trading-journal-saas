@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../config/api";
 
 export const AuthContext = createContext();
 
@@ -38,7 +39,7 @@ export const AuthProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/user`,
+        `${API_BASE_URL}/auth/user`,
         {
           method: "GET",
           headers: {

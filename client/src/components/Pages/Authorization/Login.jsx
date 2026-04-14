@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { TradeContext } from "../../../store/TradeContext";
 import { AccountContext } from "../../../context/AccountContext";
 import { SkeletonInput } from "../../ui/skeleton/Skeleton";
+import { API_BASE_URL } from "../../../config/api";
 
 export const Login = () => {
   const [user, setUser] = useState({
@@ -39,7 +40,7 @@ export const Login = () => {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/login`,
+        `${API_BASE_URL}/auth/login`,
         {
           method: "POST",
           headers: {
