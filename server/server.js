@@ -29,14 +29,34 @@ const errorMiddleware = require("./middleware/error-middleware");
 const app = express();
 
 // CORS configuration - MUST be before other middleware
+const defaultAllowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://139.59.65.78",
+  "http://139-59-65-78.sslip.io",
+  "https://139-59-65-78.sslip.io",
+  "https://logmytrade.netlify.app",
+  "https://kryosjournal.netlify.app",
+  "https://trading-journal-saas.netlify.app",
+];
+
+const envAllowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = [
+  ...new Set([...defaultAllowedOrigins, ...envAllowedOrigins]),
+];
+
 const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "https://logmytrade.netlify.app",
-    "https://kryosjournal.netlify.app",
-    "https://trading-journal-saas.netlify.app",
-  ],
+  origin: (origin, callback) => {
+    // Allow non-browser tools (curl/Postman) and explicitly allowed browser origins.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT", "HEAD", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
