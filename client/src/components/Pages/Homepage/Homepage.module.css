@@ -8,7 +8,7 @@
   background:
     var(--bg-app-vignette), linear-gradient(180deg, #080d15 0%, #0a101a 100%);
   color: var(--text-primary);
-  padding: clamp(20px, 2vw, 32px);
+  padding: clamp(10px, 1.2vw, 20px) clamp(20px, 2vw, 32px) 0;
   display: flex;
   flex-direction: column;
 }
@@ -94,16 +94,20 @@
   text-align: center;
   max-width: 860px;
   margin: auto;
-  padding: clamp(3rem, 8vw, 6rem) 0;
+  min-height: 84svh;
+  padding: clamp(0.5rem, 1.5vw, 1.25rem) 0 clamp(3rem, 6vw, 4.5rem);
   animation: fadeInUp 0.6s ease-out;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .title {
   font-size: clamp(2.75rem, 6vw, 4.75rem);
   font-weight: 700;
   line-height: 0.95;
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
   color: var(--text-primary);
   letter-spacing: -0.04em;
 }
@@ -123,11 +127,162 @@
   line-height: 1.6;
 }
 
+.mutedLine {
+  margin: 0 auto 1.35rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* ===== Content Sections ===== */
+.contentSection {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  display: grid;
+  gap: 28px;
+  margin-top: clamp(80px, 10vw, 120px);
+  padding-top: 0.5rem;
+  padding-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.sectionCard {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: clamp(1.25rem, 2vw, 1.75rem);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+}
+
+.sectionWide {
+  max-width: 900px;
+  width: 100%;
+  justify-self: center;
+}
+
+.sectionCard + .sectionCard {
+  margin-top: clamp(80px, 10vw, 120px);
+}
+
+.sectionTitle {
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  line-height: 1.15;
+  margin-bottom: 0.85rem;
+  color: var(--text-primary);
+}
+
+.sectionText {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.featureList {
+  list-style: none;
+  display: grid;
+  gap: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.featureList li {
+  position: relative;
+  padding-left: 1.1rem;
+  line-height: 1.7;
+}
+
+.featureList li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7em;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+  box-shadow: 0 0 0 4px rgba(110, 124, 255, 0.12);
+}
+
+.finalCtaSection {
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+  text-align: center;
+  margin-top: clamp(80px, 10vw, 120px);
+}
+
+.finalCtaText {
+  font-size: clamp(1.1rem, 1.7vw, 1.45rem);
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.finalCtaText span {
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dataBlock {
+  margin-top: 1rem;
+  background: var(--surface-card-strong);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 0.9rem 1rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.dataBlockPair {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.dataBlockMetric {
+  font-size: 0.96rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.dataMetricValue {
+  font-size: 1.28rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  margin-right: 0.35rem;
+}
+
+.dataMetricLoss {
+  color: var(--text-loss);
+}
+
+.dataBlockInsight {
+  margin-top: 0.35rem;
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.insightEmphasis {
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.supportingLine {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 /* ===== CTA Buttons ===== */
 .cta {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.85rem;
   flex-wrap: wrap;
 }
 
@@ -203,6 +358,8 @@
 @media (max-width: 768px) {
   .hero {
     margin: 0 auto;
+    min-height: 88svh;
+    padding-top: 1.5rem;
   }
 
   .title {
@@ -211,6 +368,15 @@
 
   .subtitle {
     font-size: 0.95rem;
+  }
+
+  .contentSection {
+    gap: 24px;
+    margin-top: 80px;
+  }
+
+  .sectionCard + .sectionCard {
+    margin-top: 80px;
   }
 
   .cta {
@@ -235,7 +401,8 @@
   }
 
   .hero {
-    padding: 2.5rem 0 3rem;
+    min-height: 86svh;
+    padding: 1.25rem 0 2.5rem;
   }
 
   .title {
@@ -245,6 +412,34 @@
   .subtitle {
     font-size: 0.9rem;
     margin-bottom: 1.5rem;
+  }
+
+  .mutedLine {
+    font-size: 0.86rem;
+  }
+
+  .sectionCard {
+    padding: 1.1rem;
+  }
+
+  .finalCtaSection {
+    margin-top: 80px;
+  }
+
+  .dataBlock {
+    padding: 0.85rem 0.9rem;
+  }
+
+  .dataMetricValue {
+    font-size: 1.18rem;
+  }
+
+  .supportingLine {
+    font-size: 0.86rem;
+  }
+
+  .featureList li {
+    padding-left: 1rem;
   }
 
   .logoBox {

@@ -233,6 +233,7 @@ const getAllTrades = async (req, res) => {
       accountId,
       strategy,
       tag,
+      sortBy = "date",
       includeImported,
     } = req.query;
 
@@ -302,13 +303,20 @@ const getAllTrades = async (req, res) => {
       query.isImported = false;
     }
 
+    const sortMap = {
+      date: { dateTime: -1 },
+      pnl: { pnl: -1, dateTime: -1 },
+      rr: { rr: -1, dateTime: -1 },
+    };
+    const sortConfig = sortMap[sortBy] || sortMap.date;
+
     /** ---------------- QUERY DB ---------------- */
     // ✅ PERFORMANCE: Cap max limit to prevent huge payloads
     const maxLimit = Math.min(Number(limit), 50); // Max 50 trades per request
 
     const [trades, totalTrades] = await Promise.all([
       Trade.find(query)
-        .sort({ dateTime: -1 }) // NEWEST FIRST
+        .sort(sortConfig)
         .skip(skip)
         .limit(maxLimit)
         .populate("tags", "name colour") // Only select needed fields

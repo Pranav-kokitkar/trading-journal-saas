@@ -4,6 +4,7 @@ import styles from "../../Layout/SideBar.module.css";
 
 export const AdminSidebar = ({ onClose }) => {
   const { user } = useAuth();
+  const userInitial = user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
 
   const getNavLinkClass = ({ isActive }) => {
     return isActive
@@ -15,9 +16,14 @@ export const AdminSidebar = ({ onClose }) => {
     <div className={styles.sidebar}>
       {/* Logo */}
       <div className={styles.logo}>
+        <img
+          src="/favicon2.ico"
+          alt="Kyros Journal"
+          className={styles.sidebarLogoImage}
+        />
         <div className={styles.logoText}>
           <h3 className={styles.title}>
-            Log My <span>Trade</span>
+            Kyros <span>Journal</span>
           </h3>
           <p>Admin Panel </p>
         </div>
@@ -82,7 +88,7 @@ export const AdminSidebar = ({ onClose }) => {
       {/* Bottom User Info */}
       <Link to="/app/my-account" style={{ visibility: "hidden" }}>
         <div className={styles.user}>
-          <div className={styles.avatar}>U</div>
+          <div className={styles.avatar}>{userInitial}</div>
           <div>
             <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
             <span className={styles.subText}>Your Account</span>

@@ -24,7 +24,7 @@
 }
 
 .heading h2 {
-  font-size: clamp(28px, 2.4vw, 40px);
+  font-size: clamp(30px, 2.6vw, 42px);
   margin: 0;
   color: var(--text-primary);
   font-weight: 600;
@@ -273,13 +273,13 @@
 /* ===== Compare Button ===== */
 .compareBtn {
   padding: 0 2rem;
-  height: 46px;
+  height: var(--btn-height);
   background: var(--btn-primary-bg);
   color: var(--btn-primary-text);
   border: none;
   border-radius: var(--radius-pill);
-  font-size: 0.9rem;
-  font-weight: 700;
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-weight);
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: var(--btn-primary-shadow);
@@ -547,7 +547,7 @@
   }
 
   .heading h2 {
-    font-size: 1.25rem;
+    font-size: clamp(24px, 6vw, 30px);
   }
 
   .resultsGrid {

@@ -35,7 +35,7 @@ export const InputField = ({
         name={name}
         type={type}
         placeholder={placeholder}
-        value={type === "file" ? undefined : value || ""} // ✅ fix
+        value={type === "file" ? undefined : value || ""}
         onChange={(e) => {
           if (type === "file") {
             onChange({ target: { name, value: e.target.files[0] } });

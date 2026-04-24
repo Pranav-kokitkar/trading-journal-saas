@@ -4,17 +4,20 @@ import styles from "./Navbar.module.css";
 export const Navbar = () => {
   return (
     <header className={styles.nav}>
-      <Link to="/" className={styles.brand} aria-label="Log My Trade home">
-        <div className={styles.logoBox}>TJ</div>
+      <Link to="/" className={styles.brand} aria-label="Kyros Journal home">
+        <img
+          src="/favicon2.ico"
+          alt="Kyros Journal"
+          className={styles.logoImage}
+        />
         <div className={styles.brandText}>
-          <span className={styles.brandTitle}>Log My Trade</span>
-          <span className={styles.brandSubtitle}>Trading journal</span>
+          <span className={styles.brandTitle}>Kyros Journal</span>
         </div>
       </Link>
 
       <nav className={styles.links}>
         <Link to="/register" className={styles.navBtn}>
-          Get Started
+          Start Free
         </Link>
       </nav>
     </header>

@@ -89,6 +89,10 @@ export const Register = () => {
 
   return (
     <div className={styles.container}>
+      <Link to="/" className={styles.brandLink} aria-label="Kyros Journal home">
+        <img src="/favicon2.ico" alt="Kyros Journal" className={styles.brandLogo} />
+      </Link>
+
       {/* Back Button */}
       <Link to="/" className={styles.backButton}>
         Back to Home
@@ -98,12 +102,15 @@ export const Register = () => {
       <div className={styles.cardWrapper}>
         <div className={styles.card}>
           <div className={styles.content}>
+            <div className={styles.eyebrow}>
+              Join traders who improve by eliminating bad trades.
+            </div>
             <div className={styles.title}>
-              <div className={styles.logo}>TJ</div>
+              <div className={styles.logo}>KJ</div>
               <div>
                 <h2 className={styles.h2}>Create Account</h2>
                 <div className={styles.subtitle}>
-                  Start logging trades and tracking performance
+                  Start building your trading edge by eliminating weak trades.
                 </div>
               </div>
             </div>
@@ -167,8 +174,12 @@ export const Register = () => {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? <SkeletonInput className={styles.buttonSkeleton} height={14} /> : "Create Account"}
+                {isLoading ? <SkeletonInput className={styles.buttonSkeleton} height={14} /> : "Start Building Your Edge"}
               </button>
+
+              <div className={styles.trustLine}>
+                No setup. Start journaling instantly.
+              </div>
 
               <div className={styles.row}>
                 <div className={styles.small}>Already have an account?</div>

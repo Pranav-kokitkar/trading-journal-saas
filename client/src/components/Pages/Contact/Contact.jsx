@@ -16,6 +16,7 @@ export const Contact = () => {
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
   const [userData, setUserData] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileRef = useRef();
 
   const { isLoggedIn, user } = useAuth();
@@ -62,6 +63,8 @@ export const Contact = () => {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
 
+    if (isSubmitting) return;
+
     // ✅ Run validation before submit
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -71,6 +74,7 @@ export const Contact = () => {
     setErrors({});
 
     try {
+      setIsSubmitting(true);
       // Use FormData instead of JSON to send text + file
       const formData = new FormData();
       formData.append("name", form.name);
@@ -109,6 +113,8 @@ export const Contact = () => {
       }
     } catch (error) {
       toast.error("Failed to submit, try re-login");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -119,12 +125,11 @@ export const Contact = () => {
 
       <main className={styles.hero}>
         <h2 className="app-page-title">
-          Contact <span>Support</span>
+          Report an Issue or Get <span>Help</span>
         </h2>
 
         <p className="app-page-subtitle">
-          Found a bug or need help? Send us a message and a brief description —
-          attaching a screenshot helps us reproduce the issue faster.
+          Describe your issue clearly — we’ll help you resolve it quickly.
         </p>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
@@ -163,7 +168,7 @@ export const Contact = () => {
               value={form.subject}
               onChange={handleChange}
               className={styles.input}
-              placeholder="Short summary"
+              placeholder="Brief summary of the issue"
             />
             {errors.subject && (
               <div className={styles.err}>{errors.subject}</div>
@@ -177,7 +182,7 @@ export const Contact = () => {
               value={form.message}
               onChange={handleChange}
               className={styles.textarea}
-              placeholder="Describe the issue, steps to reproduce, expected vs actual..."
+              placeholder="Describe what happened, what you expected, and what actually occurred."
               rows={6}
             />
             {errors.message && (
@@ -219,10 +224,12 @@ export const Contact = () => {
           </div>
 
           <div className={styles.ctaRow}>
-            <button type="submit" className={styles.primaryBtn}>
-              Send Message
+            <button type="submit" className={styles.primaryBtn} disabled={isSubmitting}>
+              {isSubmitting ? "Sending..." : "Send Message"}
             </button>
           </div>
+
+          <p className={styles.trustLine}>We typically respond within 24 hours.</p>
         </form>
       </main>
 

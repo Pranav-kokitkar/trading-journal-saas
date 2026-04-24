@@ -19,6 +19,7 @@ export const Tags = () => {
 
   const [tag, setTag] = useState({ name: "", colour: "" });
   const [tags, setTags] = useState([]);
+  const [actionLoading, setActionLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isTagUpdateModalOpen, setIsTagUpdateModalOpen] = useState(false);
   const [tagToDelete, setTagToDelete] = useState(null);
@@ -35,6 +36,8 @@ export const Tags = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (actionLoading) return;
 
     if (!tag.name.trim() || !tag.colour) {
       toast.error("Tag name and colour are required");
@@ -53,6 +56,7 @@ export const Tags = () => {
     }
 
     try {
+      setActionLoading(true);
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tags`, {
         method: "POST",
         headers: {
@@ -74,6 +78,8 @@ export const Tags = () => {
     } catch (error) {
       console.error(error);
       toast.error("Server error");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -107,8 +113,10 @@ export const Tags = () => {
 
   const confirmDelete = async () => {
     if (!tagToDelete) return;
+    if (actionLoading) return;
 
     try {
+      setActionLoading(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/tags/${tagToDelete}`,
         {
@@ -131,6 +139,7 @@ export const Tags = () => {
     } finally {
       setIsDeleteModalOpen(false);
       setTagToDelete(null);
+      setActionLoading(false);
     }
   };
 
@@ -144,8 +153,10 @@ export const Tags = () => {
 
   const confirmUpdate = async () => {
     if (!tagToUpdate) return;
+    if (actionLoading) return;
 
     try {
+      setActionLoading(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/tags/${tagToUpdate._id}`,
         {
@@ -170,6 +181,8 @@ export const Tags = () => {
     } catch (error) {
       console.error(error);
       toast.error("Server error");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -181,7 +194,7 @@ export const Tags = () => {
         {/* Page Heading */}
         <div className={styles.heading}>
           <h2>Manage Tags</h2>
-          <p>Create and organize tags to categorize your trades</p>
+          <p>Label trades to identify patterns, mistakes, and improvements</p>
         </div>
 
         {/* Create Tag Form */}
@@ -218,8 +231,8 @@ export const Tags = () => {
             </div>
           </div>
 
-          <button type="submit" className={styles.submitBtn}>
-            Create Tag
+          <button type="submit" className={styles.submitBtn} disabled={actionLoading}>
+            {actionLoading ? "Saving..." : "Create Tag"}
           </button>
         </form>
 
@@ -247,12 +260,14 @@ export const Tags = () => {
                     <button
                       onClick={() => openUpdateModal(t)}
                       className={styles.editBtn}
+                      disabled={actionLoading}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => openDeleteModal(t._id)}
                       className={styles.deleteBtn}
+                      disabled={actionLoading}
                     >
                       Delete
                     </button>
@@ -284,6 +299,7 @@ export const Tags = () => {
           tag={tag}
           setTag={setTag}
           TAG_COLORS={TAG_COLORS}
+          loading={actionLoading}
           onCancel={() => {
             setIsTagUpdateModalOpen(false);
             setTagToUpdate(null);
@@ -298,7 +314,7 @@ export const Tags = () => {
 
 /* -------------------- TAG UPDATE MODAL -------------------- */
 
-const TagUpdateModal = ({ tag, setTag, TAG_COLORS, onCancel, onConfirm }) => {
+const TagUpdateModal = ({ tag, setTag, TAG_COLORS, loading, onCancel, onConfirm }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setTag((prev) => ({ ...prev, [name]: value }));
@@ -339,11 +355,11 @@ const TagUpdateModal = ({ tag, setTag, TAG_COLORS, onCancel, onConfirm }) => {
         </div>
 
         <div className={styles.modalActions}>
-          <button className={styles.cancelBtn} onClick={onCancel}>
+          <button className={styles.cancelBtn} onClick={onCancel} disabled={loading}>
             Cancel
           </button>
-          <button className={styles.confirmBtn} onClick={onConfirm}>
-            Save Changes
+          <button className={styles.confirmBtn} onClick={onConfirm} disabled={loading}>
+            {loading ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>

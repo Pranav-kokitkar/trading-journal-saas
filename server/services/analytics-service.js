@@ -46,6 +46,7 @@ const getAnalyticsByDimension = async ({
   minTrades = 0,
   sortBy = "expectancy",
   order = "desc",
+  includeImported = true,
 }) => {
   const config = DIMENSION_CONFIG[dimension];
   const sortField = SORT_FIELD_MAP[sortBy] || "expectancy";
@@ -60,6 +61,10 @@ const getAnalyticsByDimension = async ({
 
   if (accountId) {
     baseMatch.accountId = new mongoose.Types.ObjectId(accountId);
+  }
+
+  if (!includeImported) {
+    baseMatch.isImported = false;
   }
 
   const dateRange = normalizeDateRange(startDate, endDate);

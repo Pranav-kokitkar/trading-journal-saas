@@ -8,6 +8,7 @@ export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [updatedNote, setUpdatedNote] = useState({
     title: "",
     description: "",
@@ -23,6 +24,8 @@ export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
   };
 
   const handleEdit = () => {
+    if (isSaving) return;
+
     if (!isEditing) {
       setUpdatedNote({
         title: note.title,
@@ -32,15 +35,24 @@ export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
     setIsEditing(!isEditing);
   };
 
-  const handleSave = () => {
-    onUpdate({
-      title: updatedNote.title || note.title,
-      description: updatedNote.description || note.description,
-    });
-    setIsEditing(false);
+  const handleSave = async () => {
+    if (isSaving) return;
+
+    try {
+      setIsSaving(true);
+      await onUpdate({
+        title: updatedNote.title || note.title,
+        description: updatedNote.description || note.description,
+      });
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    if (isSaving) return;
+
     setIsEditing(false);
     setUpdatedNote({
       title: "",
@@ -65,7 +77,7 @@ export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
           ) : (
             <h4 className={styles.noteTitle}>{note.title}</h4>
           )}
-          <button className={styles.modalCloseButton} onClick={onClose}>
+          <button className={styles.modalCloseButton} onClick={onClose} disabled={isSaving}>
             ✕
           </button>
         </div>
@@ -88,22 +100,23 @@ export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
         <div className={styles.modalFooter}>
           {!isEditing ? (
             <>
-              <button className={styles.editButton} onClick={handleEdit}>
+              <button className={styles.editButton} onClick={handleEdit} disabled={isSaving}>
                 Edit
               </button>
               <button
                 className={styles.deleteButton}
                 onClick={() => setIsDeleteModalOpen(true)}
+                disabled={isSaving}
               >
                 Delete
               </button>
             </>
           ) : (
             <>
-              <button className={styles.saveButton} onClick={handleSave}>
-                Save
+              <button className={styles.saveButton} onClick={handleSave} disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save"}
               </button>
-              <button className={styles.cancelButton} onClick={handleCancel}>
+              <button className={styles.cancelButton} onClick={handleCancel} disabled={isSaving}>
                 Cancel
               </button>
             </>
@@ -117,8 +130,8 @@ export const NoteModal = ({ note, onClose, onDelete, onUpdate }) => {
         confirmText="Delete"
         cancelText="Cancel"
         onCancel={() => setIsDeleteModalOpen(false)}
-        onConfirm={() => {
-          onDelete();
+        onConfirm={async () => {
+          await onDelete();
           setIsDeleteModalOpen(false);
           onClose();
         }}

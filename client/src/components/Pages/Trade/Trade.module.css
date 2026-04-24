@@ -759,6 +759,85 @@
   border-color: var(--accent);
 }
 
+@media (max-width: 1024px) {
+  .trade {
+    padding: 1.25rem;
+  }
+
+  .tradeContainer {
+    padding: 1.25rem;
+  }
+
+  .tradeData {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .trade {
+    padding: 1rem;
+  }
+
+  .tradeContainer {
+    padding: 1rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .tradeBtns {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .tradeBtns button {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .modalBtns {
+    flex-direction: column;
+  }
+
+  .notesHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .row {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h2 {
+    font-size: 1.1rem;
+  }
+
+  .tradeInfo,
+  .tradePerformance,
+  .exitPrice,
+  .tradeDescription,
+  .tradeScreenshot,
+  .tradeStrategy,
+  .tradeTags,
+  .card {
+    padding: 1rem;
+  }
+
+  .fullscreenClose {
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+}
+
 /* ===== Animations ===== */
 @keyframes fadeIn {
   from {

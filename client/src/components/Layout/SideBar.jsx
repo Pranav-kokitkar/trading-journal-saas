@@ -5,6 +5,7 @@ import { useAuth } from "../../store/Auth";
 export const Sidebar = ({ onClose }) => {
 
   const { user, isAdmin, isPro, isAuthLoading } = useAuth();
+  const userInitial = user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
 
   const getNavLinkClass = ({ isActive }) => {
     return isActive ? `${styles.navlink} ${styles.active}` : `${styles.navlink}`; 
@@ -14,11 +15,16 @@ export const Sidebar = ({ onClose }) => {
     <div className={styles.sidebar}>
       {/* Logo */}
       <div className={styles.logo}>
+        <img
+          src="/favicon2.ico"
+          alt="Kyros Journal"
+          className={styles.sidebarLogoImage}
+        />
         <div className={styles.logoText}>
           <h3 className={styles.title}>
-            Log My <span>Trade</span>
+            Kyros <span>Journal</span>
           </h3>
-          <p>Professional Trading journal </p>
+          <p>Build Your Trading Edge</p>
         </div>
       </div>
 
@@ -36,13 +42,8 @@ export const Sidebar = ({ onClose }) => {
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/add-notes" onClick={onClose}>
-              Notes
-            </NavLink>
-          </li>
-          <li>
-            <NavLink className={getNavLinkClass} to="/app/contact" onClick={onClose}>
-              Contact
+            <NavLink className={getNavLinkClass} to="/app/analytics" onClick={onClose}>
+              Analytics
             </NavLink>
           </li>
           <li>
@@ -51,8 +52,8 @@ export const Sidebar = ({ onClose }) => {
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/upgrade" onClick={onClose}>
-              Upgrade
+            <NavLink className={getNavLinkClass} to="/app/add-notes" onClick={onClose}>
+              Notes
             </NavLink>
           </li>
           <li>
@@ -61,8 +62,13 @@ export const Sidebar = ({ onClose }) => {
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/analytics" onClick={onClose}>
-              Analytics
+            <NavLink className={getNavLinkClass} to="/app/upgrade" onClick={onClose}>
+              Upgrade
+            </NavLink>
+          </li>
+          <li>
+            <NavLink className={getNavLinkClass} to="/app/contact" onClick={onClose}>
+              Get Help
             </NavLink>
           </li>
           <li>
@@ -77,7 +83,7 @@ export const Sidebar = ({ onClose }) => {
 
       {/* Bottom User Info */}
       <Link to="/app/my-account" className={styles.user}>
-        <div className={styles.avatar}>U</div>
+        <div className={styles.avatar}>{userInitial}</div>
         <div className={styles.userMeta}>
           <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
           <span className={styles.subText}>Your Account</span>

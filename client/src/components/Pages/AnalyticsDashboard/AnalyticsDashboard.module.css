@@ -144,6 +144,35 @@
   gap: var(--space-2);
 }
 
+.tabsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.importToggleLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-default);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin-left: auto;
+}
+
+.importToggleLabel input[type="checkbox"] {
+  width: 16px;
+  min-height: 16px;
+  height: 16px;
+  margin-right: 0;
+  accent-color: var(--accent);
+}
+
 .tab,
 .activeTab {
   border: 1px solid var(--border-default);
@@ -297,6 +326,14 @@
 }
 
 @media (max-width: 768px) {
+  .tabsRow {
+    align-items: flex-start;
+  }
+
+  .importToggleLabel {
+    margin-left: 0;
+  }
+
   .filtersCard {
     grid-template-columns: 1fr;
   }

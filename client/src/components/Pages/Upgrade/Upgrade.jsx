@@ -103,28 +103,33 @@ export const Upgrade = () => {
 
       {/* Why Pro Section */}
       <section className={styles.whyPro}>
-        <h2>Why upgrade to Pro?</h2>
+        <h2>Why Upgrade to Pro</h2>
         <ul>
-          <li>
-            Get a clearer view of your trading performance with structured
-            analytics
-          </li>
-          <li>Remove journaling limits as your trading volume grows</li>
-          <li>Build consistency with better insights, not guesswork</li>
+          <li>Identify exactly what's working and what's not</li>
+          <li>Remove weak trades and improve consistency</li>
+          <li>Trade with data instead of guesswork</li>
         </ul>
       </section>
 
       {/* Pro Plan Card */}
       <section className={styles.planCard}>
         <h2>Pro Plan</h2>
+        <p className={styles.contextLine}>Everything you need to improve your trading performance</p>
+
+        <div className={styles.recommendedLabel}>
+          Recommended for serious traders
+        </div>
 
         <ul className={styles.features}>
-          <li>Higher trade limits</li>
-          <li>Advanced filters (PnL, account, tags)</li>
-          <li>Up to 5 trading accounts</li>
-          <li>Up to 3 screenshots per trade</li>
-          <li>Performance analytics</li>
+          <li>Track more trades without restrictions</li>
+          <li>Find exactly what's working and what's not</li>
+          <li>Manage multiple trading accounts in one place</li>
+          <li>Upload up to 3 screenshots per trade</li>
+          <li className={styles.highlighted}>See your strongest edge and weakest patterns</li>
         </ul>
+
+        {/* Pricing Divider */}
+        <div className={styles.pricingDivider}></div>
 
         {/* Pricing */}
         <div className={styles.pricing}>
@@ -134,7 +139,7 @@ export const Upgrade = () => {
 
         {/* CTA */}
         <button className={styles.primaryBtn} onClick={handlePayment}>
-          Proceed to Payment
+          Upgrade to Pro
         </button>
 
         {/* Trust */}

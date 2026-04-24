@@ -421,7 +421,13 @@ const InsightItem = ({ type, title, description, suggestion }) => {
 export const AnalyticsDashboard = () => {
   const { authorizationToken, isAuthLoading } = useAuth();
   const { accounts = [] } = useContext(AccountContext);
-  const { accountTrades = [], trades = [], refreshAllAccountTrades } = useTrades() || {};
+  const {
+    accountTrades = [],
+    trades = [],
+    refreshAllAccountTrades,
+    includeImportedTrades,
+    setIncludeImportedTrades,
+  } = useTrades() || {};
 
   const [activeDimension, setActiveDimension] = useState("strategy");
   const [filters, setFilters] = useState(defaultFilters);
@@ -442,6 +448,7 @@ export const AnalyticsDashboard = () => {
           sortBy,
           order,
           minTrades: String(Number(filters.minTrades) || 0),
+          includeImported: Boolean(includeImportedTrades) ? "true" : "false",
         });
 
         if (filters.accountId) params.set("accountId", filters.accountId);
@@ -485,6 +492,7 @@ export const AnalyticsDashboard = () => {
     filters.minTrades,
     sortBy,
     order,
+    includeImportedTrades,
   ]);
 
   useEffect(() => {
@@ -630,6 +638,12 @@ export const AnalyticsDashboard = () => {
     [rows],
   );
 
+  const isMobileChart = typeof window !== "undefined" && window.innerWidth <= 768;
+  const chartMargins = isMobileChart
+    ? { top: 12, right: 12, left: 4, bottom: 12 }
+    : { top: 12, right: 20, left: 16, bottom: 12 };
+  const chartYAxisWidth = isMobileChart ? 108 : 140;
+
   const chartHeight = useMemo(() => {
     if (!rows.length) return 360;
     return Math.max(360, rows.length * 52);
@@ -654,17 +668,31 @@ export const AnalyticsDashboard = () => {
         </p>
       </div>
 
-      <div className={styles.tabs}>
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            type="button"
-            className={activeDimension === tab.key ? styles.activeTab : styles.tab}
-            onClick={() => setActiveDimension(tab.key)}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className={styles.tabsRow}>
+        <div className={styles.tabs}>
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              className={activeDimension === tab.key ? styles.activeTab : styles.tab}
+              onClick={() => setActiveDimension(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <label className={styles.importToggleLabel}>
+          <input
+            type="checkbox"
+            checked={Boolean(includeImportedTrades)}
+            onChange={(e) =>
+              typeof setIncludeImportedTrades === "function" &&
+              setIncludeImportedTrades(e.target.checked)
+            }
+          />
+          <span>Include Imported Trades</span>
+        </label>
       </div>
 
       <div className={styles.filtersCard}>
@@ -823,7 +851,7 @@ export const AnalyticsDashboard = () => {
                 <BarChart
                   data={chartData}
                   layout="vertical"
-                  margin={{ top: 12, right: 20, left: 16, bottom: 12 }}
+                  margin={chartMargins}
                 >
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -840,7 +868,7 @@ export const AnalyticsDashboard = () => {
                     type="category"
                     dataKey="name"
                     interval={0}
-                    width={140}
+                    width={chartYAxisWidth}
                     tick={{
                       fill: cssVar("--chart-axis-text", "var(--chart-axis-text)"),
                       fontSize: Number.parseInt(cssVar("--chart-axis-font", "11"), 10) || 11,

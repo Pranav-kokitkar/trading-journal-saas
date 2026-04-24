@@ -80,6 +80,10 @@ export const Login = () => {
 
   return (
     <div className={styles.container}>
+      <Link to="/" className={styles.brandLink} aria-label="Kyros Journal home">
+        <img src="/favicon2.ico" alt="Kyros Journal" className={styles.brandLogo} />
+      </Link>
+
       {/* Back Button */}
       <Link to="/" className={styles.backButton}>
         Back to Home
@@ -89,12 +93,15 @@ export const Login = () => {
       <div className={styles.cardWrapper}>
         <div className={styles.card}>
           <div className={styles.content}>
+            <div className={styles.eyebrow}>
+              Welcome back — let’s refine your edge.
+            </div>
             <div className={styles.title}>
-              <div className={styles.logo}>TJ</div>
+              <div className={styles.logo}>KJ</div>
               <div>
                 <h2 className={styles.h2}>Welcome Back</h2>
                 <div className={styles.subtitle}>
-                  Access your trading journal
+                  Continue refining your strategy with data-driven insights.
                 </div>
               </div>
             </div>
@@ -131,8 +138,12 @@ export const Login = () => {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? <SkeletonInput className={styles.buttonSkeleton} height={14} /> : "Login"}
+                {isLoading ? <SkeletonInput className={styles.buttonSkeleton} height={14} /> : "Continue to Your Journal"}
               </button>
+
+              <div className={styles.trustLine}>
+                Your data. Your edge.
+              </div>
 
               <div className={styles.row}>
                 <div className={styles.small}>Don't have an account?</div>

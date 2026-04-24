@@ -1,0 +1,214 @@
+.headingPrimary {
+  font-size: clamp(28px, 2.4vw, 40px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.headingSecondary {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.textMuted {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.buttonPrimary {
+  min-height: var(--btn-height);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  font-size: var(--btn-font-size);
+  font-weight: 600;
+}
+
+.sectionContainer {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+}
+
+:global(.app-page-title),
+:global(.headingPrimary) {
+  font-size: clamp(28px, 2.4vw, 40px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+:global(.app-page-subtitle),
+:global(.textMuted) {
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+:global(.headingSecondary) {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+:global(.sectionContainer) {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+}
+
+:global(*),
+:global(*::before),
+:global(*::after) {
+  box-sizing: border-box;
+}
+
+:global(img),
+:global(video),
+:global(canvas),
+:global(svg) {
+  max-width: 100%;
+}
+
+:global(.app-page),
+:global([class*="page"]),
+:global([class*="container"]),
+:global([class*="Card"]),
+:global([class*="card"]) {
+  min-width: 0;
+}
+
+:global([class*="tableWrap"]),
+:global([class*="tablewrap"]) {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+:global(table) {
+  width: 100%;
+}
+
+:global(th),
+:global(td),
+:global(p),
+:global(span),
+:global(h1),
+:global(h2),
+:global(h3),
+:global(h4) {
+  overflow-wrap: anywhere;
+}
+
+:global(.recharts-responsive-container) {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  :global(.app-page) {
+    padding: var(--space-5);
+  }
+
+  :global(.app-grid-4),
+  :global(.app-grid-3) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .headingPrimary,
+  :global(.app-page-title),
+  :global(.headingPrimary) {
+    font-size: clamp(24px, 6vw, 30px);
+  }
+
+  .headingSecondary,
+  :global(.headingSecondary) {
+    font-size: var(--text-lg);
+  }
+
+  .sectionContainer,
+  :global(.sectionContainer) {
+    padding: var(--space-4);
+  }
+
+  .buttonPrimary,
+  :global(.buttonPrimary),
+  :global(button:not([class*="hamburger"])),
+  :global(a[class*="Btn"]),
+  :global(a[class*="btn"]),
+  :global([class*="btn"]),
+  :global([class*="Btn"]) {
+    min-height: 38px;
+    height: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+    font-size: var(--text-sm);
+  }
+
+  :global(.app-page) {
+    padding: var(--space-4);
+  }
+
+  :global(.app-grid-4),
+  :global(.app-grid-3),
+  :global(.app-grid-2),
+  :global([class*="Grid"]),
+  :global([class*="grid"]) {
+    grid-template-columns: 1fr;
+  }
+
+  :global([class*="row"]),
+  :global([class*="Row"]),
+  :global([class*="filterinput"]),
+  :global([class*="filtersCard"]),
+  :global([class*="abInputGrid"]) {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :global(input),
+  :global(select),
+  :global(textarea) {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  :global(.app-page) {
+    padding: var(--space-3);
+  }
+
+  .headingPrimary,
+  :global(.app-page-title),
+  :global(.headingPrimary) {
+    font-size: clamp(22px, 7vw, 26px);
+  }
+
+  .buttonPrimary,
+  :global(.buttonPrimary),
+  :global(button:not([class*="hamburger"])),
+  :global(a[class*="Btn"]),
+  :global(a[class*="btn"]),
+  :global([class*="btn"]),
+  :global([class*="Btn"]) {
+    min-height: 36px;
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+    font-size: var(--text-sm);
+  }
+}

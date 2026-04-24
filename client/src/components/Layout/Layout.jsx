@@ -28,6 +28,21 @@ export const Layout = () => {
   }, [location.pathname]);
 
   useEffect(() => {
+    if (!window.matchMedia("(max-width: 768px)").matches) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     if (isAuthLoading) return;
     if (user && user.activeAccountId == null) {
       setIsCreateModalOpen(true);
@@ -57,13 +72,14 @@ export const Layout = () => {
           className={styles.hamburger}
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle menu"
+          aria-expanded={isOpen}
         >
           <span></span>
           <span></span>
           <span></span>
         </button>
         <h3 className={styles.title}>
-          Log My <span>Trade</span>
+          Kyros <span>Journal</span>
         </h3>
       </header>
 

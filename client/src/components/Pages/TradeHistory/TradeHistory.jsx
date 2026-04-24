@@ -9,6 +9,7 @@ import { SkeletonCard, SkeletonInput, SkeletonTableRow, SkeletonText } from "../
 
 const defaultFilters = {
   symbol: "",
+  sortBy: "date",
   marketType: "",
   status: "",
   result: "",
@@ -44,6 +45,7 @@ export const TradeHistory = () => {
   const [strategies, setStrategies] = useState([]);
   const [tags, setTags] = useState([]);
   const [showProTooltip, setShowProTooltip] = useState(null);
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const { isAuthLoading, isPro, authorizationToken } = useAuth();
   const { accounts } = useContext(AccountContext);
@@ -153,9 +155,46 @@ export const TradeHistory = () => {
       <div className={styles.tradehistorycontainer}>
         {/* ---------------- FILTER PANEL ---------------- */}
         <div className={styles.filter}>
-          <h3>Advanced Filter & Search</h3>
+          <h3>Filter & Search</h3>
 
-          <div className={styles.filterinput}>
+          <div className={styles.dateFiltersRow}>
+            <input
+              type="date"
+              name="startDate"
+              value={filters.startDate}
+              onChange={handleFilterChange}
+              onClick={handleDateInputOpen}
+              onFocus={handleDateInputOpen}
+            />
+            <input
+              type="date"
+              name="endDate"
+              value={filters.endDate}
+              onChange={handleFilterChange}
+              onClick={handleDateInputOpen}
+              onFocus={handleDateInputOpen}
+            />
+          </div>
+
+          <div className={styles.primaryFiltersGrid}>
+            <select
+              name="accountId"
+              value={filters.accountId}
+              onChange={handleFilterChange}
+              disabled={accounts.length === 0}
+            >
+              <option value="">
+                {accounts.length === 0
+                  ? "Create an account first"
+                  : "All Accounts"}
+              </option>
+              {accounts.map((acc) => (
+                <option key={acc._id} value={acc._id}>
+                  {acc.name}
+                </option>
+              ))}
+            </select>
+
             <input
               type="text"
               name="symbol"
@@ -163,27 +202,6 @@ export const TradeHistory = () => {
               value={filters.symbol}
               onChange={handleFilterChange}
             />
-
-            <select
-              name="marketType"
-              value={filters.marketType}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Market</option>
-              <option value="forex">Forex</option>
-              <option value="crypto">Crypto</option>
-              <option value="stocks">Stocks</option>
-            </select>
-
-            <select
-              name="status"
-              value={filters.status}
-              onChange={handleFilterChange}
-            >
-              <option value="">All Status</option>
-              <option value="live">Live</option>
-              <option value="exited">Exited</option>
-            </select>
 
             <select
               name="result"
@@ -205,149 +223,147 @@ export const TradeHistory = () => {
               <option value="long">Long</option>
               <option value="short">Short</option>
             </select>
+
+            <select
+              name="sortBy"
+              value={filters.sortBy}
+              onChange={handleFilterChange}
+            >
+              <option value="date">Sort by: Date</option>
+              <option value="pnl">Sort by: PnL</option>
+              <option value="rr">Sort by: RR</option>
+            </select>
           </div>
 
-          {/* ---------------- PNL & RR (UNCHANGED) ---------------- */}
-          <div className={styles.filterinput}>
-            <div className={styles.filterinputsec}>
-              <label>
-                PNL {!isPro && <span className={styles.proBadge}>PRO</span>}
-              </label>
-              <div className={styles.proInputWrapper}>
+          <button
+            type="button"
+            className={styles.moreFiltersToggle}
+            onClick={() => setShowAdvancedFilters((prev) => !prev)}
+            aria-expanded={showAdvancedFilters}
+          >
+            {showAdvancedFilters ? "Show Less ↑" : "View More Filters ↓"}
+          </button>
+
+          {showAdvancedFilters && (
+            <div className={styles.advancedFilters}>
+              <div className={styles.advancedTopRow}>
                 <select
-                  name="pnlOperator"
-                  value={filters.pnlOperator}
+                  name="marketType"
+                  value={filters.marketType}
                   onChange={handleFilterChange}
-                  onClick={handleProFeatureClick("pnl")}
-                  disabled={!isPro}
                 >
-                  <option value=">">&gt;</option>
-                  <option value="<">&lt;</option>
-                  <option value="=">=</option>
+                  <option value="">All Market</option>
+                  <option value="forex">Forex</option>
+                  <option value="crypto">Crypto</option>
+                  <option value="stocks">Stocks</option>
                 </select>
 
-                <input
-                  type="number"
-                  name="pnlValue"
-                  placeholder="PnL"
-                  value={filters.pnlValue}
-                  onChange={handleFilterChange}
-                  onClick={handleProFeatureClick("pnl")}
-                  disabled={!isPro}
-                />
-
-                {showProTooltip === "pnl" && !isPro && (
-                  <div className={styles.proTooltip}>
-                    <span className={styles.tooltipIcon}>!</span>
-                    This feature is available in Pro plan
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className={styles.filterinputsec}>
-              <label>
-                RR {!isPro && <span className={styles.proBadge}>PRO</span>}
-              </label>
-              <div className={styles.proInputWrapper}>
                 <select
-                  name="rrOperator"
-                  value={filters.rrOperator}
+                  name="status"
+                  value={filters.status}
                   onChange={handleFilterChange}
-                  onClick={handleProFeatureClick("rr")}
-                  disabled={!isPro}
                 >
-                  <option value=">">&gt;</option>
-                  <option value="<">&lt;</option>
-                  <option value="=">=</option>
+                  <option value="">All Status</option>
+                  <option value="live">Live</option>
+                  <option value="exited">Exited</option>
                 </select>
 
-                <input
-                  type="number"
-                  name="rrValue"
-                  placeholder="RR"
-                  value={filters.rrValue}
+                <select
+                  name="strategy"
+                  value={filters.strategy}
                   onChange={handleFilterChange}
-                  onClick={handleProFeatureClick("rr")}
-                  disabled={!isPro}
-                />
+                >
+                  <option value="">All Strategies</option>
+                  {filteredStrategies.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
 
-                {showProTooltip === "rr" && !isPro && (
-                  <div className={styles.proTooltip}>
-                    <span className={styles.tooltipIcon}>!</span>
-                    This feature is available in Pro plan
+                <select name="tag" value={filters.tag} onChange={handleFilterChange}>
+                  <option value="">All Tags</option>
+                  {filteredTags.map((t) => (
+                    <option key={t._id} value={t._id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.advancedMetricsRow}>
+                <div className={styles.filterinputsec}>
+                  <label>PnL</label>
+                  <div className={styles.proInputWrapper}>
+                    <select
+                      name="pnlOperator"
+                      value={filters.pnlOperator}
+                      onChange={handleFilterChange}
+                      onClick={handleProFeatureClick("pnl")}
+                      disabled={!isPro}
+                    >
+                      <option value=">">&gt;</option>
+                      <option value="<">&lt;</option>
+                      <option value="=">=</option>
+                    </select>
+
+                    <input
+                      type="number"
+                      name="pnlValue"
+                      placeholder="PnL"
+                      value={filters.pnlValue}
+                      onChange={handleFilterChange}
+                      onClick={handleProFeatureClick("pnl")}
+                      disabled={!isPro}
+                    />
+
+                    {showProTooltip === "pnl" && !isPro && (
+                      <div className={styles.proTooltip}>
+                        <span className={styles.tooltipIcon}>!</span>
+                        This feature is available in Pro plan
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+
+                <div className={styles.filterinputsec}>
+                  <label>RR</label>
+                  <div className={styles.proInputWrapper}>
+                    <select
+                      name="rrOperator"
+                      value={filters.rrOperator}
+                      onChange={handleFilterChange}
+                      onClick={handleProFeatureClick("rr")}
+                      disabled={!isPro}
+                    >
+                      <option value=">">&gt;</option>
+                      <option value="<">&lt;</option>
+                      <option value="=">=</option>
+                    </select>
+
+                    <input
+                      type="number"
+                      name="rrValue"
+                      placeholder="RR"
+                      value={filters.rrValue}
+                      onChange={handleFilterChange}
+                      onClick={handleProFeatureClick("rr")}
+                      disabled={!isPro}
+                    />
+
+                    {showProTooltip === "rr" && !isPro && (
+                      <div className={styles.proTooltip}>
+                        <span className={styles.tooltipIcon}>!</span>
+                        This feature is available in Pro plan
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          {/* ---------------- DATE & ACCOUNT ---------------- */}
-          <div className={styles.filterinput}>
-            <div className={styles.filterinputsec}>
-              <label>Date</label>
-              <input
-                type="date"
-                name="startDate"
-                value={filters.startDate}
-                onChange={handleFilterChange}
-                onClick={handleDateInputOpen}
-                onFocus={handleDateInputOpen}
-              />
-              <input
-                type="date"
-                name="endDate"
-                value={filters.endDate}
-                onChange={handleFilterChange}
-                onClick={handleDateInputOpen}
-                onFocus={handleDateInputOpen}
-              />
-            </div>
-
-            <div className={styles.filterinputsec}>
-              <select
-                name="accountId"
-                value={filters.accountId}
-                onChange={handleFilterChange}
-                disabled={accounts.length === 0}
-              >
-                <option value="">
-                  {accounts.length === 0
-                    ? "Create an account first"
-                    : "All Accounts"}
-                </option>
-                {accounts.map((acc) => (
-                  <option key={acc._id} value={acc._id}>
-                    {acc.name}
-                  </option>
-                ))}
-              </select>
-
-              <select
-                name="strategy"
-                value={filters.strategy}
-                onChange={handleFilterChange}
-              >
-                <option value="">All Strategies</option>
-                {filteredStrategies.map((s) => (
-                  <option key={s._id} value={s._id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-
-              <select name="tag" value={filters.tag} onChange={handleFilterChange}>
-                <option value="">All Tags</option>
-                {filteredTags.map((t) => (
-                  <option key={t._id} value={t._id}>
-                    {t.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className={styles.filter3}>
+          <div className={styles.filterActionRow}>
             <p>Showing {totalTrades} trades</p>
             <label>
               <input

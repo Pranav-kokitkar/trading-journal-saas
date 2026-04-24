@@ -28,6 +28,11 @@
   text-align: center;
 }
 
+.myaccountpageheading :global(.app-page-title) {
+  font-size: clamp(30px, 2.6vw, 42px);
+  font-weight: 600;
+}
+
 .title {
   font-size: clamp(28px, 2.4vw, 40px);
   font-weight: 600;
@@ -157,8 +162,8 @@
 }
 
 .btngroup button {
-  padding: 0 1.25rem;
-  height: 42px;
+  padding: 0 1.35rem;
+  height: var(--btn-height);
   background: var(--btn-primary-bg);
   color: var(--btn-primary-text);
   border: none;
@@ -166,7 +171,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   box-shadow: var(--btn-primary-shadow);
 }
 
@@ -266,14 +271,14 @@
   background: rgba(255, 127, 135, 0.16);
   color: var(--error);
   border: none;
-  padding: 0 1.25rem;
-  height: 42px;
+  padding: 0 1.35rem;
+  height: var(--btn-height);
   border-radius: var(--radius-pill);
   margin-top: 1rem;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
+  font-weight: var(--btn-weight);
+  font-size: var(--btn-font-size);
+  transition: all 0.25s ease;
   box-shadow: none;
 }
 
@@ -329,8 +334,8 @@
 }
 
 .inlineform button {
-  padding: 0 1.25rem;
-  height: 42px;
+  padding: 0 1.35rem;
+  height: var(--btn-height);
   background: var(--btn-primary-bg);
   color: var(--btn-primary-text);
   border: none;
@@ -338,7 +343,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   box-shadow: var(--btn-primary-shadow);
 }
 
@@ -417,11 +422,16 @@
     width: 100%;
     flex: 1;
   }
+
+  .createAccBtn,
+  .dangerbtn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-  .myaccountpageheading h2 {
-    font-size: 1.15rem;
+  .myaccountpageheading :global(.app-page-title) {
+    font-size: clamp(23px, 7vw, 28px);
   }
 
   .myaccountpageheading p {

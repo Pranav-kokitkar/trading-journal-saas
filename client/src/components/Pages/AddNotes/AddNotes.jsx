@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 export const AddNotes = () => {
   const [notes, setNotes] = useState([]);
   const [note, setNote] = useState({ title: "", description: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { authorizationToken } = useAuth();
 
@@ -18,8 +19,10 @@ export const AddNotes = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (note.title.trim() === "" && note.description.trim() === "") return;
+    if (isSubmitting) return;
 
     try {
+      setIsSubmitting(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/notes/`,
         {
@@ -41,6 +44,8 @@ export const AddNotes = () => {
       }
     } catch (error) {
       toast.error("Failed to add note, try re-login");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -108,7 +113,9 @@ export const AddNotes = () => {
           </div>
 
           <div className={styles.addnotebutton}>
-            <button type="submit">Save Note</button>
+            <button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Note"}
+            </button>
           </div>
         </form>
 

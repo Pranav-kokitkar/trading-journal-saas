@@ -15,11 +15,18 @@ export const Strategy = () => {
   });
 
   const [strategies, setStrategies] = useState([]);
+  const [strategyStats, setStrategyStats] = useState({});
   const [loadingStrategies, setLoadingStrategies] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [strategyToDelete, setStrategyToDelete] = useState(null);
   const [strategyToUpdate, setStrategyToUpdate] = useState(null);
+
+  const normalizeName = (value) => String(value || "").trim().toLowerCase();
+
+  const formatWinRate = (value) => `${Number(value || 0).toFixed(1)}%`;
+  const formatExpectancy = (value) => `${Number(value || 0).toFixed(2)}R`;
 
   /* -------------------- HANDLE INPUT CHANGES -------------------- */
   const handleChange = (e) => {
@@ -39,6 +46,8 @@ export const Strategy = () => {
       return;
     }
 
+    if (actionLoading) return;
+
     const maxStrategies = getMaxStrategies(isPro);
     if (strategies.length >= maxStrategies) {
       toast.error(
@@ -50,6 +59,7 @@ export const Strategy = () => {
     }
 
     try {
+      setActionLoading(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/strategy`,
         {
@@ -67,13 +77,15 @@ export const Strategy = () => {
       if (response.ok) {
         toast.success("Strategy created successfully");
         setStrategy({ name: "", description: "" });
-        getStrategies();
+        refreshStrategyData();
       } else {
         toast.error(data.message || "Failed to create strategy");
       }
     } catch (error) {
       console.error(error);
       toast.error("Error creating strategy");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -106,8 +118,41 @@ export const Strategy = () => {
     }
   };
 
+  const getStrategyStats = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/analytics?dimension=strategy&sortBy=expectancy&order=desc`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: authorizationToken,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        return;
+      }
+
+      const statsRows = await response.json();
+      const statsMap = statsRows.reduce((acc, row) => {
+        const key = normalizeName(row?.name);
+        if (key) acc[key] = row;
+        return acc;
+      }, {});
+
+      setStrategyStats(statsMap);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const refreshStrategyData = async () => {
+    await Promise.all([getStrategies(), getStrategyStats()]);
+  };
+
   useEffect(() => {
-    getStrategies();
+    refreshStrategyData();
   }, []);
 
   /* -------------------- DELETE STRATEGY -------------------- */
@@ -118,8 +163,10 @@ export const Strategy = () => {
 
   const confirmDelete = async () => {
     if (!strategyToDelete) return;
+    if (actionLoading) return;
 
     try {
+      setActionLoading(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/strategy/${strategyToDelete}`,
         {
@@ -132,7 +179,7 @@ export const Strategy = () => {
 
       if (response.ok) {
         toast.success("Strategy deleted");
-        getStrategies();
+        refreshStrategyData();
       } else {
         toast.error("Failed to delete strategy");
       }
@@ -142,6 +189,7 @@ export const Strategy = () => {
     } finally {
       setIsDeleteModalOpen(false);
       setStrategyToDelete(null);
+      setActionLoading(false);
     }
   };
 
@@ -154,6 +202,7 @@ export const Strategy = () => {
 
   const confirmUpdate = async () => {
     if (!strategyToUpdate) return;
+    if (actionLoading) return;
 
     if (!strategy.name.trim()) {
       toast.error("Strategy name is required");
@@ -161,6 +210,7 @@ export const Strategy = () => {
     }
 
     try {
+      setActionLoading(true);
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/strategy/${strategyToUpdate._id}`,
         {
@@ -181,13 +231,15 @@ export const Strategy = () => {
         setStrategy({ name: "", description: "" });
         setIsUpdateModalOpen(false);
         setStrategyToUpdate(null);
-        getStrategies();
+        refreshStrategyData();
       } else {
         toast.error("Failed to update strategy");
       }
     } catch (error) {
       console.error(error);
       toast.error("Server error");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -198,7 +250,7 @@ export const Strategy = () => {
         {/* Page Heading */}
         <div className={styles.heading}>
           <h2>Manage Strategies</h2>
-          <p>Create and organize trading strategies to categorize your trades</p>
+          <p>Track performance by strategy and identify your trading edge</p>
         </div>
 
         {/* Create Strategy Form */}
@@ -227,8 +279,8 @@ export const Strategy = () => {
             />
           </div>
 
-          <button type="submit" className={styles.submitBtn}>
-            Create Strategy
+          <button type="submit" className={styles.submitBtn} disabled={actionLoading}>
+            {actionLoading ? "Saving..." : "Create Strategy"}
           </button>
         </form>
 
@@ -252,6 +304,9 @@ export const Strategy = () => {
           ) : (
             <div className={styles.strategiesList}>
               {strategies.map((strat) => (
+                (() => {
+                  const currentStats = strategyStats[normalizeName(strat.name)] || {};
+                  return (
                 <div key={strat._id} className={styles.strategyCard}>
                   <div className={styles.strategyHeader}>
                     <div className={styles.strategyInfo}>
@@ -276,18 +331,41 @@ export const Strategy = () => {
                           {strat.description}
                         </p>
                       )}
+
+                      <div className={styles.strategyStatsRow}>
+                        <div className={styles.statItem}>
+                          <span className={styles.statLabel}>Win Rate</span>
+                          <span className={styles.statValue}>
+                            {formatWinRate(currentStats.winRate)}
+                          </span>
+                        </div>
+                        <div className={styles.statItem}>
+                          <span className={styles.statLabel}>Expectancy</span>
+                          <span className={styles.statValue}>
+                            {formatExpectancy(currentStats.expectancy)}
+                          </span>
+                        </div>
+                        <div className={styles.statItem}>
+                          <span className={styles.statLabel}>Trades</span>
+                          <span className={styles.statValue}>
+                            {Number(currentStats.totalTrades || 0)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
                     <div className={styles.strategyActions}>
                       <button
                         onClick={() => openUpdateModal(strat)}
                         className={styles.editBtn}
+                        disabled={actionLoading}
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => openDeleteModal(strat._id)}
                         className={styles.deleteBtn}
+                        disabled={actionLoading}
                       >
                         Delete
                       </button>
@@ -315,6 +393,8 @@ export const Strategy = () => {
                     </div>
                   )}
                 </div>
+                  );
+                })()
               ))}
             </div>
           )}
@@ -340,6 +420,7 @@ export const Strategy = () => {
         <StrategyUpdateModal
           strategy={strategy}
           setStrategy={setStrategy}
+          loading={actionLoading}
           onCancel={() => {
             setIsUpdateModalOpen(false);
             setStrategyToUpdate(null);
@@ -353,7 +434,7 @@ export const Strategy = () => {
 };
 
 /* -------------------- STRATEGY UPDATE MODAL -------------------- */
-const StrategyUpdateModal = ({ strategy, setStrategy, onCancel, onConfirm }) => {
+const StrategyUpdateModal = ({ strategy, setStrategy, loading, onCancel, onConfirm }) => {
   return (
     <div className={styles.modalOverlay} onClick={onCancel}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -385,11 +466,11 @@ const StrategyUpdateModal = ({ strategy, setStrategy, onCancel, onConfirm }) => 
         </div>
 
         <div className={styles.modalActions}>
-          <button onClick={onCancel} className={styles.cancelBtn}>
+          <button onClick={onCancel} className={styles.cancelBtn} disabled={loading}>
             Cancel
           </button>
-          <button onClick={onConfirm} className={styles.confirmBtn}>
-            Update
+          <button onClick={onConfirm} className={styles.confirmBtn} disabled={loading}>
+            {loading ? "Saving..." : "Update"}
           </button>
         </div>
       </div>

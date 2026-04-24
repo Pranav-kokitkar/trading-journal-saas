@@ -108,32 +108,34 @@
   border-radius: 50%;
   border: 2px solid var(--border-medium);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   padding: 0;
 }
 
 .colorButton:hover {
-  transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px) scale(1.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 .colorButton.selected {
   border: 3px solid var(--accent);
-  transform: scale(1.2);
-  box-shadow: 0 0 0 4px var(--accent-subtle);
+  transform: scale(1.12);
+  box-shadow:
+    0 0 0 4px var(--accent-subtle),
+    0 0 18px var(--accent-glow);
 }
 
 /* ===== Submit Button ===== */
 .submitBtn {
   padding: 0.65rem 1.5rem;
   background: var(--accent);
-  color: var(--bg-primary);
+  color: white;
   border: none;
   border-radius: var(--radius-sm);
   font-size: 0.85rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   box-shadow: 0 4px 12px var(--accent-subtle);
   margin-top: 0.5rem;
 }
@@ -146,17 +148,20 @@
 
 /* ===== Tags Section ===== */
 .tagsSection {
-  background: var(--gradient-card);
-  border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  display: grid;
+  gap: var(--space-2);
+  background: var(--surface-card);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4);
   border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-card);
 }
 
 .tagsSection h3 {
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
   color: var(--text-primary);
-  margin: 0 0 1rem 0;
+  margin: 0;
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 0.75rem;
 }
@@ -177,25 +182,26 @@
 .tagsList {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
+  gap: var(--space-2);
 }
 
 /* ===== Tag Card ===== */
 .tagCard {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  padding: 1rem;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-medium);
-  border-radius: var(--radius-md);
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
   transition: all 0.25s ease;
 }
 
 .tagCard:hover {
-  border-color: var(--border-light);
+  border-color: var(--border-default);
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
 }
 
 /* ===== Tag Info ===== */
@@ -203,36 +209,44 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  min-width: 0;
 }
 
 .colorDot {
-  width: 20px;
-  height: 20px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  border: 2px solid var(--border-light);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  margin-top: 1px;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
 }
 
 .tagName {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ===== Tag Actions ===== */
 .tagActions {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .editBtn,
 .deleteBtn {
-  padding: 0.45rem 0.9rem;
+  padding: 0.4rem 0.78rem;
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .editBtn {
@@ -244,6 +258,7 @@
 .editBtn:hover {
   background: var(--accent-subtle);
   border-color: var(--accent);
+  transform: translateY(-1px);
 }
 
 .deleteBtn {
@@ -255,6 +270,7 @@
 .deleteBtn:hover {
   background: var(--color-loss-subtle);
   border-color: var(--error);
+  transform: translateY(-1px);
 }
 
 /* ===================================
@@ -380,15 +396,25 @@
     padding: 1rem;
   }
 
+  .tagsList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .tagCard {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 0.65rem;
+  }
+
+  .tagInfo {
+    justify-content: center;
+    width: 100%;
   }
 
   .tagActions {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: center;
   }
 }
 
@@ -423,7 +449,16 @@
   }
 
   .tagsList {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
+  }
+
+  .tagActions {
+    flex-wrap: wrap;
+  }
+
+  .editBtn,
+  .deleteBtn {
+    flex: 1 1 120px;
   }
 }
 
@@ -440,5 +475,3 @@
     grid-template-columns: 1fr;
   }
 }
-
-

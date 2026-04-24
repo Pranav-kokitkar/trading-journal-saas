@@ -15,6 +15,89 @@ import { UserContext } from "../../../context/UserContext";
 import { AccountContext } from "../../../context/AccountContext";
 import { SkeletonCard, SkeletonChart, SkeletonText } from "../../ui/skeleton/Skeleton";
 
+const formatLabel = (value, fallback) => {
+  const text = String(value || "").trim();
+  if (!text) return fallback;
+  return text
+    .split(" ")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+};
+
+const normalizeDirection = (trade) => {
+  const raw = String(trade?.tradeDirection || trade?.tradedirection || "").toLowerCase();
+  if (raw === "buy" || raw === "long") return "Long";
+  if (raw === "sell" || raw === "short") return "Short";
+  return "Unknown";
+};
+
+const getTradeOutcome = (trade) => {
+  const result = String(trade?.tradeResult || "").toLowerCase();
+  if (result === "win") return "win";
+  if (result === "loss") return "loss";
+  const pnl = Number(trade?.pnl || 0);
+  if (pnl > 0) return "win";
+  if (pnl < 0) return "loss";
+  return "breakeven";
+};
+
+const buildKeyInsights = (trades) => {
+  const groups = new Map();
+
+  trades.forEach((trade) => {
+    const pair = String(trade?.symbol || "").trim() || "Unknown Pair";
+    const session = formatLabel(trade?.session, "Unknown Session");
+    const direction = normalizeDirection(trade);
+    const key = `${pair}__${session}__${direction}`;
+
+    if (!groups.has(key)) {
+      groups.set(key, {
+        pair,
+        session,
+        direction,
+        total: 0,
+        wins: 0,
+        totalPnL: 0,
+      });
+    }
+
+    const group = groups.get(key);
+    const pnl = Number(trade?.pnl || 0);
+    const outcome = getTradeOutcome(trade);
+
+    group.total += 1;
+    if (outcome === "win") group.wins += 1;
+    group.totalPnL += Number.isFinite(pnl) ? pnl : 0;
+  });
+
+  const ranked = Array.from(groups.values())
+    .map((group) => ({
+      ...group,
+      winRate: group.total > 0 ? (group.wins / group.total) * 100 : 0,
+    }))
+    .filter((group) => group.total > 0);
+
+  if (!ranked.length) {
+    return { weakest: null, strongest: null };
+  }
+
+  const weakest = [...ranked].sort(
+    (a, b) => a.winRate - b.winRate || a.totalPnL - b.totalPnL,
+  )[0];
+
+  const strongest = [...ranked].sort(
+    (a, b) => b.winRate - a.winRate || b.totalPnL - a.totalPnL,
+  )[0];
+
+  return { weakest, strongest };
+};
+
+const formatPnl = (value) => {
+  const amount = Number(value || 0);
+  const sign = amount >= 0 ? "+" : "-";
+  return `${sign}$${Math.abs(amount).toFixed(2)}`;
+};
+
 export const Dashboard = () => {
   const { userDetails } = useContext(UserContext);
   const { performance } = useContext(PerformanceContext);
@@ -23,8 +106,6 @@ export const Dashboard = () => {
   // Read trades from TradeContext (fallback to empty array)
   const {
     accountTrades = [],
-    includeImportedTrades,
-    setIncludeImportedTrades,
     loading: chartsLoading = false,
   } = useTrades() || {};
 
@@ -38,6 +119,10 @@ export const Dashboard = () => {
       )
     : [];
 
+  const allTrades = Array.isArray(accountTrades) ? accountTrades : [];
+  const hasEnoughInsightData = allTrades.length >= 10;
+  const { weakest, strongest } = buildKeyInsights(allTrades);
+
 
   if (!userDetails) {
     return <DashboardLoadingState />;
@@ -47,23 +132,56 @@ export const Dashboard = () => {
     <section className={`${styles.dashboard} app-page`}>
       <TradingDashboard accountDetails={accountDetails} performance={performance} />
 
+      <section className={styles.insightsSection}>
+        <h2>
+          Key <span className={styles.span}>Insights</span>
+        </h2>
+
+        {!hasEnoughInsightData ? (
+          <div className={styles.insightFallback}>
+            Not enough data to generate insights yet
+          </div>
+        ) : (
+          <div className={styles.insightsGrid}>
+            <article className={styles.insightCard}>
+              <h3>Weakest Pattern</h3>
+              <p className={styles.insightMeta}>
+                {weakest?.pair || "Unknown Pair"} — {weakest?.session || "Unknown Session"} — {weakest?.direction || "Unknown"}
+              </p>
+              <p className={styles.insightValue}>
+                Win Rate: <span>{(weakest?.winRate || 0).toFixed(0)}%</span>
+              </p>
+              <p className={styles.insightValue}>
+                Total PnL: <span className={(weakest?.totalPnL || 0) < 0 ? styles.loss : styles.profit}>{formatPnl(weakest?.totalPnL)}</span>
+              </p>
+              <p className={styles.insightNote}>
+                → Avoid this setup — it is reducing your performance
+              </p>
+            </article>
+
+            <article className={styles.insightCard}>
+              <h3>Strongest Edge</h3>
+              <p className={styles.insightMeta}>
+                {strongest?.pair || "Unknown Pair"} — {strongest?.session || "Unknown Session"} — {strongest?.direction || "Unknown"}
+              </p>
+              <p className={styles.insightValue}>
+                Win Rate: <span>{(strongest?.winRate || 0).toFixed(0)}%</span>
+              </p>
+              <p className={styles.insightValue}>
+                Total PnL: <span className={(strongest?.totalPnL || 0) < 0 ? styles.loss : styles.profit}>{formatPnl(strongest?.totalPnL)}</span>
+              </p>
+              <p className={styles.insightNote}>
+                → Keep executing this setup — it is strengthening your performance
+              </p>
+            </article>
+          </div>
+        )}
+      </section>
+
       <div className={styles.sectionHeader}>
         <h2>
           Trading <span className={styles.span}>Performance</span>
         </h2>
-        <div className={styles.controlsBar}>
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={Boolean(includeImportedTrades)}
-              onChange={(e) =>
-                typeof setIncludeImportedTrades === "function" &&
-                setIncludeImportedTrades(e.target.checked)
-              }
-            />
-            <span>Include Imported Trades</span>
-          </label>
-        </div>
       </div>
 
       <div className={styles.tradingperformance}>
@@ -155,11 +273,29 @@ const DashboardLoadingState = () => {
 };
 
 const TradingDashboard = ({ accountDetails, performance }) => {
+  const { includeImportedTrades, setIncludeImportedTrades } = useTrades() || {};
+
   return (
     <header className={`${styles.pageHero} app-page-heading`}>
-      <h1 className="app-page-title">
-        Trading <span className={styles.span}>Dashboard</span>
-      </h1>
+      <div className={styles.dashboardHeaderRow}>
+        <h1 className="app-page-title">
+          Trading <span className={styles.span}>Dashboard</span>
+        </h1>
+
+        <div className={styles.controlsBar}>
+          <label className={styles.checkboxLabel}>
+            <input
+              type="checkbox"
+              checked={Boolean(includeImportedTrades)}
+              onChange={(e) =>
+                typeof setIncludeImportedTrades === "function" &&
+                setIncludeImportedTrades(e.target.checked)
+              }
+            />
+            <span>Include Imported Trades</span>
+          </label>
+        </div>
+      </div>
       <div className={styles.tradingdata}>
         {/* Left side */}
         <div className={styles.tradingdatal}>

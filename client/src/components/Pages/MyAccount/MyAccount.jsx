@@ -109,20 +109,8 @@ export const MyAccount = () => {
           </div>
         </div>
 
-        {/* Export & Import Data */}
+        {/* Import & Export Data */}
         <div className={styles.actionRow}>
-          <div className={styles.sectionbox}>
-            <h3>Export Trading Data</h3>
-            <p>
-              Download your complete trading journal with all trades and account
-              information.
-            </p>
-            <div className={styles.btngroup}>
-              <button onClick={() => handleExport("csv")}>Export as CSV</button>
-              <button onClick={() => handleExport("json")}>Export as JSON</button>
-            </div>
-          </div>
-
           <div className={styles.sectionbox}>
             <h3>Import Trading Data</h3>
             <p>
@@ -134,11 +122,24 @@ export const MyAccount = () => {
               </button>
             </div>
           </div>
+
+          <div className={styles.sectionbox}>
+            <h3>Export Trading Data</h3>
+            <p>
+              Download your complete trading journal with all trades and account
+              information.
+            </p>
+            <div className={styles.btngroup}>
+              <button onClick={() => handleExport("csv")}>Export as CSV</button>
+              <button onClick={() => handleExport("json")}>Export as JSON</button>
+            </div>
+          </div>
         </div>
 
-        {/* Appearance */}
+        {/* Theme Preferences */}
         <div className={styles.sectionbox}>
-          <h3>Appearance</h3>
+          <h3>Theme Preferences</h3>
+          <p>Customize your interface appearance</p>
           <div className={styles.togglecontainer}>
             <p>Dark Theme</p>
             <label className={styles.switch}>
@@ -178,9 +179,7 @@ export const MyAccount = () => {
         <div className={styles.sectionbox}>
           <h3>About</h3>
           <p>
-            This Trading Journal helps traders stay organized and make informed
-            decisions. Log entries, review performance analytics, and grow as a
-            trader — all in one place.
+            Kyros Journal helps you eliminate weak trades, identify your strongest setups, and build a consistent trading edge through data.
           </p>
         </div>
       </div>

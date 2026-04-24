@@ -7,6 +7,14 @@
   display: flex;
   min-height: 100vh;
   background: transparent;
+  overflow-x: hidden;
+}
+
+@media (min-width: 769px) {
+  .layout {
+    margin-left: 0;
+    flex-direction: row;
+  }
 }
 
 /* ===== Sidebar (Desktop Default) ===== */
@@ -15,11 +23,29 @@
   flex-shrink: 0;
 }
 
+@media (min-width: 769px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 260px;
+    height: 100vh;
+    z-index: 100;
+  }
+}
+
 /* ===== Main Content Area ===== */
 .outlet {
   flex: 1;
   overflow-y: auto;
+  min-width: 0;
   background: transparent;
+}
+
+@media (min-width: 769px) {
+  .outlet {
+    margin-left: 260px;
+  }
 }
 
 /* ===== Mobile Header (Hidden on Desktop) ===== */
@@ -96,6 +122,23 @@
     opacity 150ms ease;
 }
 
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 240px;
+  }
+
+  .addTradeBtn {
+    width: 54px;
+    height: 54px;
+    right: var(--space-md);
+    bottom: var(--space-md);
+  }
+
+  .plusIcon {
+    font-size: 1.8rem;
+  }
+}
+
 .addTradeBtn:hover {
   background: var(--btn-primary-hover);
 }
@@ -148,11 +191,13 @@
     z-index: 999;
     transition: left 0.3s ease-in-out;
     overflow-y: auto;
+    pointer-events: none;
   }
 
   /* Show Sidebar When .show Class is Added */
   .sidebar.show {
     left: 0 !important;
+    pointer-events: auto;
   }
 
   /* Show Overlay When Sidebar is Open */
@@ -173,6 +218,17 @@
   .outlet {
     padding-top: 72px;
   }
+
+  .addTradeBtn {
+    width: 48px;
+    height: 48px;
+    right: var(--space-sm);
+    bottom: var(--space-sm);
+  }
+
+  .plusIcon {
+    font-size: 1.55rem;
+  }
 }
 
 /* ===================================
@@ -186,5 +242,14 @@
 
   .mobileHeader h3 {
     font-size: 1.3rem;
+  }
+
+  .addTradeBtn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .plusIcon {
+    font-size: 1.4rem;
   }
 }

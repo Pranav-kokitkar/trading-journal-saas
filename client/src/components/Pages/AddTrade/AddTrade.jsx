@@ -46,6 +46,7 @@ export const AddTrade = () => {
 
   // ✅ NEW: hold up to 2 screenshot files selected in the UI
   const [screenshots, setScreenshots] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,6 +55,8 @@ export const AddTrade = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
 
     const accountId = accountDetails?._id;
     if (!accountId) {
@@ -171,9 +174,12 @@ export const AddTrade = () => {
     }
 
     try {
+      setIsSubmitting(true);
       await addTradeFromContext(normalizedTrade, screenshots);
     } catch (err) {
       toastHelper.error("Failed to add trade");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -198,7 +204,7 @@ export const AddTrade = () => {
           screenshots={screenshots}
           setScreenshots={setScreenshots}
         />
-        <Buttons setTrade={setTrade} />
+        <Buttons setTrade={setTrade} isSubmitting={isSubmitting} />
       </form>
     </section>
   );
@@ -213,10 +219,11 @@ const PageHeading = () => (
   </div>
 );
 
-const Buttons = ({ setTrade }) => (
+const Buttons = ({ setTrade, isSubmitting }) => (
   <div className={styles.btncontainer}>
     <button
       type="reset"
+      disabled={isSubmitting}
       onClick={() =>
         setTrade({
           id: "",
@@ -240,6 +247,8 @@ const Buttons = ({ setTrade }) => (
     >
       Clear All
     </button>
-    <button type="submit">Add Trade</button>
+    <button type="submit" disabled={isSubmitting}>
+      {isSubmitting ? "Adding..." : "Add Trade"}
+    </button>
   </div>
 );

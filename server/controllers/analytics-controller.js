@@ -5,6 +5,17 @@ const {
   SORT_FIELD_MAP,
 } = require("../services/analytics-service");
 
+const parseIncludeImported = (value, defaultValue = true) => {
+  if (value === undefined || value === null || value === "")
+    return defaultValue;
+  if (typeof value === "boolean") return value;
+
+  const normalized = String(value).trim().toLowerCase();
+  if (["false", "0", "no", "off"].includes(normalized)) return false;
+  if (["true", "1", "yes", "on"].includes(normalized)) return true;
+  return defaultValue;
+};
+
 const getAnalyticsController = async (req, res) => {
   try {
     const userId = req.userID || req.user?._id || req.user?.id;
@@ -20,6 +31,7 @@ const getAnalyticsController = async (req, res) => {
       minTrades = 0,
       sortBy = "expectancy",
       order = "desc",
+      includeImported = "true",
     } = req.query;
 
     if (!dimension || !DIMENSION_CONFIG[dimension]) {
@@ -70,6 +82,7 @@ const getAnalyticsController = async (req, res) => {
       minTrades: parsedMinTrades,
       sortBy,
       order,
+      includeImported: parseIncludeImported(includeImported, true),
     });
 
     return res.status(200).json(analytics);

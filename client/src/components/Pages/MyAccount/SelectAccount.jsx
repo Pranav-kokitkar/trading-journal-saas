@@ -85,9 +85,11 @@ export const SelectAccount = ({ accounts, createAcc }) => {
   return (
     <div className={styles.selectaccountcontainer}>
       <div className={styles.currentacc}>
-        <h3>Current Account:</h3>
+        <h3>Active Account:</h3>
         <p className={styles.name}>{currAccName || "No active account"}</p>
       </div>
+
+      <p className={styles.helperText}>Switch between your trading accounts</p>
 
       <label>Change Account</label>
       <select
@@ -110,7 +112,7 @@ export const SelectAccount = ({ accounts, createAcc }) => {
 
       <div className={styles.createAcccontainer}>
         <button className={styles.createAccBtn} onClick={createAcc}>
-          Create New Account
+          Create New Trading Account
         </button>
       </div>
       {accounts.length > 0 && (

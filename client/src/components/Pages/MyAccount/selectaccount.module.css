@@ -41,6 +41,13 @@
   margin: 0;
 }
 
+.helperText {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
 /* ===== Label ===== */
 .selectaccountcontainer label {
   font-size: 0.75rem;
@@ -85,14 +92,14 @@
 }
 
 .createAccBtn {
-  padding: 0 1.25rem;
-  height: 42px;
+  padding: 0 var(--space-4);
+  height: var(--btn-height);
   background: var(--btn-primary-bg);
   color: var(--btn-primary-text);
   border: none;
   border-radius: var(--radius-pill);
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: var(--btn-font-size);
+  font-weight: var(--btn-weight);
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: var(--btn-primary-shadow);
@@ -109,13 +116,13 @@
   background: rgba(255, 127, 135, 0.16);
   color: var(--error);
   border: none;
-  padding: 0 1.25rem;
-  height: 42px;
+  padding: 0 var(--space-4);
+  height: var(--btn-height);
   border-radius: var(--radius-pill);
   margin-top: 1rem;
   cursor: pointer;
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: var(--btn-weight);
+  font-size: var(--btn-font-size);
   transition: all 0.2s ease;
   box-shadow: none;
 }
