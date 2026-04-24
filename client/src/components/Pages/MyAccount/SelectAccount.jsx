@@ -42,7 +42,7 @@ export const SelectAccount = ({ accounts, createAcc }) => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/user/active-account`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/user/active-account`,
         {
           method: "PATCH",
           headers: {

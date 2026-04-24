@@ -87,7 +87,7 @@ export const TradeProvider = ({ children }) => {
       }).toString();
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades?${params}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades?${params}`,
         {
           headers: { Authorization: authorizationToken },
         }
@@ -136,7 +136,7 @@ export const TradeProvider = ({ children }) => {
         }).toString();
 
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/trades?${params}`,
+          `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades?${params}`,
           {
             headers: { Authorization: authorizationToken },
           }
@@ -193,7 +193,7 @@ export const TradeProvider = ({ children }) => {
       }
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/`,
         {
           method: "POST",
           headers: {
@@ -268,7 +268,7 @@ export const TradeProvider = ({ children }) => {
   ) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -336,7 +336,7 @@ export const TradeProvider = ({ children }) => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${id}`,
         {
           method: "DELETE",
           headers: {

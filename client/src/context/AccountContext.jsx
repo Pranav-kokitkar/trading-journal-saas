@@ -15,7 +15,7 @@ export const AccountProvider = ({ children }) => {
   const getAllAccounts = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/account/`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/account/`,
         {
           method: "GET",
           headers: {
@@ -37,7 +37,7 @@ export const AccountProvider = ({ children }) => {
   const getActiveAccount = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/account/active-account`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/account/active-account`,
         {
           method: "GET",
           headers: {
@@ -95,7 +95,7 @@ export const AccountProvider = ({ children }) => {
       }
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/account/`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/account/`,
         {
           method: "PATCH",
           headers: {
@@ -132,7 +132,7 @@ export const AccountProvider = ({ children }) => {
   const deleteAccount = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/account/${accountDetails._id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/account/${accountDetails._id}`,
         {
           method: "DELETE",
           headers: {

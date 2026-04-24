@@ -16,7 +16,7 @@ export const AdminTradeDetails = () => {
     try {
       setLoading(true);
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/trades/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/trades/${id}`,
         {
           headers: { Authorization: authorizationToken },
         }

@@ -61,7 +61,7 @@ export const Strategy = () => {
     try {
       setActionLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/strategy`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy`,
         {
           method: "POST",
           headers: {
@@ -94,7 +94,7 @@ export const Strategy = () => {
     setLoadingStrategies(true);
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/strategy`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy`,
         {
           method: "GET",
           headers: {
@@ -121,7 +121,7 @@ export const Strategy = () => {
   const getStrategyStats = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/analytics?dimension=strategy&sortBy=expectancy&order=desc`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/analytics?dimension=strategy&sortBy=expectancy&order=desc`,
         {
           method: "GET",
           headers: {
@@ -168,7 +168,7 @@ export const Strategy = () => {
     try {
       setActionLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/strategy/${strategyToDelete}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy/${strategyToDelete}`,
         {
           method: "DELETE",
           headers: {
@@ -212,7 +212,7 @@ export const Strategy = () => {
     try {
       setActionLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/strategy/${strategyToUpdate._id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy/${strategyToUpdate._id}`,
         {
           method: "PATCH",
           headers: {

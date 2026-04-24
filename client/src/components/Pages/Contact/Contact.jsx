@@ -88,7 +88,7 @@ export const Contact = () => {
       }
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/contact/`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/contact/`,
         {
           method: "POST",
           body: formData, // ❗ NO "Content-Type" header here – browser will set it

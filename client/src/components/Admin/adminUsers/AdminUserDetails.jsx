@@ -36,7 +36,7 @@ export const AdminUserDetails = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/users/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/users/${id}`,
         {
           method: "GET",
           headers: {

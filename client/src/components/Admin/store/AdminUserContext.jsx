@@ -36,7 +36,7 @@ export const AdminUsersProvider = ({ children }) => {
       }
 
       let url = `${
-        import.meta.env.VITE_API_URL
+        (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))
       }/api/admin/users?page=${page}&limit=${limit}`;
 
       if (search) {
@@ -75,7 +75,7 @@ export const AdminUsersProvider = ({ children }) => {
   const deleteUser = async (id) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/users/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/users/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -101,7 +101,7 @@ export const AdminUsersProvider = ({ children }) => {
   const updateUser = async (id, updatedData) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/users/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/users/${id}`,
         {
           method: "PATCH",
           headers: {

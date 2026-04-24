@@ -46,7 +46,7 @@ export const ImportTrades = ({
       setLoading(true);
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/import`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/import`,
         {
           method: "POST",
           headers: {
@@ -106,7 +106,7 @@ export const ImportTrades = ({
       setLoading(true);
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/import`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/import`,
         {
           method: "POST",
           headers: {

@@ -1,4 +1,4 @@
-const envBaseUrl = import.meta.env.VITE_API_URL?.trim();
+const envBaseUrl = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))?.trim();
 const fallbackBaseUrl = import.meta.env.PROD
   ? window.location.origin
   : "http://localhost:3000";

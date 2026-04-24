@@ -28,7 +28,7 @@ export const useCompareData = (authorizationToken) => {
   const fetchAccounts = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/account/`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/account/`,
         {
           method: "GET",
           headers: {
@@ -52,7 +52,7 @@ export const useCompareData = (authorizationToken) => {
   const fetchStrategies = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/strategy?all=true`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy?all=true`,
         {
           method: "GET",
           headers: {
@@ -75,7 +75,7 @@ export const useCompareData = (authorizationToken) => {
   const fetchTags = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/tags?all=true`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags?all=true`,
         {
           method: "GET",
           headers: {

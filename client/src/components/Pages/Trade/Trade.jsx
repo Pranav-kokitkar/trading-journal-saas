@@ -93,7 +93,7 @@ export const Trade = () => {
       try {
         setIsLoading(true);
         const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/trades/${id}`,
+          `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${id}`,
           {
             method: "GET",
             headers: {
@@ -268,7 +268,7 @@ export const Trade = () => {
   const SaveNote = async (id) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/${id}/note`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${id}/note`,
         {
           method: "PATCH",
           headers: {
@@ -295,7 +295,7 @@ export const Trade = () => {
   // Tag handlers
   const handleAddTags = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tags`, {
+      const response = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags`, {
         headers: {
           Authorization: authorizationToken,
         },
@@ -322,7 +322,7 @@ export const Trade = () => {
   const saveTags = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/${trade._id}/tags`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id}/tags`,
         {
           method: "PATCH",
           headers: {
@@ -383,7 +383,7 @@ export const Trade = () => {
   const deleteScreenshot = async (screenshotUrl) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/${trade._id}/screenshot`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id}/screenshot`,
         {
           method: "DELETE",
           headers: {
@@ -425,7 +425,7 @@ export const Trade = () => {
       });
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/trades/${trade._id}/screenshots`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id}/screenshots`,
         {
           method: "PATCH",
           headers: {

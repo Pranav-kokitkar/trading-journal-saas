@@ -307,7 +307,7 @@ export const Compare = () => {
           payload.currentAccountId = accountDetails._id;
         }
 
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/compare`, {
+        const response = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/compare`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -366,7 +366,7 @@ export const Compare = () => {
         payload.currentAccountId = accountDetails._id;
       }
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/compare`, {
+      const response = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/compare`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

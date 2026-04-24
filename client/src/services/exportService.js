@@ -1,10 +1,10 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"));
 
 export const exportTrades = async (format) => {
   const token = localStorage.getItem("token");
 
   const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/export/trades?format=${format}`,
+    `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/export/trades?format=${format}`,
     {
       method: "GET",
       headers: {

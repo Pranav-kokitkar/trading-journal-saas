@@ -24,7 +24,7 @@ export const AddNotes = () => {
     try {
       setIsSubmitting(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/notes/`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/notes/`,
         {
           method: "POST",
           headers: {
@@ -52,7 +52,7 @@ export const AddNotes = () => {
   const getAllNotes = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/notes/`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/notes/`,
         {
           method: "GET",
           headers: {

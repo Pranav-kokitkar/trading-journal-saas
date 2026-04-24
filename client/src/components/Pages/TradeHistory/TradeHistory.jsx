@@ -100,10 +100,10 @@ export const TradeHistory = () => {
     const fetchFilterData = async () => {
       try {
         const [strategyRes, tagRes] = await Promise.all([
-          fetch(`${import.meta.env.VITE_API_URL}/api/strategy?all=true`, {
+          fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy?all=true`, {
             headers: { Authorization: authorizationToken },
           }),
-          fetch(`${import.meta.env.VITE_API_URL}/api/tags?all=true`, {
+          fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags?all=true`, {
             headers: { Authorization: authorizationToken },
           }),
         ]);

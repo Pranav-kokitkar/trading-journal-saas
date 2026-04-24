@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 export const compareDatasets = async (payload, authorizationToken) => {
   try {
     const response = await fetch(
-      `${import.meta.env.VITE_API_URL}/api/compare`,
+      `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/compare`,
       {
         method: "POST",
         headers: {

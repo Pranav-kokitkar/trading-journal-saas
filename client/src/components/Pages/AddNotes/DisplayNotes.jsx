@@ -26,7 +26,7 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
 
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/notes/${id}`,
         {
           method: "DELETE",
           headers: {
@@ -57,7 +57,7 @@ export const DisplayNotes = ({ notes, getAllNotes }) => {
   const updateNote = async (id, updatedNote) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/notes/${id}`,
         {
           method: "PATCH",
           headers: {

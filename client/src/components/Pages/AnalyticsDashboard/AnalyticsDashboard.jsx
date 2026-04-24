@@ -456,7 +456,7 @@ export const AnalyticsDashboard = () => {
         if (filters.endDate) params.set("endDate", filters.endDate);
 
         const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/analytics?${params.toString()}`,
+          `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/analytics?${params.toString()}`,
           {
             method: "GET",
             headers: {

@@ -32,7 +32,7 @@ export const AdminAccountDetails = () => {
       setLoading(true);
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/account/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/account/${id}`,
         {
           method: "GET",
           headers: {
@@ -62,7 +62,7 @@ export const AdminAccountDetails = () => {
       }
       const response = await fetch(
         `${
-          import.meta.env.VITE_API_URL
+          (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))
         }/api/admin/account/trades/${id}?page=${page}&limit=${limit}`,
         {
           method: "GET",
@@ -87,7 +87,7 @@ export const AdminAccountDetails = () => {
     try {
       console.log(details);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/account/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/account/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -112,7 +112,7 @@ export const AdminAccountDetails = () => {
   const getAccountPerformance = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/account/performance/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/account/performance/${id}`,
         {
           method: "GET",
           headers: {

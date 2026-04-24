@@ -36,7 +36,7 @@ export const AdminContactsProvider = ({ children }) => {
       initial ? setLoading(true) : setLoadingContacts(true);
 
       let url = `${
-        import.meta.env.VITE_API_URL
+        (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))
       }/api/admin/contact?page=${page}&limit=${limit}`;
 
       if (search) url += `&search=${search}`;
@@ -76,7 +76,7 @@ export const AdminContactsProvider = ({ children }) => {
   const updateStatus = async (id, newStatus) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/contact/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/contact/${id}`,
         {
           method: "PATCH",
           headers: {
@@ -107,7 +107,7 @@ export const AdminContactsProvider = ({ children }) => {
   const deleteContact = async (id) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/admin/contact/${id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/admin/contact/${id}`,
         {
           method: "DELETE",
           headers: {

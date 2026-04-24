@@ -29,7 +29,7 @@ export const AdminAccountsProvider = ({ children }) => {
       }
 
       let url = `${
-        import.meta.env.VITE_API_URL
+        (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))
       }/api/admin/account?page=${page}&limit=${limit}`;
 
       if (search) {

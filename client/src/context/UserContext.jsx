@@ -14,7 +14,7 @@ export const UserProvider = ({ children }) => {
       if (!authorizationToken) return;
 
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/user/`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/user/`,
         {
           method: "GET",
           headers: {

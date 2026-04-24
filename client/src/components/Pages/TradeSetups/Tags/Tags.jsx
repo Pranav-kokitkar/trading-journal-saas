@@ -57,7 +57,7 @@ export const Tags = () => {
 
     try {
       setActionLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tags`, {
+      const response = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export const Tags = () => {
 
   const getAllTags = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tags`, {
+      const response = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags`, {
         headers: {
           Authorization: authorizationToken,
         },
@@ -118,7 +118,7 @@ export const Tags = () => {
     try {
       setActionLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/tags/${tagToDelete}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags/${tagToDelete}`,
         {
           method: "DELETE",
           headers: {
@@ -158,7 +158,7 @@ export const Tags = () => {
     try {
       setActionLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/tags/${tagToUpdate._id}`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags/${tagToUpdate._id}`,
         {
           method: "PATCH",
           headers: {

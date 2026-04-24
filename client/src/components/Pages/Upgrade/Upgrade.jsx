@@ -28,7 +28,7 @@ export const Upgrade = () => {
     try {
       // 2. Create order from backend
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/payment/create-order`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/payment/create-order`,
         {
           method: "POST",
           headers: {
@@ -56,7 +56,7 @@ export const Upgrade = () => {
         handler: async function (response) {
 
           try {
-            const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
+            const verifyRes = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/payment/verify`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

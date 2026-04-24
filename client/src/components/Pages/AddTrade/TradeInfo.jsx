@@ -34,7 +34,7 @@ export const TradeInfo = ({
   /* ---------------- FETCH TAGS (ACCOUNT BASED) ---------------- */
   const getAllTags = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tags`, {
+      const response = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags`, {
         headers: {
           Authorization: authorizationToken,
         },
@@ -51,7 +51,7 @@ export const TradeInfo = ({
   const getAllStrategies = async () => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/strategy`,
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy`,
         {
           headers: {
             Authorization: authorizationToken,
