@@ -40,6 +40,7 @@ export const AddTrade = () => {
     dateNtime: "",
     tradeNotes: "",
     session: "",
+    confidence: "50",
     tags: [],
     strategy: "",
   });
@@ -153,6 +154,10 @@ export const AddTrade = () => {
       accountId,
       tags: trade.tags || [],
       strategy: trade.strategy || undefined,
+      confidence:
+        trade.confidence === "" || trade.confidence == null
+          ? 50
+          : Number(trade.confidence),
     };
 
     if (
@@ -242,6 +247,7 @@ const Buttons = ({ setTrade, isSubmitting }) => (
           riskamount: "",
           dateNtime: "",
           tradeNotes: "",
+          confidence: "50",
         })
       }
     >

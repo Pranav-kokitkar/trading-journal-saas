@@ -42,6 +42,7 @@ const tradeSchema = new mongoose.Schema({
   tradeNotes: { type: String, default: "" },
   tradeStatus: { type: String, default: "" },
   session: { type: String, default: "" },
+  confidence: { type: Number, default: 50, min: 0, max: 100 },
   tags: [
     {
       type: mongoose.Schema.Types.ObjectId,

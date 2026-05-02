@@ -47,6 +47,7 @@ export const TradeProvider = ({ children }) => {
     tradeNumber: "",
     dateNtime: "",
     tradeNotes: "",
+    confidence: "50",
   });
 
   const { authorizationToken, isLoggedIn } = useAuth();
@@ -249,6 +250,7 @@ export const TradeProvider = ({ children }) => {
           tradeNumber: "",
           dateNtime: "",
           tradeNotes: "",
+          confidence: "50",
         });
       } else {
         toast.error("Failed to add trade");

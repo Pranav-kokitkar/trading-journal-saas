@@ -79,7 +79,7 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
     <>
       {/* TRADE MODE */}
       <div className={styles.card}>
-        <h3>Trade Mode*</h3>
+        <h3>Trade Mode</h3>
         <div className={styles.radioContainer}>
           <div>
             <input
@@ -112,7 +112,7 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
       {/* TRADE STATUS (ONLY FOR LIVE MODE) */}
       {trade.tradeMode === "live" && (
         <div className={styles.card}>
-          <h3>Trade Status*</h3>
+          <h3>Trade Status</h3>
           <div className={styles.radioContainer}>
             <div>
               <input
@@ -145,7 +145,7 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
       {/* BACKTEST DATE SELECTOR */}
       {trade.tradeMode === "backtest" && (
         <div className={styles.card}>
-          <h3>Trade Date (Entry)</h3>
+          <h3>Trade Date</h3>
           <div className={styles.inputGroup}>
             <label htmlFor="tradeDate">Select Date</label>
             <input
@@ -171,7 +171,7 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
               checked={isMultipleTP}
               onChange={() => setIsMultipleTP(!isMultipleTP)}
             />
-            Multiple TP
+            Multiple Take Profit
           </label>
 
           {isMultipleTP ? (

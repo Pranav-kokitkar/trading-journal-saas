@@ -38,7 +38,11 @@ const defaultFilters = {
 };
 
 const MIN_CONFIDENCE_TRADES = 10;
-const OVERTRADING_THRESHOLD = 5;
+const MAX_PRIMARY_INSIGHTS = 4;
+const OVERTRADING_DAILY_LIMIT = 5;
+const LOSS_STREAK_TRIGGER = 3;
+const REVENGE_WINDOW_MINUTES = 30;
+const REVENGE_RISK_MULTIPLIER = 1.2;
 
 const DIMENSION_LABEL_PREFIX = {
   strategy: "Strategy",
@@ -77,26 +81,27 @@ const parseDate = (value) => {
   return parsed;
 };
 
-const getFilterWindowDays = (startDate, endDate) => {
-  const start = parseDate(startDate);
-  const end = parseDate(endDate);
-
-  if (!start && !end) return null;
-
-  const today = new Date();
-  const normalizedStart = start || end;
-  const normalizedEnd = end || today;
-  if (!normalizedStart || !normalizedEnd) return null;
-
-  const earlier = normalizedStart <= normalizedEnd ? normalizedStart : normalizedEnd;
-  const later = normalizedStart <= normalizedEnd ? normalizedEnd : normalizedStart;
-  const diffMs = later.getTime() - earlier.getTime();
-  return Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1);
-};
-
 const getTradeDate = (trade) => parseDate(trade?.dateTime || trade?.dateNtime);
 
 const normalizeTradeResult = (trade) => String(trade?.tradeResult || "").toLowerCase();
+
+const isWinTrade = (trade) => {
+  const result = normalizeTradeResult(trade);
+  const pnl = Number(trade?.pnl || 0);
+  return result === "win" || (result === "" && pnl > 0);
+};
+
+const isLossTrade = (trade) => {
+  const result = normalizeTradeResult(trade);
+  const pnl = Number(trade?.pnl || 0);
+  return result === "loss" || (result === "" && pnl < 0);
+};
+
+const calculateWinRate = (trades) => {
+  if (!Array.isArray(trades) || trades.length === 0) return null;
+  const wins = trades.reduce((sum, trade) => sum + (isWinTrade(trade) ? 1 : 0), 0);
+  return (wins / trades.length) * 100;
+};
 
 const isExitedTrade = (trade) => {
   const status = String(trade?.tradeStatus || "").toLowerCase();
@@ -110,6 +115,7 @@ const isTradeWithinDate = (trade, startDate, endDate) => {
   const start = parseDate(startDate);
   const end = parseDate(endDate);
   if (start && tradeDate < start) return false;
+
   if (end) {
     const inclusiveEnd = new Date(end);
     inclusiveEnd.setHours(23, 59, 59, 999);
@@ -119,51 +125,145 @@ const isTradeWithinDate = (trade, startDate, endDate) => {
   return true;
 };
 
-const getTradeDimensionValue = (trade, dimension) => {
-  if (dimension === "strategy") {
-    const strategyValue = trade?.strategyName || trade?.strategy?.name || trade?.strategy;
-    return typeof strategyValue === "object" ? strategyValue?.name : strategyValue;
-  }
+const getTradeRiskValue = (trade) => {
+  const riskAmount = Number(trade?.riskAmount ?? trade?.riskamount ?? 0);
+  if (!Number.isNaN(riskAmount) && riskAmount > 0) return riskAmount;
 
-  if (dimension === "session") return trade?.session;
-  if (dimension === "symbol") return trade?.symbol;
-  if (dimension === "direction") return trade?.tradeDirection || trade?.tradedirection;
-  if (dimension === "marketType") return trade?.marketType;
+  const riskPercent = Number(trade?.riskPercent ?? 0);
+  if (!Number.isNaN(riskPercent) && riskPercent > 0) return riskPercent;
 
-  if (dimension === "tag") {
-    const tags = Array.isArray(trade?.tags) ? trade.tags : [];
-    const firstTag = tags[0];
-    if (!firstTag) return null;
-    if (typeof firstTag === "string") return firstTag;
-    return firstTag?.name || firstTag?.label || null;
-  }
-
-  return null;
+  return 0;
 };
 
-const calculateTradesPerDay = (trades) => {
-  if (!Array.isArray(trades) || trades.length === 0) {
-    return { averageTradesPerDay: 0, maxTradesInDay: 0 };
-  }
+const getBehaviorInsights = (trades) => {
+  if (!Array.isArray(trades) || trades.length < MIN_CONFIDENCE_TRADES) return [];
 
-  const buckets = trades.reduce((acc, trade) => {
-    const tradeDate = getTradeDate(trade);
-    if (!tradeDate) return acc;
-    const dayKey = tradeDate.toISOString().slice(0, 10);
-    acc[dayKey] = (acc[dayKey] || 0) + 1;
+  const ordered = [...trades]
+    .filter((trade) => getTradeDate(trade))
+    .sort((a, b) => getTradeDate(a).getTime() - getTradeDate(b).getTime());
+
+  if (!ordered.length) return [];
+
+  const insights = [];
+
+  const dayBuckets = ordered.reduce((acc, trade) => {
+    const dayKey = getTradeDate(trade).toISOString().slice(0, 10);
+    const current = acc.get(dayKey) || [];
+    current.push(trade);
+    acc.set(dayKey, current);
     return acc;
-  }, {});
+  }, new Map());
 
-  const dayCounts = Object.values(buckets);
-  if (!dayCounts.length) {
-    return { averageTradesPerDay: 0, maxTradesInDay: 0 };
+  const dailyGroups = Array.from(dayBuckets.values());
+  const highFrequencyDays = dailyGroups.filter((bucket) => bucket.length > OVERTRADING_DAILY_LIMIT);
+  if (highFrequencyDays.length > 0) {
+    const highTrades = highFrequencyDays.flat();
+    const normalTrades = dailyGroups
+      .filter((bucket) => bucket.length <= OVERTRADING_DAILY_LIMIT)
+      .flat();
+    const highWinRate = calculateWinRate(highTrades);
+    const normalWinRate = calculateWinRate(normalTrades);
+    const winRateGap =
+      highWinRate !== null && normalWinRate !== null ? normalWinRate - highWinRate : null;
+    const maxTradesInDay = Math.max(...highFrequencyDays.map((bucket) => bucket.length));
+
+    insights.push({
+      type: "warning",
+      title: "Overtrading",
+      description:
+        winRateGap !== null
+          ? `You had ${highFrequencyDays.length} high-frequency day(s) with up to ${maxTradesInDay} trades. Win rate on those sessions is ${formatSignedPercent(-winRateGap)} versus regular days.`
+          : `You had ${highFrequencyDays.length} high-frequency day(s) with up to ${maxTradesInDay} trades, which correlates with noisier execution quality.`,
+      suggestion: "Set a daily trade cap and stop after your planned A+ setups are exhausted.",
+    });
   }
 
-  const total = dayCounts.reduce((sum, count) => sum + Number(count || 0), 0);
-  const averageTradesPerDay = total / dayCounts.length;
-  const maxTradesInDay = Math.max(...dayCounts);
+  let currentLossStreak = 0;
+  let longestLossStreak = 0;
+  const postStreakTrades = [];
 
-  return { averageTradesPerDay, maxTradesInDay };
+  ordered.forEach((trade) => {
+    if (isLossTrade(trade)) {
+      currentLossStreak += 1;
+      longestLossStreak = Math.max(longestLossStreak, currentLossStreak);
+      return;
+    }
+
+    if (currentLossStreak >= LOSS_STREAK_TRIGGER) {
+      postStreakTrades.push(trade);
+    }
+    currentLossStreak = 0;
+  });
+
+  if (longestLossStreak >= LOSS_STREAK_TRIGGER) {
+    const postStreakWinRate = calculateWinRate(postStreakTrades);
+    const postStreakAvgPnl =
+      postStreakTrades.length > 0
+        ? postStreakTrades.reduce((sum, trade) => sum + Number(trade?.pnl || 0), 0) /
+          postStreakTrades.length
+        : null;
+
+    insights.push({
+      type: "warning",
+      title: "Loss Streak (Tilt)",
+      description:
+        postStreakWinRate !== null
+          ? `Your longest losing run is ${longestLossStreak} trades. The next-trade win rate after streaks is ${formatMetric(postStreakWinRate, "%")} with average PnL ${formatMetric(postStreakAvgPnl)}.`
+          : `Your longest losing run is ${longestLossStreak} trades, which is a consistent tilt trigger in this sample.`,
+      suggestion: `Apply a hard pause rule after ${LOSS_STREAK_TRIGGER} consecutive losses before re-entry.`,
+    });
+  }
+
+  const revengeTrades = [];
+  const nonRevengeTrades = [];
+
+  for (let index = 1; index < ordered.length; index += 1) {
+    const previousTrade = ordered[index - 1];
+    const currentTrade = ordered[index];
+    const previousDate = getTradeDate(previousTrade);
+    const currentDate = getTradeDate(currentTrade);
+
+    if (!previousDate || !currentDate) {
+      nonRevengeTrades.push(currentTrade);
+      continue;
+    }
+
+    const minutesSinceLoss = (currentDate.getTime() - previousDate.getTime()) / (1000 * 60);
+    const previousRisk = getTradeRiskValue(previousTrade);
+    const currentRisk = getTradeRiskValue(currentTrade);
+    const hasRiskEscalation =
+      previousRisk > 0 && currentRisk >= previousRisk * REVENGE_RISK_MULTIPLIER;
+    const quickReEntryAfterLoss = isLossTrade(previousTrade) && minutesSinceLoss <= REVENGE_WINDOW_MINUTES;
+
+    if (quickReEntryAfterLoss && hasRiskEscalation) {
+      revengeTrades.push(currentTrade);
+    } else {
+      nonRevengeTrades.push(currentTrade);
+    }
+  }
+
+  if (revengeTrades.length >= 2) {
+    const revengeAvgPnl =
+      revengeTrades.reduce((sum, trade) => sum + Number(trade?.pnl || 0), 0) / revengeTrades.length;
+    const baselineAvgPnl =
+      nonRevengeTrades.length > 0
+        ? nonRevengeTrades.reduce((sum, trade) => sum + Number(trade?.pnl || 0), 0) /
+          nonRevengeTrades.length
+        : null;
+    const delta = baselineAvgPnl === null ? null : revengeAvgPnl - baselineAvgPnl;
+
+    insights.push({
+      type: "danger",
+      title: "Revenge Trading",
+      description:
+        delta !== null
+          ? `${revengeTrades.length} trade(s) were opened within ${REVENGE_WINDOW_MINUTES} minutes of a loss with higher risk. Their average PnL is ${formatMetric(revengeAvgPnl)} (${formatSignedPercent(delta)} vs baseline).`
+          : `${revengeTrades.length} trade(s) were opened quickly after a loss with risk escalation, a classic revenge pattern.`,
+      suggestion: "After a losing trade, enforce a cooldown and keep risk static for the next setup.",
+    });
+  }
+
+  return insights;
 };
 
 const getExpectationSortedRows = (rows) =>
@@ -187,211 +287,98 @@ const formatGroupLabel = (dimension, groupName) => {
   return `${prefix}: ${normalizedName}`;
 };
 
-const detectLossStreak = (trades) => {
-  if (!Array.isArray(trades) || trades.length === 0) {
-    return { hasLossStreak: false, streakSize: 0 };
+const getDimensionInsights = (rows, dimension, behaviorTrades = []) => {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return { primaryInsights: [], secondaryInsights: [] };
   }
 
-  const orderedTrades = [...trades].sort((a, b) => {
-    const aDate = getTradeDate(a)?.getTime() || 0;
-    const bDate = getTradeDate(b)?.getTime() || 0;
-    return aDate - bDate;
-  });
-
-  let currentLossStreak = 0;
-  let maxLossStreak = 0;
-
-  orderedTrades.forEach((trade) => {
-    const result = normalizeTradeResult(trade);
-    const pnl = Number(trade?.pnl || 0);
-    const isLoss = result === "loss" || (result === "" && pnl < 0);
-
-    if (isLoss) {
-      currentLossStreak += 1;
-      maxLossStreak = Math.max(maxLossStreak, currentLossStreak);
-      return;
-    }
-
-    currentLossStreak = 0;
-  });
-
-  return {
-    hasLossStreak: maxLossStreak >= 3,
-    streakSize: maxLossStreak,
-  };
-};
-
-const calculateAvgRR = (trades) => {
-  if (!Array.isArray(trades) || trades.length === 0) return null;
-
-  const rrValues = trades
-    .map((trade) => Number(trade?.rr))
-    .filter((rr) => !Number.isNaN(rr));
-
-  if (!rrValues.length) return null;
-  const total = rrValues.reduce((sum, rr) => sum + rr, 0);
-  return total / rrValues.length;
-};
-
-const calculatePnLContribution = (trades, dimension) => {
-  if (!Array.isArray(trades) || trades.length === 0) return null;
-
-  const grouped = new Map();
-  let totalPositivePnL = 0;
-
-  trades.forEach((trade) => {
-    const pnl = Number(trade?.pnl || 0);
-    if (Number.isNaN(pnl) || pnl <= 0) return;
-
-    const key = String(getTradeDimensionValue(trade, dimension) || "Unknown").trim();
-    grouped.set(key, (grouped.get(key) || 0) + pnl);
-    totalPositivePnL += pnl;
-  });
-
-  if (!totalPositivePnL || grouped.size === 0) return null;
-
-  let topKey = null;
-  let topPnL = 0;
-  grouped.forEach((value, key) => {
-    if (value > topPnL) {
-      topKey = key;
-      topPnL = value;
-    }
-  });
-
-  if (!topKey) return null;
-
-  return {
-    groupName: topKey,
-    contributionPct: (topPnL / totalPositivePnL) * 100,
-    pnlValue: topPnL,
-  };
-};
-
-const isWinningTrade = (trade) => {
-  const result = normalizeTradeResult(trade);
-  const pnl = Number(trade?.pnl || 0);
-  return result === "win" || (result === "" && pnl > 0);
-};
-
-const calculateWinRate = (trades) => {
-  if (!Array.isArray(trades) || trades.length === 0) return null;
-  const wins = trades.reduce((sum, trade) => sum + (isWinningTrade(trade) ? 1 : 0), 0);
-  return (wins / trades.length) * 100;
-};
-
-const getBehaviorInsightsByImpact = ({ trades, avgRR }) => {
-  if (!Array.isArray(trades) || trades.length === 0) return [];
-
-  const candidates = [];
-  const { averageTradesPerDay, maxTradesInDay } = calculateTradesPerDay(trades);
-  const { hasLossStreak, streakSize } = detectLossStreak(trades);
-  const byDay = new Map();
-
-  trades.forEach((trade) => {
-    const tradeDate = getTradeDate(trade);
-    if (!tradeDate) return;
-    const dayKey = tradeDate.toISOString().slice(0, 10);
-    const current = byDay.get(dayKey) || [];
-    current.push(trade);
-    byDay.set(dayKey, current);
-  });
-
-  const dayBuckets = Array.from(byDay.values());
-  const highFrequencyDays = dayBuckets.filter((bucket) => bucket.length > OVERTRADING_THRESHOLD);
-  const normalDays = dayBuckets.filter((bucket) => bucket.length <= OVERTRADING_THRESHOLD);
-  const anyExtremelyHighDay = dayBuckets.some((bucket) => bucket.length > 7);
-
-  if (averageTradesPerDay > OVERTRADING_THRESHOLD || maxTradesInDay > 7 || highFrequencyDays.length > 0 || anyExtremelyHighDay) {
-    const highTrades = highFrequencyDays.flat();
-    const normalTrades = normalDays.flat();
-    const highWinRate = calculateWinRate(highTrades) ?? 0;
-    const normalWinRate = calculateWinRate(normalTrades);
-    const drop = normalWinRate === null ? 0 : Math.max(0, normalWinRate - highWinRate);
-    const impactScore = drop + (anyExtremelyHighDay ? 5 : 0);
-
-    candidates.push({
-      key: "overtrading",
-      impactScore,
-      insight: {
-        type: "warning",
-        title: "Behavior: Overtrading Detected",
-        description: "Your win rate drops when taking more than 5 trades per day.",
-        suggestion: "Reduce number of trades and focus on quality setups.",
-      },
-    });
+  const totalTrades = rows.reduce((sum, row) => sum + Number(row.totalTrades || 0), 0);
+  if (totalTrades < MIN_CONFIDENCE_TRADES) {
+    return { primaryInsights: [], secondaryInsights: [] };
   }
 
-  const orderedTrades = [...trades].sort((a, b) => {
-    const aDate = getTradeDate(a)?.getTime() || 0;
-    const bDate = getTradeDate(b)?.getTime() || 0;
-    return aDate - bDate;
-  });
+  const sortedByExpectancy = getExpectationSortedRows(rows);
+  const hasComparativeRows = sortedByExpectancy.length > 1;
+  const best = sortedByExpectancy[0] || null;
+  const worst = hasComparativeRows
+    ? sortedByExpectancy[sortedByExpectancy.length - 1]
+    : null;
+  const overallExpectancy = Number(getWeightedAverage(rows, "expectancy") || 0);
+  const topByVolume = [...rows].sort(
+    (a, b) => Number(b.totalTrades || 0) - Number(a.totalTrades || 0),
+  )[0];
 
-  let lossStreak = 0;
-  let maxLossStreak = 0;
-  const afterStreakTrades = [];
+  const bestLabel = best ? formatGroupLabel(dimension, best.name) : "";
+  const worstLabel = worst ? formatGroupLabel(dimension, worst.name) : "";
 
-  orderedTrades.forEach((trade) => {
-    const isLoss = normalizeTradeResult(trade) === "loss" || Number(trade?.pnl || 0) < 0;
+  const expectancySpread =
+    best && worst
+      ? Number(best.expectancy || 0) - Number(worst.expectancy || 0)
+      : 0;
+  const winRateSpread =
+    best && worst ? Number(best.winRate || 0) - Number(worst.winRate || 0) : 0;
 
-    if (isLoss) {
-      lossStreak += 1;
-      maxLossStreak = Math.max(maxLossStreak, lossStreak);
-      return;
-    }
+  const bestTradeShare = best
+    ? (Number(best.totalTrades || 0) / Math.max(totalTrades, 1)) * 100
+    : 0;
+  const bestEdgeVsAverage = best ? Number(best.expectancy || 0) - overallExpectancy : 0;
+  const bestEdgePct = (bestEdgeVsAverage / Math.max(Math.abs(overallExpectancy), 0.01)) * 100;
 
-    if (lossStreak >= 3) {
-      afterStreakTrades.push(trade);
-    }
-    lossStreak = 0;
-  });
+  const dragImpactR = worst
+    ? (Number(worst.expectancy || 0) - overallExpectancy) * Number(worst.totalTrades || 0)
+    : 0;
 
-  if (hasLossStreak || maxLossStreak >= 3) {
-    const overallWinRate = calculateWinRate(trades) ?? 0;
-    const afterStreakWinRate = calculateWinRate(afterStreakTrades);
-    const drop =
-      afterStreakWinRate === null ? 0 : Math.max(0, overallWinRate - afterStreakWinRate);
+  const concentrationShare = topByVolume
+    ? (Number(topByVolume.totalTrades || 0) / Math.max(totalTrades, 1)) * 100
+    : 0;
+  const concentrationLabel = topByVolume
+    ? formatGroupLabel(dimension, topByVolume.name)
+    : "";
+  const concentrationType = concentrationShare >= 45 ? "warning" : "info";
 
-    candidates.push({
-      key: "lossStreak",
-      impactScore: drop + Math.max(maxLossStreak, Number(streakSize || 0)),
-      insight: {
-        type: "warning",
-        title: "Behavior: Loss Streak Impact",
-        description: "Performance drops after multiple consecutive losses.",
-        suggestion: "Consider stopping trading after 2 consecutive losses.",
-      },
-    });
-  }
+  const primaryInsights = [
+    best
+      ? {
+          type: "key",
+          title: "Behavior: Your Strongest Pattern",
+          description: `Best results are coming from ${bestLabel}: expectancy ${formatMetric(best.expectancy, "R")}, ${formatSignedPercent(bestEdgePct)} versus dimension average, across ${best.totalTrades || 0} trades (${formatMetric(bestTradeShare, "%")} share).`,
+          suggestion: `Lean into ${bestLabel} conditions and use it as your baseline playbook.`,
+        }
+      : null,
+    worst
+      ? {
+          type: "danger",
+          title: "Behavior: Recurring Performance Drag",
+          description: `${worstLabel} is the weak pocket: expectancy ${formatMetric(worst.expectancy, "R")} and an estimated ${formatMetric(dragImpactR, "R")} performance drag across ${worst.totalTrades || 0} trades.`,
+          suggestion: `Reduce exposure to ${worstLabel} until entry quality and execution improve.`,
+        }
+      : null,
+    best && worst
+      ? {
+          type: "success",
+          title: "Behavior: Edge Depends On Dimension",
+          description: `${DIMENSION_LABEL_PREFIX[dimension] || "Dimension"} selection changes outcomes materially: ${formatMetric(expectancySpread, "R")} expectancy spread and ${formatSignedPercent(winRateSpread)} win-rate spread between top and bottom groups.`,
+          suggestion: `Prioritize setups that match high-performing ${DIMENSION_LABEL_PREFIX[dimension] || "dimension"} groups.`,
+        }
+      : null,
+    topByVolume
+      ? {
+          type: concentrationType,
+          title: "Behavior: Allocation Concentration",
+          description: `Trade flow is concentrated in ${concentrationLabel}, representing ${formatMetric(concentrationShare, "%")} of activity and strongly influencing total outcome.`,
+          suggestion:
+            concentrationShare >= 45
+              ? `Keep size concentrated only if ${concentrationLabel} remains positive; otherwise rebalance toward stronger groups.`
+              : "Your allocation is reasonably diversified; keep tracking which groups keep their edge.",
+        }
+      : null,
+  ]
+    .filter(Boolean)
+    .slice(0, MAX_PRIMARY_INSIGHTS);
 
-  const lowRRTrades = trades.filter((trade) => {
-    const rr = Number(trade?.rr);
-    return !Number.isNaN(rr) && rr < 1;
-  });
-  const healthyRRTrades = trades.filter((trade) => {
-    const rr = Number(trade?.rr);
-    return !Number.isNaN(rr) && rr >= 1;
-  });
+  const secondaryInsights = getBehaviorInsights(behaviorTrades);
 
-  if (avgRR !== null && avgRR < 1 && lowRRTrades.length > 0) {
-    const lowRRWinRate = calculateWinRate(lowRRTrades) ?? 0;
-    const healthyRRWinRate = calculateWinRate(healthyRRTrades);
-    const drop = healthyRRWinRate === null ? 0 : Math.max(0, healthyRRWinRate - lowRRWinRate);
-
-    candidates.push({
-      key: "lowRR",
-      impactScore: drop + Math.abs(1 - avgRR) * 10,
-      insight: {
-        type: "warning",
-        title: "Behavior: Low RR Trades",
-        description: "Trades with low risk-reward ratio are underperforming.",
-        suggestion: "Focus on setups with RR greater than 1.",
-      },
-    });
-  }
-
-  return candidates.sort((a, b) => b.impactScore - a.impactScore);
+  return { primaryInsights, secondaryInsights };
 };
 
 const InsightItem = ({ type, title, description, suggestion }) => {
@@ -496,138 +483,41 @@ export const AnalyticsDashboard = () => {
   ]);
 
   useEffect(() => {
-    if (!filters.accountId || typeof refreshAllAccountTrades !== "function") return;
-    refreshAllAccountTrades(filters.accountId);
-  }, [filters.accountId, refreshAllAccountTrades]);
-
-  const behaviorTrades = useMemo(() => {
-    const source = filters.accountId ? accountTrades : accountTrades.length > 0 ? accountTrades : trades;
-    if (!Array.isArray(source) || source.length === 0) return [];
-
-    return source.filter(
-      (trade) =>
-        isExitedTrade(trade) &&
-        (!filters.accountId ||
-          String(trade?.accountId?._id || trade?.accountId || "") === String(filters.accountId)) &&
-        isTradeWithinDate(trade, filters.startDate, filters.endDate),
-    );
-  }, [accountTrades, trades, filters.accountId, filters.startDate, filters.endDate]);
-
-  useEffect(() => {
     setShowMore(false);
   }, [activeDimension, filters.accountId, filters.startDate, filters.endDate, filters.minTrades, sortBy, order]);
 
-  const insights = useMemo(() => {
-    if (!rows.length) {
-      return { primaryInsights: [], secondaryInsights: [] };
-    }
+  useEffect(() => {
+    if (!filters.accountId || typeof refreshAllAccountTrades !== "function") return;
+    refreshAllAccountTrades(filters.accountId, {
+      includeImported: Boolean(includeImportedTrades),
+    });
+  }, [filters.accountId, includeImportedTrades, refreshAllAccountTrades]);
 
-    const sorted = getExpectationSortedRows(rows);
-    const best = sorted[0] || null;
-    const worst = sorted.length > 1 ? sorted[sorted.length - 1] : null;
+  const behaviorTrades = useMemo(() => {
+    const source =
+      filters.accountId && accountTrades.length > 0
+        ? accountTrades
+        : accountTrades.length > 0
+          ? accountTrades
+          : trades;
 
-    const avgRR = calculateAvgRR(behaviorTrades);
-    const overallExpectancy = getWeightedAverage(rows, "expectancy");
-    const lowConfidenceGroups = rows.filter(
-      (row) => Number(row.totalTrades || 0) > 0 && Number(row.totalTrades || 0) < MIN_CONFIDENCE_TRADES,
-    );
-    const contribution = calculatePnLContribution(behaviorTrades, activeDimension);
-    const behaviorRanked = getBehaviorInsightsByImpact({ trades: behaviorTrades, avgRR });
-    const topBehaviorInsight = behaviorRanked[0]?.insight || null;
-    const secondaryBehaviorInsights = behaviorRanked.slice(1).map((item) => item.insight);
+    if (!Array.isArray(source) || source.length === 0) return [];
 
-    const bestLabel = best ? formatGroupLabel(activeDimension, best.name) : "";
-    const worstLabel = worst ? formatGroupLabel(activeDimension, worst.name) : "";
+    return source.filter((trade) => {
+      const tradeAccountId = String(trade?.accountId?._id || trade?.accountId || "");
 
-    const peerRows = best
-      ? rows.filter((row) => String(row.name) !== String(best.name))
-      : [];
-    const peerExpectancy =
-      peerRows.length > 0 ? getWeightedAverage(peerRows, "expectancy") : overallExpectancy;
+      return (
+        isExitedTrade(trade) &&
+        (!filters.accountId || tradeAccountId === String(filters.accountId)) &&
+        isTradeWithinDate(trade, filters.startDate, filters.endDate)
+      );
+    });
+  }, [accountTrades, trades, filters.accountId, filters.startDate, filters.endDate]);
 
-    const bestExpectancy = Number(best?.expectancy || 0);
-    const benchmark = Number(peerExpectancy || 0);
-    const edgeDenominator = Math.max(Math.abs(benchmark), 0.01);
-    const edgePct = ((bestExpectancy - benchmark) / edgeDenominator) * 100;
-
-    const comparisonPct = best && worst
-      ? ((Number(best.expectancy || 0) - Number(worst.expectancy || 0)) /
-          Math.max(Math.abs(Number(best.expectancy || 0)), Math.abs(Number(worst.expectancy || 0)), 0.01)) *
-        100
-      : 0;
-
-    const keyInsight = best
-      ? {
-          type: "key",
-          title: "🚨 Key Insight",
-          description: `${bestLabel} generates significantly higher expectancy than others (${formatSignedPercent(edgePct)}). Based on ${best.totalTrades || 0} trades.`,
-          suggestion: "This is your strongest edge - prioritize it.",
-        }
-      : null;
-
-    const strongEdgeMerged = best
-      ? {
-          type: "success",
-          title: "Strong Edge",
-          description: `${bestLabel} is your strongest edge (${formatMetric(best.expectancy, "R")} expectancy), outperforming ${worstLabel || "weaker groups"} by ${formatSignedPercent(comparisonPct)}${contribution ? ` and contributing ${formatMetric(contribution.contributionPct, "%")} of total profit` : ""}. Based on ${best.totalTrades || 0} trades.`,
-          suggestion: `Focus more on ${bestLabel} setups and reduce weaker exposure.`,
-        }
-      : null;
-
-    const weakPerformance = worst
-      ? {
-          type: "danger",
-          title: "Weak Performance",
-          description: `${worstLabel} is your weakest performing group (${formatMetric(worst.expectancy, "R")} expectancy) based on ${worst.totalTrades || 0} trades.`,
-          suggestion: `Review mistakes in ${worstLabel} and reduce exposure until consistency improves.`,
-        }
-      : null;
-
-    const secondaryInsights = [];
-
-    if (best && worst) {
-      secondaryInsights.push({
-        type: "info",
-        title: "Performance Comparison",
-        description: `${bestLabel} outperforms ${worstLabel} by ${formatSignedPercent(comparisonPct)} expectancy based on ${(best?.totalTrades || 0) + (worst?.totalTrades || 0)} trades in both groups.`,
-        suggestion: `Shift allocation toward ${bestLabel} and tighten criteria in ${worstLabel}.`,
-      });
-    }
-
-    secondaryInsights.push(...secondaryBehaviorInsights);
-
-    if (lowConfidenceGroups.length > 0) {
-      const sampleNames = lowConfidenceGroups
-        .slice(0, 2)
-        .map((row) => formatGroupLabel(activeDimension, row.name))
-        .join(", ");
-      const moreCount = Math.max(0, lowConfidenceGroups.length - 2);
-      const tailText = moreCount > 0 ? ` and ${moreCount} more` : "";
-
-      secondaryInsights.push({
-        type: "warning",
-        title: "Confidence Warning",
-        description: `${lowConfidenceGroups.length} group(s) have fewer than ${MIN_CONFIDENCE_TRADES} trades (${sampleNames}${tailText}), so signal strength is weak.`,
-        suggestion: "Collect more samples before making major decisions on these groups.",
-      });
-    }
-
-    if (contribution) {
-      const contributionLabel = formatGroupLabel(activeDimension, contribution.groupName);
-      secondaryInsights.push({
-        type: "warning",
-        title: "Profit Contribution",
-        description: `${contributionLabel} contributes ${formatMetric(contribution.contributionPct, "%")} of your total profit based on ${behaviorTrades.length} trades.`,
-        suggestion: `Focus more on ${contributionLabel}.`,
-      });
-    }
-
-    const primaryInsights = [keyInsight, strongEdgeMerged, weakPerformance, topBehaviorInsight].filter(
-      Boolean,
-    );
-
-    return { primaryInsights, secondaryInsights };
-  }, [rows, activeDimension, behaviorTrades]);
+  const insights = useMemo(
+    () => getDimensionInsights(rows, activeDimension, behaviorTrades),
+    [rows, activeDimension, behaviorTrades],
+  );
 
   const chartData = useMemo(
     () =>
@@ -750,7 +640,7 @@ export const AnalyticsDashboard = () => {
       <div className={styles.insightsCard}>
         <h3 className={styles.insightsHeading}>Psychological Insights</h3>
         {insights.primaryInsights.length === 0 ? (
-          <p className={styles.state}>No insights available for selected filters.</p>
+          <p className={styles.state}>Not enough data to generate insights.</p>
         ) : (
           <>
             <div className={styles.insightList}>
@@ -793,7 +683,7 @@ export const AnalyticsDashboard = () => {
         {loading || isAuthLoading ? (
           <AnalyticsTableLoading />
         ) : rows.length === 0 ? (
-          <p className={styles.state}>No analytics data available for selected filters.</p>
+          <p className={styles.state}>No analytics matched these filters. Try widening the date range or lowering minimum trades.</p>
         ) : (
           <div className={styles.tableWrap}>
             <table>

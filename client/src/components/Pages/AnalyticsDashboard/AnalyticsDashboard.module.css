@@ -86,10 +86,6 @@
   background: var(--accent-primary);
 }
 
-.insightKey .insightTitle {
-  font-size: var(--text-md);
-}
-
 .insightKey .insightSuggestion {
   color: var(--accent-primary);
 }

@@ -43,6 +43,7 @@ const AddTrade = async (req, res) => {
       accountId,
       tags,
       strategy,
+      confidence,
     } = req.body;
 
     if (
@@ -191,6 +192,10 @@ const AddTrade = async (req, res) => {
       dateTime: dateTime ? new Date(dateTime) : new Date(),
       tradeNotes: tradeNotes || "",
       tradeStatus: (tradeStatus || "").toString().trim(),
+      confidence:
+        confidence == null || confidence === ""
+          ? 50
+          : Math.max(0, Math.min(100, Number(confidence))),
       tags: validTagIds,
       strategy: validStrategyId,
     };

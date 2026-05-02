@@ -16,7 +16,9 @@ export const InputField = ({
     },
     label: {
       marginBottom: "0.3rem",
-      fontWeight: 500,
+      fontSize: "0.8rem",
+      fontWeight: 600,
+      color: "var(--text-secondary)",
     },
     input: {
       padding: "0.5rem",

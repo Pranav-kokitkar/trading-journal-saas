@@ -32,7 +32,7 @@ export const TradeCalculator = ({ trade, setTrade }) => {
 
   return (
     <div className={styles.card}>
-      <h3>Trade Calculator</h3>
+      <h3>Risk & Reward Snapshot</h3>
       {generalError && (
         <p style={{ color: "red", fontWeight: "bold" }}>{generalError}</p>
       )}

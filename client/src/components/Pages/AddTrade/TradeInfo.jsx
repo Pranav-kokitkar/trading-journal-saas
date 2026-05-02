@@ -10,6 +10,10 @@ export const TradeInfo = ({
   setScreenshots,
 }) => {
   const { isPro, authorizationToken } = useAuth();
+  const confidenceValue = Math.max(
+    0,
+    Math.min(100, Number(trade.confidence ?? 50)),
+  );
 
   const [tags, setTags] = useState([]);
   const [strategies, setStrategies] = useState([]);
@@ -96,25 +100,25 @@ export const TradeInfo = ({
 
       <div className={styles.sectionSpacing}>
         <div className={styles.inputGroup}>
-        <label htmlFor="strategy">Strategy (Optional)</label>
-        <select
-          id="strategy"
-          name="strategy"
-          value={trade.strategy || ""}
-          onChange={handleChange}
-        >
-          <option value="">-- Select Strategy --</option>
-          {strategies.map((s) => (
-            <option key={s._id} value={s._id}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-        {strategies.length === 0 && (
-          <small className={styles.helperText}>
-            No strategies available. Create one in Trade Setups page.
-          </small>
-        )}
+          <label htmlFor="strategy">Strategy (Optional)</label>
+          <select
+            id="strategy"
+            name="strategy"
+            value={trade.strategy || ""}
+            onChange={handleChange}
+          >
+            <option value="">-- Select Strategy --</option>
+            {strategies.map((s) => (
+              <option key={s._id} value={s._id}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          {strategies.length === 0 && (
+            <small className={styles.helperText}>
+              No strategies available. Create one in Trade Setups page.
+            </small>
+          )}
         </div>
       </div>
 
@@ -184,6 +188,27 @@ export const TradeInfo = ({
         </div>
       </div>
 
+      {/* ---------------- CONFIDENCE ---------------- */}
+
+      <div className={styles.sectionSpacing}>
+        <div className={styles.confidenceGroup}>
+          <div className={styles.confidenceHeader}>
+            <label htmlFor="confidence">Confidence</label>
+            <span>{confidenceValue}%</span>
+          </div>
+          <input
+            id="confidence"
+            name="confidence"
+            type="range"
+            min="0"
+            max="100"
+            step="1"
+            value={trade.confidence ?? 50}
+            onChange={handleChange}
+          />
+        </div>
+      </div>
+
       {/* ---------------- SCREENSHOTS ---------------- */}
 
       <div className={`${styles.col2} ${styles.sectionSpacing}`}>
@@ -206,7 +231,7 @@ export const TradeInfo = ({
       {/* ---------------- NOTES ---------------- */}
 
       <div className={`${styles.textareaGroup} ${styles.sectionSpacing}`}>
-        <label htmlFor="tradeNotes">Notes and Description</label>
+        <label htmlFor="tradeNotes">Trade Notes</label>
         <textarea
           id="tradeNotes"
           name="tradeNotes"

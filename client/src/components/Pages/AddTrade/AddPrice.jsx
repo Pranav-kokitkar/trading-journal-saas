@@ -28,7 +28,7 @@ export const AddPrice = ({ trade, handleChange }) => {
 
       <div className={styles.row}>
         <InputField
-          label="Entry:"
+          label="Entry Price"
           type="number"
           placeholder="Enter entry price"
           name="entryPrice"
@@ -37,7 +37,7 @@ export const AddPrice = ({ trade, handleChange }) => {
           required={true}
         />
         <InputField
-          label="Stoploss:"
+          label="Stop Loss"
           type="number"
           placeholder="Enter stoploss"
           name="stoplossPrice"
@@ -49,7 +49,7 @@ export const AddPrice = ({ trade, handleChange }) => {
 
       <div className={styles.row}>
         <InputField
-          label="Take Profit:"
+          label="Take Profit"
           type="number"
           placeholder="Enter TP price"
           name="takeProfitPrice"
@@ -78,7 +78,7 @@ export const AddPrice = ({ trade, handleChange }) => {
               checked={trade.riskType === "dollar"}
               onChange={handleChange}
             />
-            $ Risk
+            Dollar Risk
           </label>
           <label style={{ marginLeft: "1rem" }}>
             <input
@@ -88,7 +88,7 @@ export const AddPrice = ({ trade, handleChange }) => {
               checked={trade.riskType === "percent"}
               onChange={handleChange}
             />
-            % Risk
+            Percent Risk
           </label>
           <label style={{ marginLeft: "1rem" }}>
             <input

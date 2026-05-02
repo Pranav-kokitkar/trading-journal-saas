@@ -472,6 +472,10 @@ export const Trade = () => {
   const pnlColor = trade.pnl >= 0 ? "positive" : "negative";
   const directionColor =
     trade.tradedirection?.toLowerCase() === "long" ? "long" : "short";
+  const confidenceValue = Math.max(
+    0,
+    Math.min(100, Number(trade.confidence ?? 50)),
+  );
 
   return (
     <section className={styles.trade}>
@@ -525,6 +529,21 @@ export const Trade = () => {
             <p>
               PNL: <span className={pnlColor}>${trade.pnl}</span>
             </p>
+          </div>
+
+          <div className={styles.tradeConfidence}>
+            <h4>Additional Info</h4>
+            <div className={styles.additionalInfoRow}>
+              <p>
+                Confidence: <span>{confidenceValue}%</span>
+              </p>
+            </div>
+            <div className={styles.confidenceTrack} aria-label="Trade confidence">
+              <div
+                className={styles.confidenceFill}
+                style={{ width: `${confidenceValue}%` }}
+              />
+            </div>
           </div>
 
           <div className={styles.exitPrice}>
