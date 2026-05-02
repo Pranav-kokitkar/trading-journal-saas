@@ -14,6 +14,62 @@ const parseIncludeImported = (value, defaultValue = true) => {
   return defaultValue;
 };
 
+const toDate = (value) => {
+  if (!value) return null;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const formatDurationText = (minutes) => {
+  if (!Number.isFinite(minutes) || minutes < 0) return "";
+  const totalSeconds = Math.round(minutes * 60);
+  const hours = Math.floor(totalSeconds / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  const secs = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${mins}m${secs > 0 ? ` ${secs}s` : ""}`.trim();
+  }
+
+  if (mins > 0) {
+    return `${mins}m${secs > 0 ? ` ${secs}s` : ""}`.trim();
+  }
+
+  return `${secs}s`;
+};
+
+const getDurationFields = (entryTime, exitTime) => {
+  const startedAt = toDate(entryTime);
+  const endedAt = toDate(exitTime);
+
+  if (!startedAt || !endedAt) {
+    return {
+      durationMinutes: 0,
+      durationHours: 0,
+      durationText: "",
+    };
+  }
+
+  const durationMinutes = Math.max(
+    0,
+    Number(((endedAt.getTime() - startedAt.getTime()) / 60000).toFixed(2)),
+  );
+
+  return {
+    durationMinutes,
+    durationHours: Number((durationMinutes / 60).toFixed(2)),
+    durationText: formatDurationText(durationMinutes),
+  };
+};
+
+const getLatestDate = (items = []) => {
+  return items.reduce((latest, item) => {
+    const current = toDate(item);
+    if (!current) return latest;
+    return !latest || current.getTime() > latest.getTime() ? current : latest;
+  }, null);
+};
+
 const AddTrade = async (req, res) => {
   try {
     const userId = req.userID || (req.user && req.user._id);
@@ -29,8 +85,12 @@ const AddTrade = async (req, res) => {
       stoplossPrice,
       takeProfitPrice,
       exitedPrice,
+      exitTimestamps,
+      exitTime,
       rr,
       pnl,
+      slippage,
+      commission,
       tradeResult,
       riskType,
       riskAmount,
@@ -38,6 +98,7 @@ const AddTrade = async (req, res) => {
       balanceAfterTrade,
       tradeNumber,
       dateTime,
+      entryTime,
       tradeNotes,
       tradeStatus,
       accountId,
@@ -67,6 +128,15 @@ const AddTrade = async (req, res) => {
         parsedExitedPrice = JSON.parse(parsedExitedPrice);
       } catch {
         parsedExitedPrice = [];
+      }
+    }
+
+    let parsedExitTimestamps = exitTimestamps;
+    if (typeof parsedExitTimestamps === "string") {
+      try {
+        parsedExitTimestamps = JSON.parse(parsedExitTimestamps);
+      } catch {
+        parsedExitTimestamps = [];
       }
     }
 
@@ -159,6 +229,34 @@ const AddTrade = async (req, res) => {
       ? (riskType || "").toString().trim().toLowerCase()
       : "dollar";
 
+    const entryTimestamp = toDate(entryTime || dateTime) || new Date();
+    // Prevent front-dated (future) entries
+    if (entryTimestamp.getTime() > Date.now()) {
+      return res
+        .status(400)
+        .json({ message: "Entry time cannot be in the future." });
+    }
+    const normalizedExitTimestamps = Array.isArray(parsedExitTimestamps)
+      ? parsedExitTimestamps.map((e, index) => ({
+          price: Number(e.price ?? parsedExitedPrice[index]?.price ?? 0),
+          volume: Number(e.volume ?? parsedExitedPrice[index]?.volume ?? 0),
+          timestamp: toDate(e.timestamp) || entryTimestamp,
+        }))
+      : [];
+
+    const invalidExitTime = normalizedExitTimestamps.some(
+      (exit) => exit.timestamp.getTime() < entryTimestamp.getTime(),
+    );
+    if (invalidExitTime) {
+      return res.status(400).json({
+        message: "Exit time cannot be earlier than entry time.",
+      });
+    }
+
+    const resolvedExitTime =
+      toDate(exitTime) ||
+      getLatestDate(normalizedExitTimestamps.map((e) => e.timestamp));
+
     const tradeToSave = {
       userId,
       accountId: new mongoose.Types.ObjectId(accountId),
@@ -180,6 +278,8 @@ const AddTrade = async (req, res) => {
 
       rr: rr == null ? 0 : Number(rr),
       pnl: pnl == null ? 0 : Number(pnl),
+      slippage: slippage == null ? 0 : Number(slippage),
+      commission: commission == null ? 0 : Number(commission),
       tradeResult: tradeResult || "",
       riskAmount: riskAmount == null ? 0 : Number(riskAmount),
       riskPercent: riskPercent == null ? 0 : Number(riskPercent),
@@ -189,7 +289,8 @@ const AddTrade = async (req, res) => {
 
       screenshots: screenshotUrls,
 
-      dateTime: dateTime ? new Date(dateTime) : new Date(),
+      entryTime: entryTimestamp,
+      dateTime: entryTimestamp,
       tradeNotes: tradeNotes || "",
       tradeStatus: (tradeStatus || "").toString().trim(),
       confidence:
@@ -199,6 +300,28 @@ const AddTrade = async (req, res) => {
       tags: validTagIds,
       strategy: validStrategyId,
     };
+
+    const enteredAt = tradeToSave.entryTime;
+    const exitedAt =
+      tradeToSave.tradeStatus === "exited"
+        ? resolvedExitTime || entryTimestamp
+        : null;
+    const durationFields = getDurationFields(enteredAt, exitedAt);
+
+    tradeToSave.exitTime = exitedAt || undefined;
+    tradeToSave.durationMinutes = durationFields.durationMinutes;
+    tradeToSave.durationHours = durationFields.durationHours;
+    tradeToSave.durationText = durationFields.durationText;
+    tradeToSave.exitTimestamps =
+      tradeToSave.tradeStatus === "exited"
+        ? normalizedExitTimestamps.length > 0
+          ? normalizedExitTimestamps
+          : tradeToSave.exitedPrice.map((lvl) => ({
+              price: Number(lvl.price),
+              volume: Number(lvl.volume),
+              timestamp: exitedAt,
+            }))
+        : [];
 
     const savedTrade = await Trade.create(tradeToSave);
 
@@ -369,7 +492,15 @@ const closeTradeByID = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid trade id" });
     }
 
-    const { exitedPrice, pnl, rr, tradeResult, balanceAfterTrade } = req.body;
+    const {
+      exitedPrice,
+      pnl,
+      rr,
+      tradeResult,
+      balanceAfterTrade,
+      exitTimestamps,
+      exitTime,
+    } = req.body;
 
     if (!Array.isArray(exitedPrice) || exitedPrice.length === 0) {
       return res
@@ -451,8 +582,63 @@ const closeTradeByID = async (req, res, next) => {
           : (trade.balanceAfterTrade ?? null),
       tradeStatus: "closed",
       closedBy: userId,
-      exitTime: new Date().toISOString(),
     };
+
+    let parsedExitTimestamps = exitTimestamps;
+    if (typeof parsedExitTimestamps === "string") {
+      try {
+        parsedExitTimestamps = JSON.parse(parsedExitTimestamps);
+      } catch {
+        parsedExitTimestamps = [];
+      }
+    }
+
+    const normalizedExitTimestamps = Array.isArray(parsedExitTimestamps)
+      ? parsedExitTimestamps.map((e, index) => ({
+          price: Number(e.price ?? exitedPrice[index]?.price ?? 0),
+          volume: Number(e.volume ?? exitedPrice[index]?.volume ?? 0),
+          timestamp: toDate(e.timestamp),
+        }))
+      : [];
+
+    const closeTimestamp =
+      toDate(exitTime) ||
+      getLatestDate(normalizedExitTimestamps.map((e) => e.timestamp)) ||
+      new Date();
+
+    const tradeEntryTimestamp =
+      toDate(trade.entryTime || trade.dateTime) || closeTimestamp;
+    const invalidExitTime = normalizedExitTimestamps.some(
+      (exit) =>
+        exit.timestamp &&
+        exit.timestamp.getTime() < tradeEntryTimestamp.getTime(),
+    );
+    if (invalidExitTime) {
+      return res.status(400).json({
+        message: "Exit time cannot be earlier than entry time.",
+      });
+    }
+
+    update.exitTime = closeTimestamp;
+    update.exitTimestamps =
+      normalizedExitTimestamps.length > 0
+        ? normalizedExitTimestamps.map((lvl) => ({
+            ...lvl,
+            timestamp: lvl.timestamp || closeTimestamp,
+          }))
+        : exitedPrice.map((lvl) => ({
+            price: Number(lvl.price),
+            volume: Number(lvl.volume),
+            timestamp: closeTimestamp,
+          }));
+
+    const durationFields = getDurationFields(
+      trade.entryTime || trade.dateTime,
+      closeTimestamp,
+    );
+    update.durationMinutes = durationFields.durationMinutes;
+    update.durationHours = durationFields.durationHours;
+    update.durationText = durationFields.durationText;
 
     const filter = { _id: tradeId, userId: userId, tradeStatus: "live" };
     const opts = { new: true, returnDocument: "after" };

@@ -8,6 +8,7 @@ const DIMENSION_CONFIG = {
   direction: { field: "tradeDirection", unwind: false },
   marketType: { field: "marketType", unwind: false },
   tag: { field: "tags", unwind: true },
+  duration: { field: "durationBucket", unwind: false },
 };
 
 const SORT_FIELD_MAP = {
@@ -74,7 +75,7 @@ const getAnalyticsByDimension = async ({
 
   if (config.unwind) {
     baseMatch[config.field] = { $exists: true, $ne: [] };
-  } else {
+  } else if (dimension !== "duration") {
     if (
       config.field === "symbol" ||
       config.field === "session" ||
@@ -102,6 +103,78 @@ const getAnalyticsByDimension = async ({
       },
     },
   ];
+
+  if (dimension === "duration") {
+    pipeline.push({
+      $addFields: {
+        resolvedDurationMinutes: {
+          $cond: [
+            {
+              $and: [
+                { $ne: ["$durationMinutes", null] },
+                { $gte: ["$durationMinutes", 0] },
+              ],
+            },
+            "$durationMinutes",
+            {
+              $cond: [
+                {
+                  $and: [
+                    { $ne: ["$entryTime", null] },
+                    { $ne: ["$exitTime", null] },
+                  ],
+                },
+                {
+                  $round: [
+                    {
+                      $divide: [
+                        { $subtract: ["$exitTime", "$entryTime"] },
+                        60000,
+                      ],
+                    },
+                    2,
+                  ],
+                },
+                null,
+              ],
+            },
+          ],
+        },
+      },
+    });
+
+    pipeline.push({
+      $addFields: {
+        durationBucket: {
+          $switch: {
+            branches: [
+              {
+                case: { $eq: ["$resolvedDurationMinutes", null] },
+                then: "Unknown",
+              },
+              {
+                case: { $lt: ["$resolvedDurationMinutes", 15] },
+                then: "Scalp (< 15m)",
+              },
+              {
+                case: { $lt: ["$resolvedDurationMinutes", 60] },
+                then: "Intraday (15m-1h)",
+              },
+              {
+                case: { $lt: ["$resolvedDurationMinutes", 240] },
+                then: "Day Trade (1h-4h)",
+              },
+              {
+                case: { $lt: ["$resolvedDurationMinutes", 1440] },
+                then: "Swing (4h-1d)",
+              },
+            ],
+            default: "Position (1d+)",
+          },
+        },
+      },
+    });
+  }
 
   if (config.unwind) {
     pipeline.push({ $unwind: `$${config.field}` });
@@ -138,6 +211,12 @@ const getAnalyticsByDimension = async ({
       $unwind: {
         path: "$strategyDoc",
         preserveNullAndEmptyArrays: true,
+      },
+    });
+  } else if (dimension === "duration") {
+    pipeline.push({
+      $addFields: {
+        displayName: "$durationBucket",
       },
     });
   }

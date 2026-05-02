@@ -20,6 +20,7 @@ const TABS = [
   { key: "session", label: "Session" },
   { key: "symbol", label: "Symbol" },
   { key: "direction", label: "Direction" },
+  { key: "duration", label: "Duration" },
   { key: "tag", label: "Tags" },
   { key: "marketType", label: "Market Type" },
 ];
@@ -49,6 +50,7 @@ const DIMENSION_LABEL_PREFIX = {
   session: "Session",
   symbol: "Symbol",
   direction: "Direction",
+  duration: "Duration",
   tag: "Tag",
   marketType: "Market Type",
 };
@@ -81,7 +83,8 @@ const parseDate = (value) => {
   return parsed;
 };
 
-const getTradeDate = (trade) => parseDate(trade?.dateTime || trade?.dateNtime);
+const getTradeDate = (trade) =>
+  parseDate(trade?.entryTime || trade?.dateTime || trade?.dateNtime);
 
 const normalizeTradeResult = (trade) => String(trade?.tradeResult || "").toLowerCase();
 

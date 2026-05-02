@@ -60,7 +60,7 @@ export const TradeCalculator = ({ trade, setTrade }) => {
           )}
 
           <p>
-            PNL: <span>{pnl !== "-" ? `$${pnl}` : "-"}</span>
+            PNL (net): <span>{pnl !== "-" ? `$${pnl}` : "-"}</span>
           </p>
           {profitError && (
             <p style={{ color: "red", fontSize: "0.9rem" }}>{profitError}</p>

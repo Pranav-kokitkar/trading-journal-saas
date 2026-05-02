@@ -5,6 +5,12 @@ const exitedPriceSchema = new mongoose.Schema({
   volume: { type: Number, required: true },
 });
 
+const exitTimestampSchema = new mongoose.Schema({
+  price: { type: Number, required: true },
+  volume: { type: Number, required: true },
+  timestamp: { type: Date, required: true },
+});
+
 const tradeSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -31,6 +37,8 @@ const tradeSchema = new mongoose.Schema({
 
   rr: { type: Number, default: 0 },
   pnl: { type: Number, default: 0 },
+  slippage: { type: Number, default: 0 },
+  commission: { type: Number, default: 0 },
   tradeResult: { type: String, default: "" },
   riskAmount: { type: Number, default: 0 },
   riskPercent: { type: Number, default: 0 },
@@ -57,6 +65,12 @@ const tradeSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  entryTime: { type: Date, required: true },
+  exitTime: { type: Date },
+  durationMinutes: { type: Number, default: 0 },
+  durationHours: { type: Number, default: 0 },
+  durationText: { type: String, default: "" },
+  exitTimestamps: { type: [exitTimestampSchema], default: [] },
 });
 
 // ✅ CRITICAL INDEXES for query performance

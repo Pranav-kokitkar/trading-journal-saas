@@ -12,6 +12,20 @@ import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationMo
 import { getMaxScreenshots } from "../../../config/planLimits";
 import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
 
+const formatDuration = (trade) => {
+  if (trade?.durationText) return trade.durationText;
+  const minutes = Number(trade?.durationMinutes);
+  if (!Number.isFinite(minutes) || minutes <= 0) return "—";
+  if (minutes < 60) return `${minutes.toFixed(0)}m`;
+  return `${(minutes / 60).toFixed(minutes >= 240 ? 0 : 1)}h`;
+};
+
+const formatDateTime = (value) => {
+  if (!value) return "—";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toLocaleString();
+};
+
 export const Trade = () => {
   const { accountDetails, updateAccount } = useContext(AccountContext);
   const { deleteTradeByID } = useContext(TradeContext);
@@ -476,6 +490,9 @@ export const Trade = () => {
     0,
     Math.min(100, Number(trade.confidence ?? 50)),
   );
+  const entryTime = formatDateTime(trade.entryTime ?? trade.dateTime ?? trade.dateNtime);
+  const exitTime = formatDateTime(trade.exitTime);
+  const duration = formatDuration(trade);
 
   return (
     <section className={styles.trade}>
@@ -488,7 +505,7 @@ export const Trade = () => {
             <h2>
               Trade Details: <span>{trade.symbol}</span>
             </h2>
-            <p>{trade.dateNtime}</p>
+            <p>{formatDateTime(trade.entryTime ?? trade.dateTime ?? trade.dateNtime)}</p>
           </div>
           <div
             className={`${
@@ -515,6 +532,15 @@ export const Trade = () => {
             </p>
             <p>
               Take Profit: <span>{trade.takeProfitPrice}</span>
+            </p>
+            <p>
+              Entry Time: <span>{entryTime}</span>
+            </p>
+            <p>
+              Exit Time: <span>{exitTime}</span>
+            </p>
+            <p>
+              Duration: <span>{duration}</span>
             </p>
           </div>
 
@@ -550,16 +576,26 @@ export const Trade = () => {
             <h4>Exit Prices</h4>
             {trade.tradeStatus === "live"
               ? "Trade Is Live (add Exit Price)"
-              : trade.exitedPrice.map((exitedPrice, index) => (
-                  <div key={index} className={styles.exitPriceData}>
-                    <p>
-                      Exit Price {index + 1}: <span>{exitedPrice.price}</span>
-                    </p>
-                    <p>
-                      Volume: <span>{exitedPrice.volume}%</span>
-                    </p>
-                  </div>
-                ))}
+              : trade.exitedPrice.map((exitedPrice, index) => {
+                  const exitTimestamp = trade.exitTimestamps?.[index]?.timestamp;
+                  const formattedExitTimestamp = exitTimestamp
+                    ? formatDateTime(exitTimestamp)
+                    : exitTime;
+
+                  return (
+                    <div key={index} className={styles.exitPriceData}>
+                      <p>
+                        Exit Price {index + 1}: <span>{exitedPrice.price}</span>
+                      </p>
+                      <p>
+                        Volume: <span>{exitedPrice.volume}%</span>
+                      </p>
+                      <p>
+                        Exit Time: <span>{formattedExitTimestamp}</span>
+                      </p>
+                    </div>
+                  );
+                })}
           </div>
         </div>
 

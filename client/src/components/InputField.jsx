@@ -6,6 +6,9 @@ export const InputField = ({
   value,
   onChange,
   required,
+  min,
+  max,
+  step,
 }) => {
   const styles = {
     inputGroup: {
@@ -38,6 +41,9 @@ export const InputField = ({
         type={type}
         placeholder={placeholder}
         value={type === "file" ? undefined : value || ""}
+        min={min}
+        max={max}
+        step={step}
         onChange={(e) => {
           if (type === "file") {
             onChange({ target: { name, value: e.target.files[0] } });

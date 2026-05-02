@@ -1,5 +1,11 @@
 const Trade = require("../models/trade-model");
 
+const toIsoString = (value) => {
+  if (!value) return "";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toISOString();
+};
+
 const exportTrades = async (req, res) => {
   try {
     const { format } = req.query; // csv | json
@@ -21,7 +27,9 @@ const exportTrades = async (req, res) => {
         exportedAt: new Date().toISOString(),
         tradeCount: trades.length,
         trades: trades.map((t) => ({
-          dateTime: t.dateTime,
+          dateTime: toIsoString(t.dateTime),
+          entryTime: toIsoString(t.entryTime),
+          exitTime: toIsoString(t.exitTime),
           marketType: t.marketType,
           symbol: t.symbol,
           direction: t.tradeDirection,
@@ -32,8 +40,18 @@ const exportTrades = async (req, res) => {
             price: e.price,
             volume: e.volume,
           })),
+          exitTimestamps: Array.isArray(t.exitTimestamps)
+            ? t.exitTimestamps.map((e) => ({
+                price: e.price,
+                volume: e.volume,
+                timestamp: toIsoString(e.timestamp),
+              }))
+            : [],
           rr: t.rr,
           pnl: t.pnl,
+          durationMinutes: t.durationMinutes,
+          durationHours: t.durationHours,
+          durationText: t.durationText,
           riskAmount: t.riskAmount,
           result: t.tradeResult,
           notes: t.tradeNotes,
@@ -51,7 +69,8 @@ const exportTrades = async (req, res) => {
     // ---------- CSV EXPORT (EXIT-BASED) ----------
     if (format === "csv") {
       const headers = [
-        "Date",
+        "EntryTime",
+        "ExitTime",
         "Market",
         "Symbol",
         "Direction",
@@ -60,8 +79,12 @@ const exportTrades = async (req, res) => {
         "TakeProfit",
         "ExitPrice",
         "ExitVolume",
+        "ExitTimestamp",
         "RR",
         "PNL",
+        "DurationMinutes",
+        "DurationHours",
+        "Duration",
         "Risk",
         "Result",
         "Notes",
@@ -70,10 +93,16 @@ const exportTrades = async (req, res) => {
       const rows = [];
 
       trades.forEach((t) => {
-        t.exitedPrice.forEach((exit) => {
+        const exitTimestamps = Array.isArray(t.exitTimestamps)
+          ? t.exitTimestamps
+          : [];
+        t.exitedPrice.forEach((exit, index) => {
+          const exitTimestamp =
+            exitTimestamps[index]?.timestamp || t.exitTime || "";
           rows.push(
             [
-              t.dateTime,
+              toIsoString(t.entryTime || t.dateTime),
+              toIsoString(t.exitTime),
               t.marketType,
               t.symbol,
               t.tradeDirection,
@@ -82,8 +111,12 @@ const exportTrades = async (req, res) => {
               t.takeProfitPrice,
               exit.price,
               exit.volume,
+              toIsoString(exitTimestamp),
               t.rr,
               t.pnl,
+              t.durationMinutes ?? "",
+              t.durationHours ?? "",
+              t.durationText ?? "",
               t.riskAmount,
               t.tradeResult,
               `"${(t.tradeNotes || "").replace(/"/g, '""')}"`,

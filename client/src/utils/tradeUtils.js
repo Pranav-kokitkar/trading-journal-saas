@@ -1,3 +1,13 @@
+const toNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const getTradeCosts = (trade) => ({
+  slippage: Math.max(0, toNumber(trade?.slippage ?? trade?.slippageCost)),
+  commission: Math.max(0, toNumber(trade?.commission ?? trade?.commissionCost)),
+});
+
 export const calculateTradeOnExit = ({
   trade,
   exitLevels,
@@ -101,12 +111,15 @@ export const calculateTradeOnExit = ({
     pnl = 0;
   }
 
+  const { slippage, commission } = getTradeCosts(updatedTrade);
+  pnl -= slippage + commission;
+
   // cap extreme loss
   if (pnl < 0 && Math.abs(pnl) > accountBalance) pnl = -accountBalance;
   pnl = parseFloat(pnl.toFixed(2));
 
   // Set tradeResult for performance calculation
-  const tradeResult = pnl >= 0 ? "win" : "loss";
+  const tradeResult = pnl > 0 ? "win" : pnl < 0 ? "loss" : "breakeven";
 
   // Update balance after this trade
   const balanceAfterTrade = parseFloat((accountBalance + pnl).toFixed(2));
@@ -282,13 +295,20 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
     profitError = "Exit price required to calculate potential profit.";
   }
 
+  const { slippage, commission } = getTradeCosts(trade);
+  let netPnl = Number(pnl) - slippage - commission;
+
+  if (netPnl < 0 && Math.abs(netPnl) > accountBalance) {
+    netPnl = -accountBalance;
+  }
+
   return {
     rr: parseFloat(rr) || 0,
     rrError,
     riskamount: parseFloat(riskamount) || 0,
     lossError,
     lossWarning,
-    pnl: parseFloat(pnl) || 0,
+    pnl: parseFloat(netPnl.toFixed(2)) || 0,
     profitError,
     generalError,
   };

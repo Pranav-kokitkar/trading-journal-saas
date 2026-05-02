@@ -13,6 +13,11 @@ import { PerformanceContext } from "../../../context/PerformanceContext";
 import { toastHelper } from "../../../utils/toastHelper";
 import { AccountContext } from "../../../context/AccountContext";
 
+const toDateTimeLocalValue = (date = new Date()) => {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+};
+
 export const AddTrade = () => {
   const { authorizationToken } = useAuth();
   const { AddTrade: addTradeFromContext } = useTrades();
@@ -28,6 +33,10 @@ export const AddTrade = () => {
     stoplossPrice: "1.33120",
     riskType: "dollar",
     takeProfitPrice: "1.33319",
+    showCosts: false,
+    slippage: "",
+    commission: "",
+    entryTime: toDateTimeLocalValue(),
     tradeStatus: "live",
     exitedPrice: [{ price: "", volume: "" }],
     rr: "",
@@ -50,8 +59,11 @@ export const AddTrade = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setTrade((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setTrade((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -82,6 +94,16 @@ export const AddTrade = () => {
     // Protect against accountDetails missing
     const prevBalance = Number(accountDetails?.currentBalance || 0);
     const prevTotalTrades = Number(accountDetails?.totalTrades || 0);
+    const entrySource = trade.entryTime || trade.tradeDate || new Date();
+    const entryDate = new Date(entrySource);
+    const now = new Date();
+    if (entryDate.getTime() > now.getTime()) {
+      alert("Entry time cannot be in the future.");
+      return;
+    }
+    const entryIso = Number.isNaN(entryDate.getTime())
+      ? new Date().toISOString()
+      : entryDate.toISOString();
 
     const { pnl, rr, riskamount } = calculateTradeValues({
       trade,
@@ -92,10 +114,7 @@ export const AddTrade = () => {
     if (pnl > 0) tradeResult = "win";
     else if (pnl < 0) tradeResult = "loss";
 
-    const isoDate =
-      trade.tradeMode === "backtest" && trade.tradeDate
-        ? new Date(trade.tradeDate).toISOString()
-        : new Date().toISOString();
+    const isoDate = entryIso;
 
     const tradeNumber = prevTotalTrades + 1;
     const balanceAfterTrade = Number(
@@ -111,11 +130,22 @@ export const AddTrade = () => {
           .map((ep) => {
             const price = Number(ep.price);
             const volume = Number(ep.volume);
+            const timestamp = ep.timestamp ? new Date(ep.timestamp) : new Date(entryIso);
             if (Number.isNaN(price) || Number.isNaN(volume)) return null;
-            return { price, volume };
+            if (Number.isNaN(timestamp.getTime())) return null;
+            return { price, volume, timestamp: timestamp.toISOString() };
           })
           .filter(Boolean)
       : [];
+
+    const invalidExitTime = normalizedExits.some(
+      (exit) => new Date(exit.timestamp).getTime() < entryDate.getTime(),
+    );
+
+    if (invalidExitTime) {
+      alert("Exit time cannot be earlier than entry time.");
+      return;
+    }
 
     const normalizedDirection = (trade.tradedirection || "")
       .toString()
@@ -136,6 +166,8 @@ export const AddTrade = () => {
         trade.takeProfitPrice === "" || trade.takeProfitPrice == null
           ? undefined
           : Number(trade.takeProfitPrice),
+      slippage: trade.showCosts ? Number(trade.slippage || 0) : 0,
+      commission: trade.showCosts ? Number(trade.commission || 0) : 0,
       riskType: (trade.riskType || "").toString(),
       exitedPrice: normalizedExits,
       rr: Number(rr || 0),
@@ -148,6 +180,17 @@ export const AddTrade = () => {
       balanceAfterTrade: Number(balanceAfterTrade),
       tradeNumber: Number(tradeNumber),
       dateTime: isoDate,
+      entryTime: isoDate,
+      exitTime:
+        trade.tradeStatus === "exited" && normalizedExits.length > 0
+          ? new Date(
+              normalizedExits.reduce((latest, exit) => {
+                const current = new Date(exit.timestamp).getTime();
+                return current > latest ? current : latest;
+              }, 0),
+            ).toISOString()
+          : undefined,
+      exitTimestamps: trade.tradeStatus === "exited" ? normalizedExits : [],
       tradeNotes: trade.tradeNotes || "",
       tradeStatus: normalizedStatus,
       session: (trade.session || "").toString().trim().toLowerCase(),
@@ -239,6 +282,10 @@ const Buttons = ({ setTrade, isSubmitting }) => (
           stoplossPrice: "",
           riskType: "dollar",
           takeProfitPrice: "",
+          showCosts: false,
+          slippage: "",
+          commission: "",
+          entryTime: toDateTimeLocalValue(),
           tradeStatus: "",
           exitedPrice: [{ price: "", volume: "" }],
           rr: "",

@@ -181,6 +181,27 @@
   min-width: 200px;
 }
 
+.costToggleRow {
+  margin: 0.25rem 0 0.9rem;
+}
+
+.costToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.costToggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
 /* ===== Radio Buttons ===== */
 .tradedirection {
   margin: 1rem 0;
@@ -229,81 +250,141 @@
 
 .confidenceGroup {
   margin-top: 1rem;
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-subtle);
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(110, 124, 255, 0.08),
+      transparent 36%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 55%);
 }
 
 .confidenceHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
 }
 
 .confidenceHeader label {
   display: block;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--text-secondary);
   font-weight: 600;
   text-transform: none;
   letter-spacing: 0.01em;
 }
 
-.confidenceHeader span {
-  font-size: 0.85rem;
-  color: var(--text-primary);
-  font-weight: 700;
+.confidenceLabelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
-.confidenceGroup input[type="range"] {
+.confidenceLabelGroup span {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+.confidenceMeta {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--radius-pill);
+  background: var(--accent-subtle);
+  border: 1px solid rgba(110, 124, 255, 0.16);
+}
+
+.confidenceTrack {
+  position: relative;
   width: 100%;
-  height: 10px;
-  appearance: none;
-  -webkit-appearance: none;
+  height: 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.confidenceTrackFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--confidence, 50%);
+  border-radius: inherit;
   background: linear-gradient(
     90deg,
     var(--accent) 0%,
-    var(--accent-bright) 52%,
+    var(--accent-bright) 50%,
     var(--accent-teal) 100%
   );
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
-  margin: 0;
-  overflow: hidden;
+  box-shadow: 0 0 18px rgba(110, 124, 255, 0.18);
 }
 
-.confidenceGroup input[type="range"]::-webkit-slider-runnable-track {
-  height: 10px;
+.confidenceTrack input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  appearance: none;
+  -webkit-appearance: none;
   background: transparent;
-  border-radius: inherit;
+  margin: 0;
+  cursor: pointer;
+  z-index: 1;
 }
 
-.confidenceGroup input[type="range"]::-webkit-slider-thumb {
+.confidenceMarks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.55rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.confidenceTrack input[type="range"]:focus-visible {
+  outline: none;
+}
+
+.confidenceTrack input[type="range"]::-webkit-slider-runnable-track {
+  height: 16px;
+  background: transparent;
+}
+
+.confidenceTrack input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid var(--bg-primary);
   background: linear-gradient(135deg, var(--accent-bright), var(--accent-teal));
-  box-shadow: 0 0 0 4px rgba(110, 124, 255, 0.14);
-  cursor: pointer;
-  margin-top: -5px;
+  box-shadow:
+    0 0 0 4px rgba(110, 124, 255, 0.16),
+    0 6px 16px rgba(0, 0, 0, 0.2);
+  margin-top: -2px;
+  transform: translateX(0);
 }
 
-.confidenceGroup input[type="range"]::-moz-range-track {
-  height: 10px;
+.confidenceTrack input[type="range"]::-moz-range-track {
+  height: 16px;
   background: transparent;
-  border-radius: inherit;
 }
 
-.confidenceGroup input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+.confidenceTrack input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid var(--bg-primary);
   background: linear-gradient(135deg, var(--accent-bright), var(--accent-teal));
-  box-shadow: 0 0 0 4px rgba(110, 124, 255, 0.14);
-  cursor: pointer;
+  box-shadow:
+    0 0 0 4px rgba(110, 124, 255, 0.16),
+    0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: translateX(0);
 }
 
 /* ===== Radio Buttons in Card (Price & Risk Section) ===== */

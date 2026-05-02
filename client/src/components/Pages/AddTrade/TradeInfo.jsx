@@ -191,21 +191,37 @@ export const TradeInfo = ({
       {/* ---------------- CONFIDENCE ---------------- */}
 
       <div className={styles.sectionSpacing}>
-        <div className={styles.confidenceGroup}>
+        <div
+          className={styles.confidenceGroup}
+          style={{ "--confidence": `${confidenceValue}%` }}
+        >
           <div className={styles.confidenceHeader}>
-            <label htmlFor="confidence">Confidence</label>
-            <span>{confidenceValue}%</span>
+            <div className={styles.confidenceLabelGroup}>
+              <label htmlFor="confidence">Confidence</label>
+              <span>How sure are you?</span>
+            </div>
+            <span className={styles.confidenceMeta}>{confidenceValue}%</span>
           </div>
-          <input
-            id="confidence"
-            name="confidence"
-            type="range"
-            min="0"
-            max="100"
-            step="1"
-            value={trade.confidence ?? 50}
-            onChange={handleChange}
-          />
+          <div className={styles.confidenceTrack}>
+            <div className={styles.confidenceTrackFill} />
+            <input
+              id="confidence"
+              name="confidence"
+              type="range"
+              min="0"
+              max="100"
+              step="1"
+              value={trade.confidence ?? 50}
+              onChange={handleChange}
+              aria-valuenow={confidenceValue}
+              aria-valuetext={`${confidenceValue}% confidence`}
+            />
+          </div>
+          <div className={styles.confidenceMarks} aria-hidden="true">
+            <span>Low</span>
+            <span>Medium</span>
+            <span>High</span>
+          </div>
         </div>
       </div>
 
