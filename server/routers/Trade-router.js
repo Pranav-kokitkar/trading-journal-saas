@@ -7,6 +7,8 @@ const {
   getTradeByID,
   closeTradeByID,
   deleteTradeById,
+  restoreTradeById,
+  undoTradeById,
   updateTradeNotesById,
   updateTradeTagsById,
   updateTradeScreenshots,
@@ -31,6 +33,9 @@ router
   .get(authMiddleware, getTradeByID)
   .patch(authMiddleware, closeTradeByID)
   .delete(authMiddleware, deleteTradeById);
+
+router.route("/:id/restore").post(authMiddleware, restoreTradeById);
+router.route("/:id/undo").post(authMiddleware, undoTradeById);
 
 router.route("/:id/note").patch(authMiddleware, updateTradeNotesById);
 router.route("/:id/tags").patch(authMiddleware, updateTradeTagsById);

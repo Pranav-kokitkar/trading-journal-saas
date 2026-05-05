@@ -1,5 +1,5 @@
 // src/components/.../Trade.jsx
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Trade.module.css";
 import { useContext, useState, useEffect } from "react";
 import { CloseTrade } from "./CloseTrade";
@@ -32,6 +32,8 @@ export const Trade = () => {
 
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const historyState = location.state || {};
 
   // get trades
   const { trades = [], refreshTrades, closeTradeByID } = useTrades() || {};
@@ -261,7 +263,7 @@ export const Trade = () => {
       }
 
       setCloseTrade(false);
-      navigate(`/app/trade/${id}`);
+      navigate(`/app/trade/${id}`, { replace: true, state: historyState });
     } catch (err) {
       console.error("Error saving trade exit:", err);
       alert(err.message || "Failed to save trade exit — check console");
@@ -498,19 +500,27 @@ export const Trade = () => {
     <section className={styles.trade}>
       <div className={styles.tradeContainer}>
         <header className={styles.header}>
-          <button className={styles.backBtn} onClick={() => navigate(-1)}>
+          <button
+            className={styles.backBtn}
+            onClick={() =>
+              navigate(historyState.from || "/app/trade-history", {
+                state:
+                  typeof historyState.page === "number"
+                    ? { page: historyState.page }
+                    : undefined,
+              })
+            }
+          >
             ← Back
           </button>
-          <div>
+          <div className={styles.headerTitle}>
             <h2>
               Trade Details: <span>{trade.symbol}</span>
             </h2>
             <p>{formatDateTime(trade.entryTime ?? trade.dateTime ?? trade.dateNtime)}</p>
           </div>
           <div
-            className={`${
-              styles.marketType
-            } ${trade.marketType?.toLowerCase()}`}
+            className={`${styles.marketType} ${trade.marketType?.toLowerCase()}`}
           >
             {trade.marketType}
           </div>
@@ -520,49 +530,93 @@ export const Trade = () => {
         <div className={styles.tradeData}>
           <div className={styles.tradeInfo}>
             <h4>Trade Information</h4>
-            <p>
-              Direction:{" "}
-              <span className={directionColor}>{trade.tradeDirection}</span>
-            </p>
-            <p>
-              Entry Price: <span>{trade.entryPrice}</span>
-            </p>
-            <p>
-              Stop Loss: <span>{trade.stoplossPrice}</span>
-            </p>
-            <p>
-              Take Profit: <span>{trade.takeProfitPrice}</span>
-            </p>
-            <p>
-              Entry Time: <span>{entryTime}</span>
-            </p>
-            <p>
-              Exit Time: <span>{exitTime}</span>
-            </p>
-            <p>
-              Duration: <span>{duration}</span>
-            </p>
+            <div className={styles.infoGrid}>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Direction</span>
+                <span className={`${styles.metricValue} ${directionColor}`}>
+                  {trade.tradeDirection}
+                </span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Entry Price</span>
+                <span className={styles.metricValue}>{trade.entryPrice}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Stop Loss</span>
+                <span className={styles.metricValue}>{trade.stoplossPrice}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Take Profit</span>
+                <span className={styles.metricValue}>{trade.takeProfitPrice}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Entry Time</span>
+                <span className={styles.metricValue}>{entryTime}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Exit Time</span>
+                <span className={styles.metricValue}>{exitTime}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Duration</span>
+                <span className={styles.metricValue}>{duration}</span>
+              </div>
+            </div>
           </div>
 
           <div className={styles.tradePerformance}>
             <h4>Performance</h4>
-            <p>
-              Risk Amount: <span>${trade.riskAmount}</span>
-            </p>
-            <p>
-              RR: 1:<span>{trade.rr}</span>
-            </p>
-            <p>
-              PNL: <span className={pnlColor}>${trade.pnl}</span>
-            </p>
+            <div className={styles.performanceGrid}>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Risk Amount</span>
+                <span className={styles.metricValue}>${trade.riskAmount || 0}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Risk %</span>
+                <span className={styles.metricValue}>{trade.riskPercent || 0}%</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>RR</span>
+                <span className={styles.metricValue}>1:{trade.rr || 0}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>PnL</span>
+                <span className={`${styles.metricValue} ${pnlColor}`}>${trade.pnl || 0}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Balance After</span>
+                <span className={styles.metricValue}>${trade.balanceAfterTrade || 0}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Result</span>
+                <span className={styles.metricValue}>{trade.tradeResult || "—"}</span>
+              </div>
+            </div>
           </div>
 
           <div className={styles.tradeConfidence}>
             <h4>Additional Info</h4>
-            <div className={styles.additionalInfoRow}>
-              <p>
-                Confidence: <span>{confidenceValue}%</span>
-              </p>
+            <div className={styles.additionalInfoGrid}>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Confidence</span>
+                <span className={styles.metricValue}>{confidenceValue}%</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Status</span>
+                <span className={`${styles.metricValue} ${trade.tradeStatus === "live" ? styles.statusLive : styles.statusExited}`}>
+                  {trade.tradeStatus || "—"}
+                </span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Market Type</span>
+                <span className={styles.metricValue}>{trade.marketType || "—"}</span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Account</span>
+                <span className={styles.metricValue}>
+                  {trade.accountId?.name || trade.accountId?.label || "—"}
+                </span>
+              </div>
             </div>
             <div className={styles.confidenceTrack} aria-label="Trade confidence">
               <div
@@ -574,28 +628,43 @@ export const Trade = () => {
 
           <div className={styles.exitPrice}>
             <h4>Exit Prices</h4>
-            {trade.tradeStatus === "live"
-              ? "Trade Is Live (add Exit Price)"
-              : trade.exitedPrice.map((exitedPrice, index) => {
+            {trade.tradeStatus === "live" ? (
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Status</span>
+                <span className={styles.metricValue}>Trade is live — add exit prices</span>
+              </div>
+            ) : (
+              <div className={styles.exitGrid}>
+                {trade.exitedPrice.map((exitedPrice, index) => {
                   const exitTimestamp = trade.exitTimestamps?.[index]?.timestamp;
                   const formattedExitTimestamp = exitTimestamp
                     ? formatDateTime(exitTimestamp)
                     : exitTime;
 
                   return (
-                    <div key={index} className={styles.exitPriceData}>
-                      <p>
-                        Exit Price {index + 1}: <span>{exitedPrice.price}</span>
-                      </p>
-                      <p>
-                        Volume: <span>{exitedPrice.volume}%</span>
-                      </p>
-                      <p>
-                        Exit Time: <span>{formattedExitTimestamp}</span>
-                      </p>
+                    <div key={index} className={styles.exitGroupCard}>
+                      <div className={styles.exitGroupHeader}>
+                        Exit {index + 1}
+                      </div>
+                      <div className={styles.exitMetricGrid}>
+                        <div className={styles.metricCard}>
+                          <span className={styles.metricLabel}>Price</span>
+                          <span className={styles.metricValue}>{exitedPrice.price}</span>
+                        </div>
+                        <div className={styles.metricCard}>
+                          <span className={styles.metricLabel}>Volume</span>
+                          <span className={styles.metricValue}>{exitedPrice.volume}%</span>
+                        </div>
+                        <div className={styles.metricCard}>
+                          <span className={styles.metricLabel}>Exit Time</span>
+                          <span className={styles.metricValue}>{formattedExitTimestamp}</span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -603,17 +672,33 @@ export const Trade = () => {
         {trade.strategy && (
           <div className={styles.tradeStrategy}>
             <h4>Strategy</h4>
-            <div className={styles.strategyDisplay}>
-              <span className={styles.strategyIcon}>📊</span>
-              <div className={styles.strategyInfo}>
-                <p className={styles.strategyName}>
+            <div className={styles.strategyGrid}>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Strategy Name</span>
+                <span className={styles.metricValue}>
                   {typeof trade.strategy === 'object' ? trade.strategy.name : 'Strategy Selected'}
-                </p>
-                {typeof trade.strategy === 'object' && trade.strategy.description && (
+                </span>
+              </div>
+
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Strategy Type</span>
+                <span className={styles.metricValue}>
+                  {typeof trade.strategy === 'object'
+                    ? (trade.strategy.type || trade.strategy.category || 'Custom')
+                    : 'Selected'}
+                </span>
+              </div>
+
+              <div className={styles.strategyDescriptionCard}>
+                <div className={styles.strategyIcon}>📊</div>
+                <div className={styles.strategyInfo}>
+                  <span className={styles.metricLabel}>Notes</span>
                   <p className={styles.strategyDescription}>
-                    {trade.strategy.description}
+                    {typeof trade.strategy === 'object' && trade.strategy.description
+                      ? trade.strategy.description
+                      : 'No strategy description added.'}
                   </p>
-                )}
+                </div>
               </div>
             </div>
           </div>
@@ -638,56 +723,60 @@ export const Trade = () => {
 
           {!isAddingTags ? (
             Array.isArray(trade.tags) && trade.tags.length > 0 ? (
-              <div className={styles.tagsContainer}>
-                {trade.tags.map((tag) => (
-                  <span
-                    key={tag._id}
-                    className={styles.tagBadge}
-                    style={{ backgroundColor: tag.colour }}
-                  >
-                    {tag.name}
-                  </span>
-                ))}
+              <div className={styles.tagsGrid}>
+                <div className={styles.metricCard}>
+                  <span className={styles.metricLabel}>Total Tags</span>
+                  <span className={styles.metricValue}>{trade.tags.length}</span>
+                </div>
+                <div className={styles.tagsListCard}>
+                  {trade.tags.map((tag) => (
+                    <span
+                      key={tag._id}
+                      className={styles.tagBadge}
+                      style={{ backgroundColor: tag.colour }}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
               </div>
             ) : (
-              <p
-                style={{
-                  fontSize: "0.85rem",
-                  opacity: 0.7,
-                  marginTop: "0.75rem",
-                }}
-              >
-                No tags added
-              </p>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Tags</span>
+                <span className={styles.metricValue}>No tags added</span>
+              </div>
             )
           ) : (
-            <div className={styles.tagPicker}>
+            <div className={styles.tagPickerCard}>
               {allTags.length === 0 ? (
-                <p style={{ fontSize: "0.85rem", opacity: 0.7 }}>
-                  No tags available. Create tags in the Tags page.
-                </p>
+                <div className={styles.metricCard}>
+                  <span className={styles.metricLabel}>Tag Editor</span>
+                  <span className={styles.metricValue}>No tags available. Create tags in the Tags page.</span>
+                </div>
               ) : (
-                allTags.map((t) => {
-                  const isSelected = editableTags.includes(t._id);
+                <div className={styles.tagPicker}>
+                  {allTags.map((t) => {
+                    const isSelected = editableTags.includes(t._id);
 
-                  return (
-                    <button
-                      key={t._id}
-                      type="button"
-                      onClick={() => toggleTag(t._id)}
-                      className={
-                        isSelected ? styles.tagSelected : styles.tagUnselected
-                      }
-                      style={{
-                        backgroundColor: isSelected ? t.colour : "transparent",
-                        color: isSelected ? "#fff" : t.colour,
-                        borderColor: t.colour,
-                      }}
-                    >
-                      {t.name}
-                    </button>
-                  );
-                })
+                    return (
+                      <button
+                        key={t._id}
+                        type="button"
+                        onClick={() => toggleTag(t._id)}
+                        className={
+                          isSelected ? styles.tagSelected : styles.tagUnselected
+                        }
+                        style={{
+                          backgroundColor: isSelected ? t.colour : "transparent",
+                          color: isSelected ? "#fff" : t.colour,
+                          borderColor: t.colour,
+                        }}
+                      >
+                        {t.name}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
             </div>
           )}

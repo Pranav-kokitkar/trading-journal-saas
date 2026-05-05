@@ -71,6 +71,20 @@ const tradeSchema = new mongoose.Schema({
   durationHours: { type: Number, default: 0 },
   durationText: { type: String, default: "" },
   exitTimestamps: { type: [exitTimestampSchema], default: [] },
+  // Soft-delete and audit helpers
+  deleted: { type: Boolean, default: false },
+  deletedAt: { type: Date, default: null },
+  deletedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
+  lastModifiedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
+  lastModifiedAt: { type: Date, default: null },
 });
 
 // ✅ CRITICAL INDEXES for query performance

@@ -13,6 +13,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const authRoute = require("./routers/Auth-router");
 const tradeRoute = require("./routers/Trade-router");
+const auditRouter = require("./routers/audit-router");
 const notesRoute = require("./routers/Notes-router");
 const userRoute = require("./routers/User-router");
 const contactRoute = require("./routers/Contact-router");
@@ -124,6 +125,7 @@ app.get("/health", (req, res) => {
 
 app.use("/api/auth/", authLimiter, authRoute);
 app.use("/api/trades", tradeRoute);
+app.use("/api/audit", auditRouter);
 app.use("/api/user", userRoute);
 app.use("/api/notes", notesRoute);
 app.use("/api/contact", contactRoute);

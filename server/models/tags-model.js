@@ -21,8 +21,19 @@ const tagsSchema = new Schema(
       type: String,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
+
+// Soft-delete fields
+tagsSchema.add({
+  deleted: { type: Boolean, default: false },
+  deletedAt: { type: Date, default: null },
+  deletedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
+  },
+});
 
 const Tags = new mongoose.model("Tags", tagsSchema);
 module.exports = Tags;

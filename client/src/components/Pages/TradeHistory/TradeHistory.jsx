@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from "react";
+import { useLocation } from "react-router-dom";
 import styles from "../../../styles/tradehistory.module.css";
 import { useTrades } from "../../../store/TradeContext";
 import { TradeCard } from "./TradeCard";
@@ -29,6 +30,7 @@ const defaultFilters = {
 };
 
 export const TradeHistory = () => {
+  const location = useLocation();
   const {
     trades = [],
     refreshTrades,
@@ -49,6 +51,7 @@ export const TradeHistory = () => {
 
   const { isAuthLoading, isPro, authorizationToken } = useAuth();
   const { accounts } = useContext(AccountContext);
+  const restorePage = location.state?.page;
 
   /** ---------------- FILTER HANDLERS ---------------- */
   const handleFilterChange = (e) => {
@@ -126,6 +129,12 @@ export const TradeHistory = () => {
   useEffect(() => {
     setFilters((prev) => ({ ...prev, includeImported: includeImportedTrades }));
   }, [includeImportedTrades]);
+
+  useEffect(() => {
+    if (typeof restorePage === "number" && restorePage > 0 && restorePage !== page) {
+      setPage(restorePage);
+    }
+  }, [restorePage, page, setPage]);
 
   useEffect(() => {
     refreshTrades(filters);
@@ -386,7 +395,7 @@ export const TradeHistory = () => {
             ))}
           </div>
         ) : (
-          <TradeCard savedTrade={trades} />
+          <TradeCard savedTrade={trades} currentPage={page} />
         )}
 
         <Pagination

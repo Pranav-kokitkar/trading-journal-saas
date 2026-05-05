@@ -25,7 +25,7 @@ export const TradeProvider = ({ children }) => {
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(12);
 
   const [trade, setTrade] = useState({
     id: "",

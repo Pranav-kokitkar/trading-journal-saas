@@ -13,12 +13,13 @@
 /* ===== Main Container ===== */
 .tradeContainer {
   width: 100%;
-  max-width: 1100px;
-  background: var(--gradient-card);
-  border-radius: var(--radius-lg);
+  max-width: 1280px;
+  /* Remove visual chrome per user request */
+  background: transparent;
+  border-radius: 0;
   padding: 1.5rem;
-  border: 1px solid var(--border-subtle);
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+  border: none;
+  box-shadow: none;
 }
 
 /* ===== Header ===== */
@@ -26,6 +27,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
   padding-bottom: 1rem;
   margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--border-subtle);
@@ -33,23 +35,30 @@
 
 .header h2 {
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 600;
+  font-size: 1.4rem;
+  font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.3px;
 }
 
+.headerTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
 .header p {
   margin: 0.25rem 0 0;
-  font-size: 0.85rem;
-  color: var(--muted);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
 }
 
 /* Market Type Badge */
 .marketType {
-  padding: 0.4rem 0.9rem;
+  padding: 0.5rem 0.95rem;
   border-radius: var(--radius-full);
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   background: var(--accent);
@@ -112,9 +121,9 @@
 .tradePerformance p,
 .tradeConfidence p,
 .exitPrice p {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   margin: 0.5rem 0;
-  color: var(--muted);
+  color: var(--text-secondary);
 }
 
 .additionalInfoRow {
@@ -141,11 +150,80 @@
   font-weight: 600;
 }
 
+.tradePerformance {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.tradeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.performanceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.metricCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.95rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+.metricLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.metricValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
 .confidenceHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.75rem;
+}
+
+.tradeConfidence {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.additionalInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.statusLive {
+  color: var(--success) !important;
+}
+
+.statusExited {
+  color: var(--accent) !important;
 }
 
 .confidenceTrack {
@@ -161,6 +239,34 @@
   border-radius: inherit;
   background: linear-gradient(90deg, var(--accent), var(--success));
   transition: width 0.2s ease;
+}
+
+.exitGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.exitGroupCard {
+  padding: 0.95rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+.exitGroupHeader {
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.exitMetricGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
 }
 
 /* Exit Price Data */
@@ -223,20 +329,52 @@
 }
 
 .notebtn {
-  background: transparent;
-  border: 1px solid var(--border-medium);
-  color: var(--accent);
-  padding: 0.4rem 0.9rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
+  position: relative;
+  isolation: isolate;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.01)
+  );
+  border: 1px solid color-mix(in srgb, var(--accent) 34%, var(--border-medium));
+  color: var(--text-primary);
+  padding: 0.58rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: var(--radius-md);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
 }
 
 .notebtn:hover {
-  background: var(--accent-subtle);
-  border-color: var(--accent);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06),
+    rgba(255, 255, 255, 0.02)
+  );
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border-light));
+  color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.notebtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--accent-subtle),
+    0 10px 22px rgba(0, 0, 0, 0.16);
+}
+
+.notebtn:active {
+  transform: translateY(0);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
 }
 
 .editTextArea {
@@ -319,6 +457,23 @@
   padding-bottom: 0.5rem;
 }
 
+.strategyGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.strategyDescriptionCard {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+  padding: 0.95rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
 .strategyDisplay {
   display: flex;
   align-items: flex-start;
@@ -340,14 +495,14 @@
 
 .strategyName {
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--accent);
+  font-weight: 700;
+  color: var(--text-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .strategyDescription {
-  font-size: 0.85rem;
-  color: var(--muted);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
   line-height: 1.5;
   margin: 0;
 }
@@ -396,6 +551,37 @@
   border-color: rgba(255, 255, 255, 0.4);
 }
 
+.tagsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tagsListCard,
+.tagPickerCard {
+  grid-column: 1 / -1;
+  padding: 0.95rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+.tagsListCard {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tagPickerCard {
+  margin-top: 0.25rem;
+}
+
+.tagPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 /* ===== Action Buttons ===== */
 .tradeBtns {
   display: flex;
@@ -406,10 +592,10 @@
 }
 
 .tradeBtns button {
-  min-width: 140px;
   padding: 0.65rem 1.25rem;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
+  letter-spacing: 0.01em;
   border-radius: var(--radius-sm);
   border: none;
   cursor: pointer;
@@ -582,10 +768,11 @@
 .saveBtn,
 .cancelBtn {
   flex: 1;
-  padding: 0.65rem 1.25rem;
+  padding: 0.75rem 1.25rem;
   border-radius: var(--radius-sm);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -617,12 +804,20 @@
 
 .backBtn {
   background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
-  padding: 0.45rem 0.8rem;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  border: 1px solid var(--border-medium);
+  color: var(--text-primary);
+  padding: 0.55rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.backBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
 }
 
 /* Screenshot Upload Section */
@@ -703,24 +898,20 @@
 
 /* Tag Picker */
 .tagPicker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-  padding: 0.75rem;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-subtle);
+  margin-top: 0;
 }
 
 .tagPicker button {
-  padding: 0.4rem 0.9rem;
+  padding: 0.45rem 0.95rem;
   border-radius: var(--radius-full);
   font-size: 0.8rem;
   font-weight: 600;
   border: 2px solid;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease;
 }
 
 .tagSelected {
@@ -735,7 +926,7 @@
 
 .tagPicker button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
 }
 
 /* Fullscreen Image Modal */
@@ -843,6 +1034,10 @@
     gap: 0.75rem;
   }
 
+  .marketType {
+    align-self: flex-start;
+  }
+
   .tradeBtns {
     flex-direction: column;
     align-items: stretch;
@@ -865,6 +1060,30 @@
 
   .row {
     flex-direction: column;
+  }
+
+  .performanceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .additionalInfoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .strategyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .tagsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .exitMetricGrid {
+    grid-template-columns: 1fr;
   }
 }
 

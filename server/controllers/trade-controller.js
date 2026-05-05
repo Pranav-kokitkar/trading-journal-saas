@@ -70,6 +70,8 @@ const getLatestDate = (items = []) => {
   }, null);
 };
 
+const auditService = require("../services/audit-service");
+
 const AddTrade = async (req, res) => {
   try {
     const userId = req.userID || (req.user && req.user._id);
@@ -325,6 +327,21 @@ const AddTrade = async (req, res) => {
 
     const savedTrade = await Trade.create(tradeToSave);
 
+    // Write audit log for creation
+    try {
+      await auditService.log({
+        action: "create",
+        collection: "trades",
+        documentId: savedTrade._id,
+        userId,
+        before: null,
+        after: savedTrade.toObject ? savedTrade.toObject() : savedTrade,
+        metadata: { source: req.ip },
+      });
+    } catch (e) {
+      console.error("Failed to write audit log for trade create", e);
+    }
+
     return res.status(201).json({ success: true, trade: savedTrade });
   } catch (error) {
     console.error("AddTrade error:", error);
@@ -369,6 +386,10 @@ const getAllTrades = async (req, res) => {
 
     /** ---------------- BUILD QUERY ---------------- */
     const query = { userId };
+    // By default exclude soft-deleted records; allow override with includeDeleted=true
+    if (!req.query.includeDeleted || req.query.includeDeleted === "false") {
+      query.deleted = { $ne: true };
+    }
 
     if (symbol) {
       query.symbol = { $regex: symbol, $options: "i" };
@@ -650,6 +671,21 @@ const closeTradeByID = async (req, res, next) => {
       });
     }
 
+    // Audit log for close/update
+    try {
+      await auditService.log({
+        action: "update",
+        collection: "trades",
+        documentId: updated._id,
+        userId,
+        before: trade,
+        after: updated,
+        metadata: { source: req.ip },
+      });
+    } catch (e) {
+      console.error("Failed to write audit log for trade close/update", e);
+    }
+
     return res.status(200).json({ success: true, trade: updated });
   } catch (err) {
     console.error("closeTrade error:", err);
@@ -663,8 +699,33 @@ const closeTradeByID = async (req, res, next) => {
 const deleteTradeById = async (req, res, next) => {
   try {
     const id = req.params.id;
-    await Trade.deleteOne({ _id: id });
-    res.status(200).json({ message: "tarde deleted" });
+    const userId = req.userID || req.user?._id;
+    const trade = await Trade.findById(id).lean();
+    if (!trade) return res.status(404).json({ message: "Trade not found" });
+
+    // Soft-delete: set flags
+    const updated = await Trade.findOneAndUpdate(
+      { _id: id },
+      { deleted: true, deletedAt: new Date(), deletedBy: userId },
+      { new: true },
+    ).lean();
+
+    // Audit log
+    try {
+      await auditService.log({
+        action: "delete",
+        collection: "trades",
+        documentId: id,
+        userId,
+        before: trade,
+        after: updated,
+        metadata: { source: req.ip },
+      });
+    } catch (e) {
+      console.error("Failed to write audit log for trade delete", e);
+    }
+
+    res.status(200).json({ message: "trade soft-deleted" });
   } catch (error) {
     return res.status(400).json({ message: error });
   }
@@ -825,6 +886,118 @@ const deleteTradeScreenshot = async (req, res) => {
   }
 };
 
+const restoreTradeById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const userId = req.userID || req.user?._id;
+    const trade = await Trade.findById(id).lean();
+    if (!trade) return res.status(404).json({ message: "Trade not found" });
+
+    const updated = await Trade.findOneAndUpdate(
+      { _id: id },
+      { deleted: false, deletedAt: null, deletedBy: null },
+      { new: true },
+    ).lean();
+
+    try {
+      await auditService.log({
+        action: "restore",
+        collection: "trades",
+        documentId: id,
+        userId,
+        before: trade,
+        after: updated,
+        metadata: { source: req.ip },
+      });
+    } catch (e) {
+      console.error("Failed to write audit log for trade restore", e);
+    }
+
+    res.status(200).json({ message: "trade restored", trade: updated });
+  } catch (err) {
+    console.error("restoreTrade error:", err);
+    res.status(500).json({ message: "Failed to restore trade" });
+  }
+};
+
+const undoTradeById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const userId = req.userID || req.user?._id;
+    const recent = await auditService.getRecentForDocument("trades", id, 5);
+    if (!recent || recent.length === 0) {
+      return res.status(404).json({ message: "No audit history to undo" });
+    }
+
+    const last = recent[0];
+    if (last.action === "create") {
+      // Undo create = soft-delete
+      const deleted = await Trade.findOneAndUpdate(
+        { _id: id },
+        { deleted: true, deletedAt: new Date(), deletedBy: userId },
+        { new: true },
+      ).lean();
+      await auditService.log({
+        action: "undo",
+        collection: "trades",
+        documentId: id,
+        userId,
+        before: last.after,
+        after: deleted,
+      });
+      return res
+        .status(200)
+        .json({ message: "create undone (soft-deleted)", trade: deleted });
+    }
+
+    if (last.action === "update" || last.action === "undo") {
+      const before = last.before || {};
+      const current = await Trade.findById(id).lean();
+      if (!current) return res.status(404).json({ message: "Trade not found" });
+      // apply before snapshot
+      const applied = await Trade.findOneAndUpdate({ _id: id }, before, {
+        new: true,
+      }).lean();
+      await auditService.log({
+        action: "undo",
+        collection: "trades",
+        documentId: id,
+        userId,
+        before: current,
+        after: applied,
+      });
+      return res
+        .status(200)
+        .json({ message: "undo successful", trade: applied });
+    }
+
+    if (last.action === "delete") {
+      // restore
+      const restored = await Trade.findOneAndUpdate(
+        { _id: id },
+        { deleted: false, deletedAt: null, deletedBy: null },
+        { new: true },
+      ).lean();
+      await auditService.log({
+        action: "undo",
+        collection: "trades",
+        documentId: id,
+        userId,
+        before: last.before,
+        after: restored,
+      });
+      return res
+        .status(200)
+        .json({ message: "undo delete (restored)", trade: restored });
+    }
+
+    return res.status(400).json({ message: "Unsupported undo action" });
+  } catch (err) {
+    console.error("undoTrade error:", err);
+    res.status(500).json({ message: "Failed to undo trade" });
+  }
+};
+
 // Update exports
 module.exports = {
   AddTrade,
@@ -836,4 +1009,6 @@ module.exports = {
   updateTradeTagsById,
   updateTradeScreenshots,
   deleteTradeScreenshot,
+  restoreTradeById,
+  undoTradeById,
 };

@@ -228,19 +228,161 @@
 
 .tradecard {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md);
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-sm);
   border: 1px solid var(--border-default);
   background: var(--surface-card);
   border-radius: var(--radius-xl);
-  padding: var(--space-4);
-  box-shadow: var(--shadow-card);
+  padding: 0;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+  overflow: hidden;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+  /* removed will-change to avoid creating too many compositor layers during scroll */
 }
 
 .tradecard:hover {
   background: var(--bg-hover);
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.12);
+}
+
+.tradeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* larger vertical spacing (row) than horizontal */
+  gap: 2.4rem var(--space-md);
+}
+
+.cardImage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-top-left-radius: var(--radius-xl);
+  border-top-right-radius: var(--radius-xl);
+}
+
+.cardImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+}
+
+.faviconWrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  box-sizing: border-box;
+  padding: 12px;
+}
+
+.faviconImg {
+  width: auto;
+  max-width: 120px;
+  max-height: 120px;
+  object-fit: contain;
+  display: block;
+  opacity: 0.95;
+}
+
+@media (max-width: 1024px) {
+  .faviconImg {
+    max-height: 100px;
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .faviconWrapper {
+    padding: 8px;
+  }
+  .faviconImg {
+    max-height: 80px;
+    max-width: 80px;
+  }
+}
+
+.cardFooter {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.cardFooter {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.leftMeta {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.rr {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.symbolName {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+.cardMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.confidenceContainer {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  margin: 8px 12px 12px 12px;
+  overflow: hidden;
+}
+
+.confidenceFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-profit), #7ad29a);
+  transition: width 220ms ease;
+}
+
+.strategyBadgeSmall {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  background: var(--bg-level-2);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.direction {
+  text-transform: capitalize;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.pnlPositive {
+  color: var(--color-profit);
+  font-weight: 600;
+}
+
+.pnlNegative {
+  color: var(--color-loss);
+  font-weight: 600;
 }
 
 .belowsymbol {
@@ -366,5 +508,17 @@
 
   .tradequickdata {
     gap: var(--space-md);
+  }
+}
+
+@media (max-width: 1024px) {
+  .tradeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .tradeGrid {
+    grid-template-columns: 1fr;
   }
 }
