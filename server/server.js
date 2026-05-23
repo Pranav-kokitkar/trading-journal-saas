@@ -29,6 +29,8 @@ const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 // CORS configuration - MUST be before other middleware
 const defaultAllowedOrigins = [
   "http://localhost:5173",
@@ -36,6 +38,10 @@ const defaultAllowedOrigins = [
   "http://139.59.65.78",
   "http://139-59-65-78.sslip.io",
   "https://139-59-65-78.sslip.io",
+  "http://kyrosjournal.dev",
+  "https://kyrosjournal.dev",
+  "http://www.kyrosjournal.dev",
+  "https://www.kyrosjournal.dev",
   "https://logmytrade.netlify.app",
   "https://kryosjournal.netlify.app",
   "https://trading-journal-saas.netlify.app",
