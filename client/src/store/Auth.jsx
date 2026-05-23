@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || "");
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
-  const authorizationToken = `Bearer ${token}`;
+  const authorizationToken = token ? `Bearer ${token}` : "";
   const isLoggedIn = !!token;
 
   const storeTokenInLS = (newToken) => {

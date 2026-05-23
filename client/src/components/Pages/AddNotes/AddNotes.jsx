@@ -10,6 +10,10 @@ export const AddNotes = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { authorizationToken } = useAuth();
+  const hasValidToken =
+    typeof authorizationToken === "string" &&
+    authorizationToken.startsWith("Bearer ") &&
+    authorizationToken.trim() !== "Bearer";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,6 +23,10 @@ export const AddNotes = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (note.title.trim() === "" && note.description.trim() === "") return;
+    if (!hasValidToken) {
+      toast.error("Please log in again");
+      return;
+    }
     if (isSubmitting) return;
 
     try {
@@ -50,6 +58,10 @@ export const AddNotes = () => {
   };
 
   const getAllNotes = async () => {
+    if (!hasValidToken) {
+      return;
+    }
+
     try {
       const response = await fetch(
         `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/notes/`,
@@ -71,8 +83,13 @@ export const AddNotes = () => {
   };
 
   useEffect(() => {
+    if (!hasValidToken) {
+      setNotes([]);
+      return;
+    }
+
     getAllNotes();
-  }, []);
+  }, [hasValidToken]);
 
   return (
     <section className={`${styles.addnotescontainer} app-page`}>
