@@ -167,10 +167,29 @@ const getAccounts = async (req, res) => {
     const userId = req.userID || (req.user && req.user._id);
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
+    // ✅ Recalculate all accounts on fetch (after login)
+    const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+    
+    const accounts = await Account.find({ userId });
+    
+    // Recalculate balance for each account
+    for (const account of accounts) {
+      try {
+        await recalculateAccountTrades({
+          userId,
+          accountId: account._id,
+        });
+      } catch (recalcError) {
+        console.error(`Failed to recalculate account ${account._id}:`, recalcError);
+        // Don't fail the whole request, just log the error
+      }
+    }
+
+    // Fetch fresh account data after recalculation
     const response = await Account.find({ userId });
     res.status(200).json(response);
   } catch (error) {
-    res.status(400).json({ message: "error while gettign accounts" });
+    res.status(400).json({ message: "error while getting accounts" });
   }
 };
 
@@ -187,6 +206,19 @@ const getAcitveAccount = async (req, res) => {
       return res
         .status(400)
         .json({ message: "No active account set for this user" });
+    }
+
+    // ✅ Recalculate active account on fetch (after login)
+    const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+    
+    try {
+      await recalculateAccountTrades({
+        userId,
+        accountId: user.activeAccountId,
+      });
+    } catch (recalcError) {
+      console.error("Failed to recalculate active account:", recalcError);
+      // Continue anyway - account exists even if recalc fails
     }
 
     const account = await Account.findOne({
@@ -268,10 +300,54 @@ const updateAccount = async (req, res) => {
   }
 };
 
+// ✅ Manual recalculation endpoint for fixing corrupted balances
+const manualRecalculateAccount = async (req, res) => {
+  try {
+    const userId = req.userID;
+    const accountId = req.params.id;
+
+    if (!accountId) {
+      return res.status(400).json({ message: "Account ID is required" });
+    }
+
+    // Verify account belongs to user
+    const account = await Account.findOne({ _id: accountId, userId });
+    if (!account) {
+      return res
+        .status(404)
+        .json({ message: "Account not found or does not belong to you" });
+    }
+
+    // ✅ Call recalculation service
+    const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+    const { recalculatedTrades, finalBalance } = await recalculateAccountTrades({
+      userId,
+      accountId,
+    });
+
+    // Fetch updated account
+    const updatedAccount = await Account.findById(accountId).lean();
+
+    return res.status(200).json({
+      message: "Account recalculated successfully",
+      recalculatedTrades,
+      finalBalance,
+      account: updatedAccount,
+    });
+  } catch (error) {
+    console.error("manualRecalculateAccount error:", error);
+    return res.status(500).json({
+      message: "Failed to recalculate account",
+      error: error.message || "Unknown error",
+    });
+  }
+};
+
 module.exports = {
   createAccount,
   getAccounts,
   getAcitveAccount,
   updateAccount,
   deleteAccountByID,
+  manualRecalculateAccount,
 };

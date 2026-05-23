@@ -17,7 +17,7 @@ export const mergeEquityCurveData = (datasetA, datasetB) => {
 
   const maxTradeCount = Math.max(
     dataA.length > 0 ? dataA[dataA.length - 1].tradeNumber : 0,
-    dataB.length > 0 ? dataB[dataB.length - 1].tradeNumber : 0
+    dataB.length > 0 ? dataB[dataB.length - 1].tradeNumber : 0,
   );
 
   const merged = [];
@@ -44,7 +44,7 @@ export const mergeExpectancyData = (datasetA, datasetB) => {
 
   const maxTradeCount = Math.max(
     dataA.length > 0 ? dataA[dataA.length - 1].tradeNumber : 0,
-    dataB.length > 0 ? dataB[dataB.length - 1].tradeNumber : 0
+    dataB.length > 0 ? dataB[dataB.length - 1].tradeNumber : 0,
   );
 
   const merged = [];
@@ -69,20 +69,24 @@ export const getDimensionLabel = (key, value, accounts, strategies, tags) => {
   if (!value) return "Not selected";
 
   switch (key) {
-    case "accountId":
+    case "accountId": {
       const account = accounts.find((acc) => acc._id === value);
       return account ? account.name : value;
+    }
 
-    case "strategy":
+    case "strategy": {
       const strategy = strategies.find((strat) => strat._id === value);
       return strategy ? strategy.name : value;
+    }
 
-    case "tag":
+    case "tag": {
       const tag = tags.find((t) => t._id === value);
       return tag ? tag.name : value;
+    }
 
-    case "direction":
+    case "direction": {
       return value.toUpperCase();
+    }
 
     case "tradeStatus":
       return value === "live" ? "Live (Ongoing)" : "Exited (Completed)";

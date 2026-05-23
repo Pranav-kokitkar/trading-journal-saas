@@ -36,20 +36,32 @@ const Login = async (req, res, next) => {
       userExist.planExpiresAt = null;
       await userExist.save();
     }
-    ``;
+
+    if (!userExist.password) {
+      return res.status(500).json({ message: "Stored password is missing" });
+    }
+
     const passwordMatch = await userExist.comparePassword(password);
     if (!passwordMatch) {
       return res.status(400).json({ message: "Incorrect password" });
     }
 
+    const token = await userExist.generateToken();
+    if (!token) {
+      return res
+        .status(500)
+        .json({ message: "Failed to generate login token" });
+    }
+
     res.status(200).json({
       message: "login sucess",
-      token: await userExist.generateToken(),
+      token,
       userID: userExist._id.toString(),
       plan: userExist.plan,
       planExpiresAt: userExist.planExpiresAt,
     });
   } catch (error) {
+    console.error("Login error:", error);
     next(error);
   }
 };

@@ -3,11 +3,10 @@
  * Fails fast if critical config is missing
  */
 
-const requiredEnvVars = [
-  "MONGO_URI",
-  "JWT_SECRETE_KEY", // Note: There's a typo in your env var name (should be SECRET)
-  "PORT",
-];
+const requiredEnvVars = ["MONGO_URI", "PORT"];
+
+const hasJwtSecret =
+  Boolean(process.env.JWT_SECRET_KEY) || Boolean(process.env.JWT_SECRETE_KEY);
 
 const validateEnv = () => {
   const missing = [];
@@ -17,6 +16,10 @@ const validateEnv = () => {
       missing.push(varName);
     }
   });
+
+  if (!hasJwtSecret) {
+    missing.push("JWT_SECRET_KEY or JWT_SECRETE_KEY");
+  }
 
   if (missing.length > 0) {
     console.error("❌ CRITICAL ERROR: Missing required environment variables:");

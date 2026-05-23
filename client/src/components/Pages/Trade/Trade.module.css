@@ -430,7 +430,7 @@
 
 .screenshotList img {
   width: 100%;
-  max-width: 420px;
+  max-width: 760px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -983,6 +983,41 @@
   transform: scale(1.1) rotate(90deg);
 }
 
+.fullscreenNav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10001;
+}
+
+.fullscreenNav:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.32);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.fullscreenPrev {
+  left: 2rem;
+}
+
+.fullscreenNext {
+  right: 2rem;
+}
+
 @keyframes zoomIn {
   from {
     transform: scale(0.8);
@@ -997,6 +1032,9 @@
 /* Make screenshot thumbnails look clickable */
 .screenshotItem img {
   transition: all 0.3s ease;
+  width: 100%;
+  max-width: 760px;
+  display: block;
 }
 
 .screenshotItem img:hover {
@@ -1110,6 +1148,20 @@
     height: 40px;
     font-size: 1.2rem;
   }
+
+  .fullscreenNav {
+    width: 42px;
+    height: 42px;
+    font-size: 1.5rem;
+  }
+
+  .fullscreenPrev {
+    left: 0.75rem;
+  }
+
+  .fullscreenNext {
+    right: 0.75rem;
+  }
 }
 
 /* ===== Animations ===== */
@@ -1177,6 +1229,10 @@
   }
 
   .screenshotList img {
+    max-width: 100%;
+  }
+
+  .screenshotItem img {
     max-width: 100%;
   }
 }

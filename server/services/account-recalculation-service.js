@@ -24,7 +24,8 @@ const recalculateAccountTrades = async ({ userId, accountId }) => {
     throw new Error("Account not found for recalculation");
   }
 
-  const trades = await Trade.find({ userId, accountId })
+  // ✅ CRITICAL FIX: Exclude soft-deleted trades
+  const trades = await Trade.find({ userId, accountId, deleted: { $ne: true } })
     .select("_id pnl")
     .sort({ dateTime: 1, _id: 1 })
     .lean();

@@ -1,5 +1,8 @@
 const jwt = require("jsonwebtoken");
 
+const getJwtSecret = () =>
+  process.env.JWT_SECRET_KEY || process.env.JWT_SECRETE_KEY;
+
 const authMiddleware = async (req, res, next) => {
   const token = req.header("Authorization");
   if (!token) {
@@ -11,7 +14,13 @@ const authMiddleware = async (req, res, next) => {
   const jwttoken = token.replace("Bearer", "").trim();
 
   try {
-    const decoded = jwt.verify(jwttoken, process.env.JWT_SECRETE_KEY);
+    const jwtSecret = getJwtSecret();
+
+    if (!jwtSecret) {
+      return res.status(500).json({ message: "JWT secret is not configured" });
+    }
+
+    const decoded = jwt.verify(jwttoken, jwtSecret);
 
     // ✅ PERFORMANCE: Use JWT payload directly instead of DB query
     // All needed data is already in the token (set in user-model.js)

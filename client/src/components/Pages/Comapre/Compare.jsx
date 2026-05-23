@@ -9,7 +9,6 @@ import { DimensionInputs } from "./DimensionInputs";
 import { DatasetCard } from "./DatasetCard";
 import { ComparisonCharts } from "./ComparisonCharts";
 import { useCompareData } from "./useCompareData";
-import { compareDatasets } from "./compareApi";
 import { getMaxCompareDimensions } from "../../../config/planLimits";
 import {
   formatMetricValue,
@@ -171,7 +170,7 @@ export const Compare = () => {
           </select>
         );
 
-      case "strategy":
+      case "strategy": {
         const filteredStrategies = getFilteredStrategies(dataset);
         return (
           <select
@@ -192,8 +191,9 @@ export const Compare = () => {
             )}
           </select>
         );
+      }
 
-      case "tag":
+      case "tag": {
         const filteredTags = getFilteredTags(dataset);
         return (
           <select
@@ -212,6 +212,7 @@ export const Compare = () => {
             )}
           </select>
         );
+      }
 
       case "direction":
         return (
@@ -228,13 +229,13 @@ export const Compare = () => {
           </select>
         );
 
-      case "tradeStatus":
+      case "tradeStatus": {
         const getStatusLabel = (status) => {
           if (status === "live") return "Live (Ongoing)";
           if (status === "exited") return "Exited (Completed)";
           return status;
         };
-        
+
         return (
           <select
             value={value}
@@ -248,6 +249,7 @@ export const Compare = () => {
             ))}
           </select>
         );
+      }
 
       case "marketType":
         return (

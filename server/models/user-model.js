@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const getJwtSecret = () =>
+  process.env.JWT_SECRET_KEY || process.env.JWT_SECRETE_KEY;
+
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -76,13 +79,19 @@ userSchema.pre("save", async function (next) {
 // Generate JWT
 userSchema.methods.generateToken = function () {
   try {
+    const jwtSecret = getJwtSecret();
+
+    if (!jwtSecret) {
+      throw new Error("JWT secret is not configured");
+    }
+
     return jwt.sign(
       {
         userId: this._id.toString(),
         email: this.email,
         isAdmin: this.isAdmin,
       },
-      process.env.JWT_SECRET_KEY || process.env.JWT_SECRETE_KEY, // safe fallback
+      jwtSecret,
       { expiresIn: "30d" },
     );
   } catch (error) {

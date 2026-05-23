@@ -438,7 +438,7 @@ export const AnalyticsDashboard = () => {
           sortBy,
           order,
           minTrades: String(Number(filters.minTrades) || 0),
-          includeImported: Boolean(includeImportedTrades) ? "true" : "false",
+          includeImported: includeImportedTrades ? "true" : "false",
         });
 
         if (filters.accountId) params.set("accountId", filters.accountId);
@@ -464,7 +464,7 @@ export const AnalyticsDashboard = () => {
         }
 
         setRows(Array.isArray(data) ? data : []);
-      } catch (error) {
+      } catch {
         toast.error("Failed to fetch analytics");
         setRows([]);
       } finally {

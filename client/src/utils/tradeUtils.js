@@ -111,6 +111,15 @@ export const calculateTradeOnExit = ({
     pnl = 0;
   }
 
+  // ✅ CRITICAL FIX: Cap PnL to reasonable limits (max 100x risk)
+  const maxPnL = Math.abs(actualRisk) * 100;
+  if (Math.abs(pnl) > maxPnL) {
+    console.warn(
+      `⚠️ PnL capped: ${pnl} → ${pnl > 0 ? maxPnL : -maxPnL}. Check Entry/SL/TP values.`,
+    );
+    pnl = pnl > 0 ? maxPnL : -maxPnL;
+  }
+
   const { slippage, commission } = getTradeCosts(updatedTrade);
   pnl -= slippage + commission;
 
@@ -150,6 +159,33 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
   const symbol = (trade.symbol || "").toString().toUpperCase();
   const riskType = trade.riskType || "dollar";
   const priceDiff = Math.abs(entry - stoploss);
+  const snapshotExitPrice =
+    takeprofit ||
+    (trade.exitedPrice?.length > 0 ? Number(trade.exitedPrice[0].price) : 0);
+
+  // ✅ CRITICAL FIX: Validate SL/TP logic for direction
+  let slTpWarning = "";
+  if (entry && stoploss && tradedirection) {
+    if (tradedirection === "buy" || tradedirection === "long") {
+      if (stoploss >= entry) {
+        slTpWarning = "⚠️ LONG trade: Stop Loss must be BELOW Entry price.";
+      }
+      if (takeprofit && takeprofit <= entry) {
+        slTpWarning = slTpWarning
+          ? slTpWarning + " TP must be ABOVE Entry."
+          : "⚠️ LONG trade: Take Profit must be ABOVE Entry price.";
+      }
+    } else if (tradedirection === "sell" || tradedirection === "short") {
+      if (stoploss <= entry) {
+        slTpWarning = "⚠️ SHORT trade: Stop Loss must be ABOVE Entry price.";
+      }
+      if (takeprofit && takeprofit >= entry) {
+        slTpWarning = slTpWarning
+          ? slTpWarning + " TP must be BELOW Entry."
+          : "⚠️ SHORT trade: Take Profit must be BELOW Entry price.";
+      }
+    }
+  }
 
   const requiredFields = {
     entry,
@@ -179,10 +215,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
     tradeStatus === "exited" &&
     (takeprofit || (trade.exitedPrice && trade.exitedPrice.length > 0))
   ) {
-    const rrExit =
-      trade.exitedPrice?.length > 0
-        ? Number(trade.exitedPrice[0].price)
-        : takeprofit;
+    const rrExit = snapshotExitPrice;
 
     if (tradedirection === "buy" || tradedirection === "long") {
       rrError =
@@ -254,9 +287,30 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
   let pnl = "-";
   let profitError = "";
 
-  if (tradeStatus === "live") {
+  if (snapshotExitPrice > 0) {
+    let totalProfit = 0;
+    const priceDiff = Math.abs(entry - stoploss);
+    if (priceDiff > 0) {
+      const rewardDiff =
+        tradedirection === "sell" || tradedirection === "short"
+          ? entry - snapshotExitPrice
+          : snapshotExitPrice - entry;
+      const positionSize = actualRisk / priceDiff;
+      totalProfit = rewardDiff * positionSize;
+    }
+
+    if (totalProfit < 0 && Math.abs(totalProfit) > accountBalance) {
+      pnl = (-accountBalance).toFixed(2);
+      profitError = "Loss capped at account balance.";
+    } else {
+      pnl = totalProfit.toFixed(2);
+      if (totalProfit < 0 && Math.abs(totalProfit) > 0.2 * accountBalance) {
+        lossWarning = "Warning: Loss exceeds 20% of account balance.";
+      }
+    }
+  } else if (tradeStatus === "live") {
     profitError =
-      "Trade is live. Add exit price to calculate potential profit.";
+      "Take profit or exit price required to calculate potential profit.";
   } else if (tradeStatus === "exited" && trade.exitedPrice?.length > 0) {
     const totalVolume = trade.exitedPrice.reduce(
       (sum, lvl) => sum + Number(lvl.volume || 0),
@@ -292,11 +346,21 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
       }
     }
   } else {
-    profitError = "Exit price required to calculate potential profit.";
+    profitError =
+      "Take profit or exit price required to calculate potential profit.";
   }
 
   const { slippage, commission } = getTradeCosts(trade);
   let netPnl = Number(pnl) - slippage - commission;
+
+  // ✅ CRITICAL FIX: Cap PnL to reasonable limits (max 100x risk)
+  const maxPnL = Math.abs(parseFloat(riskamount) || 0) * 100;
+  if (Math.abs(netPnl) > maxPnL) {
+    console.warn(
+      `⚠️ PnL capped: ${netPnl} → ${netPnl > 0 ? maxPnL : -maxPnL}. Check Entry/SL/TP values.`,
+    );
+    netPnl = netPnl > 0 ? maxPnL : -maxPnL;
+  }
 
   if (netPnl < 0 && Math.abs(netPnl) > accountBalance) {
     netPnl = -accountBalance;
@@ -307,7 +371,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
     rrError,
     riskamount: parseFloat(riskamount) || 0,
     lossError,
-    lossWarning,
+    lossWarning: slTpWarning || lossWarning, // ✅ Show SL/TP validation warning
     pnl: parseFloat(netPnl.toFixed(2)) || 0,
     profitError,
     generalError,

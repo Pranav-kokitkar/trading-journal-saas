@@ -342,6 +342,17 @@ const AddTrade = async (req, res) => {
       console.error("Failed to write audit log for trade create", e);
     }
 
+    // ✅ CRITICAL FIX: Recalculate account balance after adding trade
+    try {
+      const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+      await recalculateAccountTrades({
+        userId,
+        accountId: new mongoose.Types.ObjectId(accountId),
+      });
+    } catch (recalcError) {
+      console.error("Failed to recalculate account after adding trade:", recalcError);
+    }
+
     return res.status(201).json({ success: true, trade: savedTrade });
   } catch (error) {
     console.error("AddTrade error:", error);
@@ -686,6 +697,17 @@ const closeTradeByID = async (req, res, next) => {
       console.error("Failed to write audit log for trade close/update", e);
     }
 
+    // ✅ CRITICAL FIX: Recalculate account balance after closing trade
+    try {
+      const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+      await recalculateAccountTrades({
+        userId,
+        accountId: trade.accountId,
+      });
+    } catch (recalcError) {
+      console.error("Failed to recalculate account after closing trade:", recalcError);
+    }
+
     return res.status(200).json({ success: true, trade: updated });
   } catch (err) {
     console.error("closeTrade error:", err);
@@ -725,7 +747,18 @@ const deleteTradeById = async (req, res, next) => {
       console.error("Failed to write audit log for trade delete", e);
     }
 
-    res.status(200).json({ message: "trade soft-deleted" });
+    // ✅ CRITICAL FIX: Recalculate account balance after deletion
+    try {
+      const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+      await recalculateAccountTrades({
+        userId,
+        accountId: trade.accountId,
+      });
+    } catch (recalcError) {
+      console.error("Failed to recalculate account after trade delete:", recalcError);
+    }
+
+    res.status(200).json({ message: "trade soft-deleted", recalculated: true });
   } catch (error) {
     return res.status(400).json({ message: error });
   }

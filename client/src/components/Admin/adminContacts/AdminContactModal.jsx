@@ -3,15 +3,13 @@ import styles from "./AdminContactModal.module.css";
 import { useBodyScrollLock } from "../../../hooks/useBodyScrollLock";
 
 export const AdminContactModal = ({ contact, onClose, updateStatus }) => {
-  useBodyScrollLock(Boolean(contact));
-
-  if (!contact) return null;
-
   const [updatedStatus, setUpdatedStatus] = useState({
-    status: contact.status,
+    status: contact?.status || "",
   });
 
+  useBodyScrollLock(Boolean(contact));
   const handleChange = (e) => {
+  if (!contact) return null;
     const { name, value } = e.target;
     setUpdatedStatus((prev) => ({
       ...prev,

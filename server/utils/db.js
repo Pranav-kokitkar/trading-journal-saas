@@ -8,8 +8,9 @@ const connectDB = async () => {
     await mongoose.connect(URI, {
       maxPoolSize: 10, // Reuse connections (critical for performance)
       minPoolSize: 2,
-      serverSelectionTimeoutMS: 5000, // Fail fast on connection issues
-      socketTimeoutMS: 45000,
+      connectTimeoutMS: 30000,
+      serverSelectionTimeoutMS: 30000, // Allow cold starts / slow DNS resolution
+      socketTimeoutMS: 60000,
     });
     console.log("✅ Database connected successfully");
 
@@ -23,8 +24,32 @@ const connectDB = async () => {
     });
   } catch (error) {
     console.error("❌ Database connection failed:", error.message);
-    // Don't exit process - let error handling middleware catch it
-    throw error;
+
+    // Retry a few times before giving up so the app can survive temporary cold starts.
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      const delayMs = attempt * 5000;
+      console.warn(
+        `⚠️ Retrying MongoDB connection in ${delayMs / 1000}s (attempt ${attempt}/3)...`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+      try {
+        await mongoose.connect(URI, {
+          maxPoolSize: 10,
+          minPoolSize: 2,
+          connectTimeoutMS: 30000,
+          serverSelectionTimeoutMS: 30000,
+          socketTimeoutMS: 60000,
+        });
+        console.log("✅ Database connected successfully after retry");
+        return;
+      } catch (retryError) {
+        console.error(`❌ Retry ${attempt} failed:`, retryError.message);
+        if (attempt === 3) {
+          throw retryError;
+        }
+      }
+    }
   }
 };
 

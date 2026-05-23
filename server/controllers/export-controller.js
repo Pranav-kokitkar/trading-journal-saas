@@ -12,7 +12,8 @@ const exportTrades = async (req, res) => {
     const userId = req.userID;
 
     // ✅ PERFORMANCE: Only select needed fields, use lean()
-    const trades = await Trade.find({ userId })
+    // ✅ CRITICAL FIX: Exclude soft-deleted trades
+    const trades = await Trade.find({ userId, deleted: { $ne: true } })
       .select("-__v -userId") // Exclude unnecessary fields
       .sort({ dateTime: 1 })
       .lean();

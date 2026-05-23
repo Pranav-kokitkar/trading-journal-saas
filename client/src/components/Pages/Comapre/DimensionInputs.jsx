@@ -3,7 +3,6 @@ import styles from "./Compare.module.css";
 
 export const DimensionInputs = ({
   selectedDimensions,
-  dimensionValues,
   availableDimensions,
   renderInputField,
   onRemoveDimension,

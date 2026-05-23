@@ -224,7 +224,7 @@ export const AddTrade = () => {
     try {
       setIsSubmitting(true);
       await addTradeFromContext(normalizedTrade, screenshots);
-    } catch (err) {
+    } catch {
       toastHelper.error("Failed to add trade");
     } finally {
       setIsSubmitting(false);

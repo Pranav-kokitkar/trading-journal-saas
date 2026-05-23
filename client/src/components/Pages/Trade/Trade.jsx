@@ -63,16 +63,34 @@ export const Trade = () => {
 
   const { authorizationToken, isPro } = useAuth();
 
-  const [fullscreenImage, setFullscreenImage] = useState(null);
+  const [fullscreenIndex, setFullscreenIndex] = useState(-1);
   const [screenshotToDelete, setScreenshotToDelete] = useState(null);
 
   // Add handler after saveScreenshots function
   const openFullscreen = (imageUrl) => {
-    setFullscreenImage(imageUrl);
+    const nextIndex = tradeScreenshots.findIndex((url) => url === imageUrl);
+    setFullscreenIndex(nextIndex >= 0 ? nextIndex : 0);
   };
 
   const closeFullscreen = () => {
-    setFullscreenImage(null);
+    setFullscreenIndex(-1);
+  };
+
+  const showFullscreenImage = (nextIndex) => {
+    if (!tradeScreenshots.length) return;
+    const boundedIndex =
+      (nextIndex + tradeScreenshots.length) % tradeScreenshots.length;
+    setFullscreenIndex(boundedIndex);
+  };
+
+  const handleFullscreenNext = (event) => {
+    event.stopPropagation();
+    showFullscreenImage(fullscreenIndex + 1);
+  };
+
+  const handleFullscreenPrevious = (event) => {
+    event.stopPropagation();
+    showFullscreenImage(fullscreenIndex - 1);
   };
 
   const openScreenshotDeleteModal = ()=>{
@@ -93,6 +111,12 @@ export const Trade = () => {
 
   // Use trade from context if available, otherwise fall back to fetchedTrade
   const trade = fetchedTrade || contextTrade;
+  const tradeScreenshots = Array.isArray(trade?.screenshots)
+    ? trade.screenshots
+    : [];
+  const fullscreenImage =
+    fullscreenIndex >= 0 ? tradeScreenshots[fullscreenIndex] : null;
+  const canNavigateFullscreen = tradeScreenshots.length > 2;
 
   // keep tradeStatus synced when we have trade
   useEffect(() => {
@@ -526,6 +550,119 @@ export const Trade = () => {
           </div>
         </header>
 
+        {/* Images */}
+        <div className={styles.tradeScreenshot}>
+          <div className={styles.notesHeader}>
+            {!isEditingScreenshots ? (
+              <button
+                onClick={handleEditScreenshots}
+                className={styles.notebtn}
+              >
+                +
+              </button>
+            ) : (
+              <button onClick={saveScreenshots} className={styles.notebtn}>
+                Save
+              </button>
+            )}
+          </div>
+
+          {isEditingScreenshots && (
+            <div className={styles.uploadSection}>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleScreenshotFileChange}
+                className={styles.fileInput}
+              />
+              {newScreenshots.length > 0 && (
+                <small
+                  style={{
+                    fontSize: "0.85rem",
+                    color: "var(--muted)",
+                    marginTop: "0.5rem",
+                    display: "block",
+                  }}
+                >
+                  {newScreenshots.length} file(s) selected
+                </small>
+              )}
+            </div>
+          )}
+
+          {tradeScreenshots.length > 0 ? (
+            <div className={styles.screenshotList}>
+              {tradeScreenshots.map((url, index) => (
+                <div key={index} className={styles.screenshotItem}>
+                  <img
+                    src={url}
+                    alt={`Trade image ${index + 1}`}
+                    onClick={() => openFullscreen(url)}
+                    style={{ cursor: "pointer" }}
+                  />
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setScreenshotToDelete(url);
+                      openScreenshotDeleteModal();
+                    }}
+                    className={styles.deleteScreenshotBtn}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p
+              style={{
+                fontSize: "0.85rem",
+                opacity: 0.7,
+                marginTop: "0.75rem",
+              }}
+            >
+              No images added
+            </p>
+          )}
+
+          {/* ✅ NEW: Fullscreen Modal */}
+          {fullscreenImage && (
+            <div className={styles.fullscreenOverlay} onClick={closeFullscreen}>
+              {canNavigateFullscreen && (
+                <button
+                  className={`${styles.fullscreenNav} ${styles.fullscreenPrev}`}
+                  onClick={handleFullscreenPrevious}
+                  aria-label="Previous image"
+                >
+                  ‹
+                </button>
+              )}
+              <button
+                className={styles.fullscreenClose}
+                onClick={closeFullscreen}
+              >
+                ✕
+              </button>
+              <img
+                src={fullscreenImage}
+                alt="Fullscreen view"
+                className={styles.fullscreenImage}
+                onClick={(e) => e.stopPropagation()}
+              />
+              {canNavigateFullscreen && (
+                <button
+                  className={`${styles.fullscreenNav} ${styles.fullscreenNext}`}
+                  onClick={handleFullscreenNext}
+                  aria-label="Next image"
+                >
+                  ›
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
         {/* Trade Info & Performance */}
         <div className={styles.tradeData}>
           <div className={styles.tradeInfo}>
@@ -820,102 +957,6 @@ export const Trade = () => {
               </div>
             )}
           </div>
-        </div>
-
-        {/* ✅ Screenshot - UPDATED SECTION */}
-        <div className={styles.tradeScreenshot}>
-          <div className={styles.notesHeader}>
-            <p>Screenshots</p>
-            {!isEditingScreenshots ? (
-              <button
-                onClick={handleEditScreenshots}
-                className={styles.notebtn}
-              >
-                Add
-              </button>
-            ) : (
-              <button onClick={saveScreenshots} className={styles.notebtn}>
-                Save
-              </button>
-            )}
-          </div>
-
-          {isEditingScreenshots && (
-            <div className={styles.uploadSection}>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleScreenshotFileChange}
-                className={styles.fileInput}
-              />
-              {newScreenshots.length > 0 && (
-                <small
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "var(--muted)",
-                    marginTop: "0.5rem",
-                    display: "block",
-                  }}
-                >
-                  {newScreenshots.length} file(s) selected
-                </small>
-              )}
-            </div>
-          )}
-
-          {Array.isArray(trade.screenshots) && trade.screenshots.length > 0 ? (
-            <div className={styles.screenshotList}>
-              {trade.screenshots.map((url, index) => (
-                <div key={index} className={styles.screenshotItem}>
-                  <img
-                    src={url}
-                    alt={`Trade screenshot ${index + 1}`}
-                    onClick={() => openFullscreen(url)}
-                    style={{ cursor: "pointer" }}
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setScreenshotToDelete(url);
-                      openScreenshotDeleteModal();
-                    }}
-                    className={styles.deleteScreenshotBtn}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p
-              style={{
-                fontSize: "0.85rem",
-                opacity: 0.7,
-                marginTop: "0.75rem",
-              }}
-            >
-              No screenshots added
-            </p>
-          )}
-
-          {/* ✅ NEW: Fullscreen Modal */}
-          {fullscreenImage && (
-            <div className={styles.fullscreenOverlay} onClick={closeFullscreen}>
-              <button
-                className={styles.fullscreenClose}
-                onClick={closeFullscreen}
-              >
-                ✕
-              </button>
-              <img
-                src={fullscreenImage}
-                alt="Fullscreen view"
-                className={styles.fullscreenImage}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          )}
         </div>
 
         {/* Buttons */}

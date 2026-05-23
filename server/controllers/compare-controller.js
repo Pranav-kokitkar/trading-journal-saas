@@ -321,8 +321,8 @@ const Compare = async (req, res) => {
       req.body.currentAccountId || req.headers["x-account-id"];
 
     // Build query objects for datasets A and B
-    const queryA = { userId };
-    const queryB = { userId };
+    const queryA = { userId, deleted: { $ne: true } }; // ✅ CRITICAL FIX: Exclude soft-deleted trades
+    const queryB = { userId, deleted: { $ne: true } }; // ✅ CRITICAL FIX: Exclude soft-deleted trades
 
     if (!shouldIncludeImported) {
       queryA.isImported = false;

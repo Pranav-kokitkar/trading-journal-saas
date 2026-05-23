@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useEffect, useRef } from "react";
 import { UserContext } from "../context/UserContext";
 import toast from "react-hot-toast";
 import { AccountContext } from "../context/AccountContext";
+import { API_BASE_URL } from "../config/api";
 
 export const TradeContext = createContext();
 
@@ -66,6 +67,46 @@ export const TradeProvider = ({ children }) => {
     return defaultValue;
   };
 
+  const fetchJsonWithRetry = async (url, options = {}, retries = 2) => {
+    const timeoutMs = 30000;
+
+    for (let attempt = 0; attempt <= retries; attempt += 1) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal,
+        });
+
+        const data = await response.json().catch(() => null);
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+          throw new Error(data?.message || `Request failed with status ${response.status}`);
+        }
+
+        return data;
+      } catch (error) {
+        clearTimeout(timeoutId);
+
+        const isLastAttempt = attempt === retries;
+        const isAbort = error?.name === "AbortError";
+
+        if (isLastAttempt || (!isAbort && error?.message?.includes("status"))) {
+          throw error;
+        }
+
+        if (!isLastAttempt) {
+          await new Promise((resolve) => setTimeout(resolve, (attempt + 1) * 1500));
+        }
+      }
+    }
+
+    throw new Error("Request failed after retries");
+  };
+
   async function getAllTrades(filters = {}) {
     if (!isLoggedIn || !authorizationToken) return;
 
@@ -91,21 +132,16 @@ export const TradeProvider = ({ children }) => {
         ),
       }).toString();
 
-      const response = await fetch(
-        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades?${params}`,
+      const data = await fetchJsonWithRetry(
+        `${API_BASE_URL}/trades?${params}`,
         {
           headers: { Authorization: authorizationToken },
-        }
+        },
       );
 
-      const data = await response.json();
-
-      if (response.ok) {
-        setTrades(data.trades);
-        console.log("trades",data.trades)
-        setTotalPages(data.pagination.totalPages);
-        setTotalTrades(data.stats?.totalTrades ?? data.stats?.filteredTrades ?? 0);
-      }
+      setTrades(Array.isArray(data?.trades) ? data.trades : []);
+      setTotalPages(Number(data?.pagination?.totalPages || 0));
+      setTotalTrades(data?.stats?.totalTrades ?? data?.stats?.filteredTrades ?? 0);
     } catch (err) {
       console.error("fetch trades error", err);
     } finally {
@@ -140,18 +176,12 @@ export const TradeProvider = ({ children }) => {
           includeImported: shouldIncludeImported ? "true" : "false",
         }).toString();
 
-        const response = await fetch(
-          `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades?${params}`,
+        const data = await fetchJsonWithRetry(
+          `${API_BASE_URL}/trades?${params}`,
           {
             headers: { Authorization: authorizationToken },
-          }
+          },
         );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data?.message || "Failed to fetch account trades");
-        }
 
         const pageTrades = Array.isArray(data?.trades) ? data.trades : [];
         allTrades.push(...pageTrades);
