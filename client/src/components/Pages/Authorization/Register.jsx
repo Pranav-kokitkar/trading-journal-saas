@@ -1,10 +1,8 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import { toastHelper } from "../../../utils/toastHelper";
-import { TradeContext } from "../../../store/TradeContext";
-import { AccountContext } from "../../../context/AccountContext";
 import { SkeletonInput } from "../../ui/skeleton/Skeleton";
 import { API_BASE_URL } from "../../../config/api";
 
@@ -19,9 +17,6 @@ export const Register = () => {
   const confirmPasswordRef = useRef();
   const { storeTokenInLS } = useAuth();
   const { isLoggedIn } = useAuth();
-
-  const { refreshTrades } = useContext(TradeContext);
-  const { getAllAccounts } = useContext(AccountContext);
 
   const handleChange = async (e) => {
     let name = e.target.name;
@@ -61,8 +56,6 @@ export const Register = () => {
 
       if (response.ok) {
         storeTokenInLS(res_data.token);
-        refreshTrades();
-        getAllAccounts();
         toastHelper.success("Registration successful");
         setUser({
           name: "",

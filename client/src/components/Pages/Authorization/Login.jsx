@@ -1,10 +1,8 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import styles from "./Auth.module.css";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import toast from "react-hot-toast";
-import { TradeContext } from "../../../store/TradeContext";
-import { AccountContext } from "../../../context/AccountContext";
 import { SkeletonInput } from "../../ui/skeleton/Skeleton";
 import { API_BASE_URL } from "../../../config/api";
 
@@ -17,8 +15,6 @@ export const Login = () => {
 
   const { storeTokenInLS } = useAuth();
   const { isLoggedIn } = useAuth();
-  const { refreshTrades } = useContext(TradeContext);
-  const { getAllAccounts } = useContext(AccountContext);
 
   const navigate = useNavigate();
 
@@ -52,8 +48,6 @@ export const Login = () => {
       const res_data = await response.json();
       if (response.ok) {
         storeTokenInLS(res_data.token);
-        refreshTrades();
-        getAllAccounts();
         navigate("/app/dashboard");
         toast.success("Login successful");
         setUser({

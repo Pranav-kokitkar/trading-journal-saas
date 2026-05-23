@@ -12,7 +12,16 @@ export const AccountProvider = ({ children }) => {
   const { authorizationToken, isLoggedIn } = useAuth();
   const {getUser} = useContext(UserContext)
 
+  const hasValidToken =
+    typeof authorizationToken === "string" &&
+    authorizationToken.startsWith("Bearer ") &&
+    authorizationToken.trim() !== "Bearer";
+
   const getAllAccounts = async () => {
+    if (!isLoggedIn || !hasValidToken) {
+      return;
+    }
+
     try {
       const response = await fetch(
         `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/account/`,
@@ -35,6 +44,10 @@ export const AccountProvider = ({ children }) => {
   };
 
   const getActiveAccount = async () => {
+    if (!isLoggedIn || !hasValidToken) {
+      return;
+    }
+
     try {
       const response = await fetch(
         `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/account/active-account`,
@@ -62,7 +75,7 @@ export const AccountProvider = ({ children }) => {
 
   const updateAccount = async (input) => {
     try {
-      if (!authorizationToken) {
+      if (!hasValidToken) {
         return null;
       }
 
@@ -131,6 +144,10 @@ export const AccountProvider = ({ children }) => {
 
   const deleteAccount = async () => {
     try {
+      if (!hasValidToken || !accountDetails?._id) {
+        return;
+      }
+
       const response = await fetch(
         `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/account/${accountDetails._id}`,
         {
@@ -154,11 +171,11 @@ export const AccountProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!isLoggedIn || !authorizationToken) return;
+    if (!isLoggedIn || !hasValidToken) return;
 
     getAllAccounts();
     getActiveAccount();
-  }, [isLoggedIn, authorizationToken]);
+  }, [isLoggedIn, authorizationToken, hasValidToken]);
 
   return (
     <AccountContext.Provider
