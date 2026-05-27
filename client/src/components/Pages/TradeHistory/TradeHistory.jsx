@@ -7,6 +7,7 @@ import { Pagination } from "../../Pagination";
 import { useAuth } from "../../../store/Auth";
 import { AccountContext } from "../../../context/AccountContext";
 import { SkeletonCard, SkeletonInput, SkeletonTableRow, SkeletonText } from "../../ui/skeleton/Skeleton";
+import { TradeHistoryTradeModal } from "./TradeHistoryTradeModal";
 
 const defaultFilters = {
   symbol: "",
@@ -48,6 +49,7 @@ export const TradeHistory = () => {
   const [tags, setTags] = useState([]);
   const [showProTooltip, setShowProTooltip] = useState(null);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [selectedTrade, setSelectedTrade] = useState(null);
 
   const { isAuthLoading, isPro, authorizationToken } = useAuth();
   const { accounts } = useContext(AccountContext);
@@ -94,6 +96,14 @@ export const TradeHistory = () => {
         // ignore if browser blocks programmatic open
       }
     }
+  };
+
+  const handleTradeClick = (trade) => {
+    setSelectedTrade(trade);
+  };
+
+  const handleCloseTradeModal = () => {
+    setSelectedTrade(null);
   };
 
   /** ---------------- FETCH ---------------- */
@@ -395,13 +405,19 @@ export const TradeHistory = () => {
             ))}
           </div>
         ) : (
-          <TradeCard savedTrade={trades} currentPage={page} />
+          <TradeCard savedTrade={trades} currentPage={page} onTradeClick={handleTradeClick} />
         )}
 
         <Pagination
           page={page}
           totalPages={totalPages}
           onPageChange={setPage}
+        />
+
+        <TradeHistoryTradeModal
+          trade={selectedTrade}
+          page={page}
+          onClose={handleCloseTradeModal}
         />
       </div>
     </section>

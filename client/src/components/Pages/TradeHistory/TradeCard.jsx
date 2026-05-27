@@ -10,13 +10,7 @@ const formatDuration = (tradeData) => {
   return `${(minutes / 60).toFixed(minutes >= 240 ? 0 : 1)}h`;
 };
 
-const formatDateTime = (value) => {
-  if (!value) return "";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toLocaleString();
-};
-
-export const TradeCard = ({ savedTrade, currentPage = 1 }) => {
+export const TradeCard = ({ savedTrade, currentPage = 1, onTradeClick }) => {
 
   if (!savedTrade || savedTrade.length === 0)
     return <p className={styles.notrades}>No trades</p>;
@@ -25,12 +19,12 @@ export const TradeCard = ({ savedTrade, currentPage = 1 }) => {
 
   return (
     <div className={styles.tradeGrid}>
-      {savedTrade.map((tradeData) => {
+      {savedTrade.map((tradeData, index) => {
         const id =
           tradeData.id ??
           tradeData._id ??
           tradeData.tradeNumber ??
-          Math.random();
+          index;
 
         const imageSrc =
           (Array.isArray(tradeData.screenshots) && tradeData.screenshots[0]) ||
@@ -48,13 +42,7 @@ export const TradeCard = ({ savedTrade, currentPage = 1 }) => {
         const confidence = Number(tradeData.confidence ?? tradeData.confidenceLevel ?? 0);
         const strategyName = tradeData.strategy && typeof tradeData.strategy === 'object' ? tradeData.strategy.name : tradeData.strategy;
 
-        return (
-          <NavLink
-            key={id}
-            to={`/app/trade/${id}`}
-            state={{ from: "/app/trade-history", page: currentPage }}
-            className={styles.tradeLink}
-          >
+        const cardContent = (
             <div className={styles.tradecard}>
               <div className={styles.cardImage}>
                 {isFallback ? (
@@ -100,6 +88,25 @@ export const TradeCard = ({ savedTrade, currentPage = 1 }) => {
                 </div>
               </div>
             </div>
+        );
+
+        return onTradeClick ? (
+          <button
+            key={id}
+            type="button"
+            className={styles.tradeLinkButton}
+            onClick={() => onTradeClick(tradeData)}
+          >
+            {cardContent}
+          </button>
+        ) : (
+          <NavLink
+            key={id}
+            to={`/app/trade/${id}`}
+            state={{ from: "/app/trade-history", page: currentPage }}
+            className={styles.tradeLink}
+          >
+            {cardContent}
           </NavLink>
         );
       })}

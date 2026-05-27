@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTrades } from "../../../store/TradeContext";
+import { useContext } from "react";
+import { AccountContext } from "../../../context/AccountContext";
 import styles from "./ImportTrades.module.css";
 import { SkeletonInput } from "../../ui/skeleton/Skeleton";
 
@@ -10,6 +12,7 @@ export const ImportTrades = ({
   authorizationToken,
 }) => {
   const { refreshTrades, refreshAllAccountTrades } = useTrades();
+  const { getActiveAccount } = useContext(AccountContext);
   const [csvFile, setCsvFile] = useState(null);
   const [jsonText, setJsonText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -69,6 +72,10 @@ export const ImportTrades = ({
         refreshTrades({ page: 1, limit: 50, accountId }),
         refreshAllAccountTrades(accountId),
       ]);
+
+      if (typeof getActiveAccount === "function") {
+        await getActiveAccount();
+      }
     } catch (err) {
       setError(err.message || "CSV import failed.");
     } finally {
@@ -133,6 +140,10 @@ export const ImportTrades = ({
         refreshTrades({ page: 1, limit: 50, accountId }),
         refreshAllAccountTrades(accountId),
       ]);
+
+      if (typeof getActiveAccount === "function") {
+        await getActiveAccount();
+      }
     } catch (err) {
       setError(err.message || "JSON import failed.");
     } finally {

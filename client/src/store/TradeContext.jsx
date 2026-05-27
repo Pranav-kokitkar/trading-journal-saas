@@ -16,7 +16,7 @@ export const TradeProvider = ({ children }) => {
     );
   }
   const {user} = useAuth();
-  const { updateAccount, accountDetails } = useContext(AccountContext);
+  const { updateAccount, accountDetails, getActiveAccount } = useContext(AccountContext);
 
   const [trades, setTrades] = useState([]);
   const [totalTrades, setTotalTrades] = useState(0);
@@ -260,6 +260,9 @@ export const TradeProvider = ({ children }) => {
               deltaTrades: 1,
             });
           }
+          if (typeof getActiveAccount === "function") {
+            await getActiveAccount();
+          }
         } catch (err) {
         }
 
@@ -392,6 +395,9 @@ export const TradeProvider = ({ children }) => {
             await updateAccount({ pnl: pnlToAdjust, deltaTrades: -1 });
             await getAllTrades();
             await getAllAccountTrades(accountDetails?._id);
+            if (typeof getActiveAccount === "function") {
+              await getActiveAccount();
+            }
           }
         } catch (err) {
           console.error("updateAccount failed on delete", err);

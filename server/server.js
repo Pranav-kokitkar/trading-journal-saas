@@ -25,6 +25,7 @@ const tagsRoute = require("./routers/Tags-router");
 const strategyRoute = require("./routers/Strategy-router");
 const compareRoute = require("./routers/Compare-router");
 const analyticsRoute = require("./routers/Analytics-router");
+const marketDataRoute = require("./routers/MarketData-router");
 const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
@@ -88,25 +89,6 @@ app.use(
   }),
 );
 
-// Rate limiting to prevent abuse
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: {
-    message: "Too many requests from this IP, please try again later",
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-  handler: (req, res) => {
-    res.status(429).json({
-      message: "Too many requests from this IP, please try again later",
-    });
-  },
-});
-
-// Apply rate limiting to all routes
-app.use(limiter);
-
 // Stricter rate limit for auth routes
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -143,6 +125,7 @@ app.use("/api/tags", tagsRoute);
 app.use("/api/strategy", strategyRoute);
 app.use("/api/compare", compareRoute);
 app.use("/api/analytics", analyticsRoute);
+app.use("/api/market-data", marketDataRoute);
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 5000;

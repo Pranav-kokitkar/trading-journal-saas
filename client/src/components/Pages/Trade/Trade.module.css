@@ -74,6 +74,44 @@
   margin-bottom: 1.5rem;
 }
 
+.viewTabs {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding-bottom: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.viewTabButton {
+  appearance: none;
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.75rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  position: relative;
+  bottom: -1px;
+}
+
+.viewTabButton:hover {
+  color: var(--text-primary);
+  background: var(--bg-level-1);
+}
+
+.viewTabButtonActive {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.tabPanel {
+  margin-bottom: 1.5rem;
+}
+
 .tradeInfo,
 .tradePerformance,
 .tradeConfidence,
@@ -410,7 +448,7 @@
   background: var(--bg-secondary);
   padding: 1.25rem;
   border-radius: var(--radius-md);
-  margin-bottom: 1.5rem;
+  margin-bottom: 0;
   border: 1px solid var(--border-medium);
 }
 
@@ -421,16 +459,80 @@
   margin: 0 0 1rem 0;
 }
 
-.screenshotList {
+.screenshotToolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.screenshotUploadRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.screenshotUploadLabel,
+.screenshotUploadButton,
+.screenshotCancelButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.screenshotUploadLabel:hover,
+.screenshotUploadButton:hover:not(:disabled),
+.screenshotCancelButton:hover {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+}
+
+.screenshotCancelButton {
+  border-color: rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.12);
+  color: rgba(254, 202, 202, 0.95);
+}
+
+.screenshotUploadButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.screenshotUploadInput {
+  display: none;
+}
+
+.screenshotSelectionText {
+  margin: 0 0 0.8rem;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.screenshotList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
   margin-top: 0.75rem;
 }
 
 .screenshotList img {
   width: 100%;
-  max-width: 760px;
+  max-width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);

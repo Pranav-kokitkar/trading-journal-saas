@@ -1,7 +1,7 @@
 // src/components/.../Trade.jsx
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Trade.module.css";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { CloseTrade } from "./CloseTrade";
 import { calculateTradeOnExit } from "../../../utils/tradeUtils";
 import { TradeContext, useTrades } from "../../../store/TradeContext";
@@ -9,8 +9,10 @@ import { useAuth } from "../../../store/Auth";
 import { toastHelper } from "../../../utils/toastHelper";
 import { AccountContext } from "../../../context/AccountContext";
 import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
-import { getMaxScreenshots } from "../../../config/planLimits";
 import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
+import { TradeChart } from "../../trade/TradeChart";
+import { formatDateTimeUtc } from "../../../utils/formatDateTimeUtc";
+import { getMaxScreenshots } from "../../../config/planLimits";
 
 const formatDuration = (trade) => {
   if (trade?.durationText) return trade.durationText;
@@ -18,12 +20,6 @@ const formatDuration = (trade) => {
   if (!Number.isFinite(minutes) || minutes <= 0) return "—";
   if (minutes < 60) return `${minutes.toFixed(0)}m`;
   return `${(minutes / 60).toFixed(minutes >= 240 ? 0 : 1)}h`;
-};
-
-const formatDateTime = (value) => {
-  if (!value) return "—";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? String(value) : parsed.toLocaleString();
 };
 
 export const Trade = () => {
@@ -46,7 +42,10 @@ export const Trade = () => {
   const [exitLevels, setExitLevels] = useState([]);
   const [tradeStatus, setTradeStatus] = useState("live");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isDeleteScreenshotModalOpen, setIsDeleteScreenshotModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("chart");
+  const [selectedScreenshots, setSelectedScreenshots] = useState([]);
+  const [isUploadingScreenshots, setIsUploadingScreenshots] = useState(false);
+  const screenshotInputRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [triedRefresh, setTriedRefresh] = useState(false);
@@ -57,45 +56,7 @@ export const Trade = () => {
   const [allTags, setAllTags] = useState([]);
   const [editableTags, setEditableTags] = useState([]);
 
-  // ✅ NEW: Screenshot state
-  const [isEditingScreenshots, setIsEditingScreenshots] = useState(false);
-  const [newScreenshots, setNewScreenshots] = useState([]);
-
   const { authorizationToken, isPro } = useAuth();
-
-  const [fullscreenIndex, setFullscreenIndex] = useState(-1);
-  const [screenshotToDelete, setScreenshotToDelete] = useState(null);
-
-  // Add handler after saveScreenshots function
-  const openFullscreen = (imageUrl) => {
-    const nextIndex = tradeScreenshots.findIndex((url) => url === imageUrl);
-    setFullscreenIndex(nextIndex >= 0 ? nextIndex : 0);
-  };
-
-  const closeFullscreen = () => {
-    setFullscreenIndex(-1);
-  };
-
-  const showFullscreenImage = (nextIndex) => {
-    if (!tradeScreenshots.length) return;
-    const boundedIndex =
-      (nextIndex + tradeScreenshots.length) % tradeScreenshots.length;
-    setFullscreenIndex(boundedIndex);
-  };
-
-  const handleFullscreenNext = (event) => {
-    event.stopPropagation();
-    showFullscreenImage(fullscreenIndex + 1);
-  };
-
-  const handleFullscreenPrevious = (event) => {
-    event.stopPropagation();
-    showFullscreenImage(fullscreenIndex - 1);
-  };
-
-  const openScreenshotDeleteModal = ()=>{
-    setIsDeleteScreenshotModalOpen(true);
-  }
 
   // helper to find trade by several possible id fields
   const findTradeById = (list, idParam) => {
@@ -111,12 +72,6 @@ export const Trade = () => {
 
   // Use trade from context if available, otherwise fall back to fetchedTrade
   const trade = fetchedTrade || contextTrade;
-  const tradeScreenshots = Array.isArray(trade?.screenshots)
-    ? trade.screenshots
-    : [];
-  const fullscreenImage =
-    fullscreenIndex >= 0 ? tradeScreenshots[fullscreenIndex] : null;
-  const canNavigateFullscreen = tradeScreenshots.length > 2;
 
   // keep tradeStatus synced when we have trade
   useEffect(() => {
@@ -394,108 +349,7 @@ export const Trade = () => {
     }
   };
 
-  // ✅ NEW: Screenshot handlers
-  const handleEditScreenshots = () => {
-    setIsEditingScreenshots(true);
-  };
-
-  const handleScreenshotFileChange = (e) => {
-    const files = Array.from(e.target.files || []);
-    const uploadLimit = getMaxScreenshots(isPro);
-    const currentScreenshotCount = trade?.screenshots?.length || 0;
-    const totalAfterUpload = currentScreenshotCount + files.length;
-
-    if (files.length > uploadLimit) {
-      alert(`You can upload a maximum of ${uploadLimit} screenshots at once.`);
-      e.target.value = "";
-      return;
-    }
-
-    if (totalAfterUpload > uploadLimit) {
-      alert(`Total screenshots cannot exceed ${uploadLimit}. You currently have ${currentScreenshotCount} screenshot(s).`);
-      e.target.value = "";
-      return;
-    }
-
-    setNewScreenshots(files);
-  };
-
-  const deleteScreenshot = async (screenshotUrl) => {
-    try {
-      const response = await fetch(
-        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id}/screenshot`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authorizationToken,
-          },
-          body: JSON.stringify({ screenshotUrl }),
-        },
-      );
-
-      if (response.ok) {
-        await refreshTrades();
-
-        const updated = await response.json();
-        if (fetchedTrade) {
-          setFetchedTrade(updated);
-        }
-
-        toastHelper.success("Screenshot deleted");
-      } else {
-        toastHelper.error("Failed to delete screenshot");
-      }
-    } catch (error) {
-      console.error(error);
-      toastHelper.error("Error deleting screenshot");
-    }
-  };
-
-  const saveScreenshots = async () => {
-    if (newScreenshots.length === 0) {
-      toastHelper.error("Please select at least one screenshot");
-      return;
-    }
-
-    try {
-      const formData = new FormData();
-      newScreenshots.forEach((file) => {
-        formData.append("screenshots", file);
-      });
-
-      const response = await fetch(
-        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id}/screenshots`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: authorizationToken,
-          },
-          body: formData,
-        },
-      );
-
-      if (response.ok) {
-        setIsEditingScreenshots(false);
-        setNewScreenshots([]);
-        await refreshTrades();
-
-        const updated = await response.json();
-        if (fetchedTrade) {
-          setFetchedTrade(updated);
-        }
-
-        toastHelper.success("Screenshots added");
-      } else {
-        toastHelper.error("Failed to add screenshots");
-      }
-    } catch (error) {
-      console.error(error);
-      toastHelper.error("Error adding screenshots");
-    }
-  };
-
-  const onDelete = async (id) => {
+  const onDelete = async () => {
     setIsDeleteModalOpen(true);
   };
 
@@ -516,9 +370,85 @@ export const Trade = () => {
     0,
     Math.min(100, Number(trade.confidence ?? 50)),
   );
-  const entryTime = formatDateTime(trade.entryTime ?? trade.dateTime ?? trade.dateNtime);
-  const exitTime = formatDateTime(trade.exitTime);
+  const tradeScreenshots = Array.isArray(trade.screenshots) ? trade.screenshots : [];
+  const hasScreenshots = tradeScreenshots.length > 0;
+  const screenshotUploadLimit = getMaxScreenshots(isPro);
+  const entryTime = formatDateTimeUtc(trade.entryTime ?? trade.dateTime ?? trade.dateNtime);
+  const exitTime = formatDateTimeUtc(trade.exitTime);
   const duration = formatDuration(trade);
+
+  const handleScreenshotSelection = (event) => {
+    const files = Array.from(event.target.files || []);
+    if (files.length > screenshotUploadLimit) {
+      alert(`You can upload a maximum of ${screenshotUploadLimit} screenshots.`);
+      event.target.value = "";
+      return;
+    }
+
+    setSelectedScreenshots(files);
+  };
+
+  const cancelScreenshotSelection = () => {
+    setSelectedScreenshots([]);
+    if (screenshotInputRef.current) {
+      screenshotInputRef.current.value = "";
+    }
+  };
+
+  const uploadScreenshots = async () => {
+    if (!trade?._id && !trade?.id) {
+      alert("Trade not found.");
+      return;
+    }
+
+    if (!selectedScreenshots.length) {
+      alert("Please choose at least one screenshot.");
+      return;
+    }
+
+    if (!authorizationToken) {
+      alert("You are not authenticated. Please log in.");
+      return;
+    }
+
+    setIsUploadingScreenshots(true);
+    try {
+      const formData = new FormData();
+      selectedScreenshots.slice(0, screenshotUploadLimit).forEach((file) => {
+        formData.append("screenshots", file);
+      });
+
+      const response = await fetch(
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id || trade.id}/screenshots`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: authorizationToken,
+          },
+          body: formData,
+        },
+      );
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok) {
+        throw new Error(data?.message || "Failed to update screenshots");
+      }
+
+      setFetchedTrade(data);
+      setSelectedScreenshots([]);
+      setActiveTab("screenshots");
+      if (typeof refreshTrades === "function") {
+        await refreshTrades();
+      }
+      toastHelper.success("Screenshots updated");
+    } catch (error) {
+      console.error(error);
+      toastHelper.error(error.message || "Failed to upload screenshots");
+    } finally {
+      setIsUploadingScreenshots(false);
+    }
+  };
 
   return (
     <section className={styles.trade}>
@@ -541,7 +471,7 @@ export const Trade = () => {
             <h2>
               Trade Details: <span>{trade.symbol}</span>
             </h2>
-            <p>{formatDateTime(trade.entryTime ?? trade.dateTime ?? trade.dateNtime)}</p>
+            <p>{formatDateTimeUtc(trade.entryTime ?? trade.dateTime ?? trade.dateNtime)}</p>
           </div>
           <div
             className={`${styles.marketType} ${trade.marketType?.toLowerCase()}`}
@@ -550,116 +480,91 @@ export const Trade = () => {
           </div>
         </header>
 
-        {/* Images */}
-        <div className={styles.tradeScreenshot}>
-          <div className={styles.notesHeader}>
-            {!isEditingScreenshots ? (
-              <button
-                onClick={handleEditScreenshots}
-                className={styles.notebtn}
-              >
-                +
-              </button>
-            ) : (
-              <button onClick={saveScreenshots} className={styles.notebtn}>
-                Save
-              </button>
-            )}
-          </div>
+        <div className={styles.viewTabs} role="tablist" aria-label="Trade detail views">
+          <button
+            type="button"
+            className={`${styles.viewTabButton} ${activeTab === "chart" ? styles.viewTabButtonActive : ""}`}
+            onClick={() => setActiveTab("chart")}
+            aria-pressed={activeTab === "chart"}
+          >
+            Chart
+          </button>
+          <button
+            type="button"
+            className={`${styles.viewTabButton} ${activeTab === "screenshots" ? styles.viewTabButtonActive : ""}`}
+            onClick={() => setActiveTab("screenshots")}
+            aria-pressed={activeTab === "screenshots"}
+          >
+            Screenshots {hasScreenshots ? `(${tradeScreenshots.length})` : ""}
+          </button>
+        </div>
 
-          {isEditingScreenshots && (
-            <div className={styles.uploadSection}>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleScreenshotFileChange}
-                className={styles.fileInput}
-              />
-              {newScreenshots.length > 0 && (
-                <small
-                  style={{
-                    fontSize: "0.85rem",
-                    color: "var(--muted)",
-                    marginTop: "0.5rem",
-                    display: "block",
-                  }}
-                >
-                  {newScreenshots.length} file(s) selected
-                </small>
-              )}
-            </div>
-          )}
-
-          {tradeScreenshots.length > 0 ? (
-            <div className={styles.screenshotList}>
-              {tradeScreenshots.map((url, index) => (
-                <div key={index} className={styles.screenshotItem}>
-                  <img
-                    src={url}
-                    alt={`Trade image ${index + 1}`}
-                    onClick={() => openFullscreen(url)}
-                    style={{ cursor: "pointer" }}
-                  />
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setScreenshotToDelete(url);
-                      openScreenshotDeleteModal();
-                    }}
-                    className={styles.deleteScreenshotBtn}
-                  >
-                    ✕
-                  </button>
-                </div>
-              ))}
-            </div>
+        <div className={styles.tabPanel}>
+          {activeTab === "chart" ? (
+            <TradeChart trade={trade} />
           ) : (
-            <p
-              style={{
-                fontSize: "0.85rem",
-                opacity: 0.7,
-                marginTop: "0.75rem",
-              }}
-            >
-              No images added
-            </p>
-          )}
+            <section className={styles.tradeScreenshot} aria-label="Trade screenshots">
+              <div className={styles.screenshotToolbar}>
+                <p>Trade screenshots</p>
+                <div className={styles.screenshotUploadRow}>
+                  {selectedScreenshots.length === 0 ? (
+                    <label className={styles.screenshotUploadLabel} htmlFor="trade-screenshot-upload">
+                      Add screenshot
+                    </label>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.screenshotCancelButton}
+                      onClick={cancelScreenshotSelection}
+                    >
+                      Cancel
+                    </button>
+                  )}
+                  <input
+                    id="trade-screenshot-upload"
+                    ref={screenshotInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleScreenshotSelection}
+                    className={styles.screenshotUploadInput}
+                  />
+                  {selectedScreenshots.length > 0 && (
+                    <button
+                      type="button"
+                      className={styles.screenshotUploadButton}
+                      onClick={uploadScreenshots}
+                      disabled={isUploadingScreenshots}
+                    >
+                      {isUploadingScreenshots ? "Uploading..." : "Save"}
+                    </button>
+                  )}
+                </div>
+              </div>
 
-          {/* ✅ NEW: Fullscreen Modal */}
-          {fullscreenImage && (
-            <div className={styles.fullscreenOverlay} onClick={closeFullscreen}>
-              {canNavigateFullscreen && (
-                <button
-                  className={`${styles.fullscreenNav} ${styles.fullscreenPrev}`}
-                  onClick={handleFullscreenPrevious}
-                  aria-label="Previous image"
-                >
-                  ‹
-                </button>
+              {selectedScreenshots.length > 0 && (
+                <p className={styles.screenshotSelectionText}>
+                  {selectedScreenshots.length}/{screenshotUploadLimit} selected
+                </p>
               )}
-              <button
-                className={styles.fullscreenClose}
-                onClick={closeFullscreen}
-              >
-                ✕
-              </button>
-              <img
-                src={fullscreenImage}
-                alt="Fullscreen view"
-                className={styles.fullscreenImage}
-                onClick={(e) => e.stopPropagation()}
-              />
-              {canNavigateFullscreen && (
-                <button
-                  className={`${styles.fullscreenNav} ${styles.fullscreenNext}`}
-                  onClick={handleFullscreenNext}
-                  aria-label="Next image"
-                >
-                  ›
-                </button>
+
+              {hasScreenshots ? (
+                <div className={styles.screenshotList}>
+                  {tradeScreenshots.map((imageUrl, index) => (
+                    <img
+                      key={`${imageUrl}-${index}`}
+                      src={imageUrl}
+                      alt={`Trade screenshot ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className={styles.metricCard}>
+                  <span className={styles.metricLabel}>Screenshots</span>
+                  <span className={styles.metricValue}>No screenshots added for this trade.</span>
+                </div>
               )}
-            </div>
+            </section>
           )}
         </div>
 
@@ -775,7 +680,7 @@ export const Trade = () => {
                 {trade.exitedPrice.map((exitedPrice, index) => {
                   const exitTimestamp = trade.exitTimestamps?.[index]?.timestamp;
                   const formattedExitTimestamp = exitTimestamp
-                    ? formatDateTime(exitTimestamp)
+                    ? formatDateTimeUtc(exitTimestamp)
                     : exitTime;
 
                   return (
@@ -982,24 +887,6 @@ export const Trade = () => {
         cancelText="Cancel"
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => confirmDeleteAccount(trade._id)}
-      />
-      <ConfirmationModal
-        isOpen={isDeleteScreenshotModalOpen}
-        title="Delete Screenshot?"
-        message="This screenshot will be permanently deleted. This action cannot be undone."
-        confirmText="Delete"
-        cancelText="Cancel"
-        onCancel={() => {
-          setIsDeleteScreenshotModalOpen(false);
-          setScreenshotToDelete(null);
-        }}
-        onConfirm={() => {
-          if (screenshotToDelete) {
-            deleteScreenshot(screenshotToDelete);
-          }
-          setIsDeleteScreenshotModalOpen(false);
-          setScreenshotToDelete(null);
-        }}
       />
 
       {closeTrade && (

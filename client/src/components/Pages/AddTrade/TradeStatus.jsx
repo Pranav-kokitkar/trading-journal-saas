@@ -1,10 +1,6 @@
+/* @refresh skip */
 import { useState, useEffect } from "react";
 import styles from "./addtrade.module.css";
-
-const toDateTimeLocalValue = (date = new Date()) => {
-  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 16);
-};
 
 const SingleExit = ({ handleSingleExit, exitTime, onExitTimeChange, minTime }) => (
   <div className={styles.inputGroup}>
@@ -95,9 +91,9 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
   const [exitLevels, setExitLevels] = useState([]);
   const [singleExit, setSingleExit] = useState({
     price: "",
-    timestamp: trade.entryTime || toDateTimeLocalValue(),
+    timestamp: trade.entryTime || "",
   });
-  const defaultExitTime = trade.entryTime || toDateTimeLocalValue();
+  const defaultExitTime = trade.entryTime || "";
 
   /** Force exited when backtesting */
   useEffect(() => {
@@ -111,7 +107,7 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
   useEffect(() => {
     setSingleExit((prev) => ({
       ...prev,
-      timestamp: trade.entryTime || prev.timestamp || toDateTimeLocalValue(),
+      timestamp: trade.entryTime || prev.timestamp || "",
     }));
   }, [trade.entryTime]);
 
@@ -122,29 +118,20 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
     ]);
   };
 
-  useEffect(() => {
-    if (trade.tradeStatus === "exited" && exitLevels.length === 0) {
-      const initialExit = {
-        price: "",
-        volume: "100",
-        timestamp: defaultExitTime,
-      };
-      setExitLevels([initialExit]);
-      onExitChange([initialExit]);
-    }
-  }, [trade.tradeStatus, defaultExitTime, exitLevels.length, onExitChange]);
   /** Sync state when toggling between single and multiple TP */
   useEffect(() => {
     if (isMultipleTP && exitLevels.length === 0) {
       // Switching to multi-TP: initialize with current single exit
-      const initialExit = {
-        price: singleExit.price,
-        volume: "100",
-        timestamp: singleExit.timestamp || defaultExitTime,
-      };
-      setExitLevels([initialExit]);
-      onExitChange([initialExit]);
-    } else if (!isMultipleTP && exitLevels.length > 0) {
+      if (singleExit.price) {
+        const initialExit = {
+          price: singleExit.price,
+          volume: "100",
+          timestamp: singleExit.timestamp || defaultExitTime,
+        };
+        setExitLevels([initialExit]);
+        onExitChange([initialExit]);
+      }
+    } else if (!isMultipleTP && exitLevels.length > 0 && exitLevels[0]?.price) {
       // Switching to single-TP: use first exit level
       setSingleExit({
         price: exitLevels[0].price,

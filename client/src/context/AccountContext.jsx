@@ -135,6 +135,10 @@ export const AccountProvider = ({ children }) => {
         );
       }
 
+      if (typeof getActiveAccount === "function") {
+        await getActiveAccount();
+      }
+
       return result.account ?? result;
     } catch (error) {
       return null;

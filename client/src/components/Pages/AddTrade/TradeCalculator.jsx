@@ -9,6 +9,8 @@ export const TradeCalculator = ({ trade, setTrade }) => {
 
   const {
     rr,
+    plannedRR,
+    realizedRR,
     rrError,
     riskamount,
     lossError,
@@ -40,7 +42,10 @@ export const TradeCalculator = ({ trade, setTrade }) => {
       <div className={styles.row3}>
         <div className={styles.col2}>
           <p>
-            RR: 1:<span>{rr}</span>
+            Planned RR: 1:<span>{plannedRR}</span>
+          </p>
+          <p>
+            Realized RR: 1:<span>{trade.tradeStatus === "exited" ? realizedRR : 0}</span>
           </p>
           {rrError && (
             <p style={{ color: "red", fontSize: "0.9rem" }}>{rrError}</p>

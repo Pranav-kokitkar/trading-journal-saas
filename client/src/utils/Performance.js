@@ -20,7 +20,7 @@ export const calculatePerformance = (trades = []) => {
       const lower = k.toLowerCase();
       if (Object.prototype.hasOwnProperty.call(t, lower)) return t[lower];
       const alt = Object.keys(t).find(
-        (x) => x.toLowerCase() === k.toLowerCase()
+        (x) => x.toLowerCase() === k.toLowerCase(),
       );
       if (alt) return t[alt];
     }
@@ -34,20 +34,20 @@ export const calculatePerformance = (trades = []) => {
   const totalLongTrades = closedTrades.filter(
     (t) =>
       String(
-        read(t, "tradeDirection", "tradedirection") || ""
-      ).toLowerCase() === "long"
+        read(t, "tradeDirection", "tradedirection") || "",
+      ).toLowerCase() === "long",
   ).length;
 
   const totalShortTrades = closedTrades.filter(
     (t) =>
       String(
-        read(t, "tradeDirection", "tradedirection") || ""
-      ).toLowerCase() === "short"
+        read(t, "tradeDirection", "tradedirection") || "",
+      ).toLowerCase() === "short",
   ).length;
 
   // Average RR (wins only)
   const closedWinTrades = closedTrades.filter(
-    (t) => String(read(t, "tradeResult") || "").toLowerCase() === "win"
+    (t) => String(read(t, "tradeResult") || "").toLowerCase() === "win",
   );
 
   let rrSum = 0;
@@ -66,7 +66,7 @@ export const calculatePerformance = (trades = []) => {
   const totalWins = closedWinTrades.length;
 
   const closedLossTrades = closedTrades.filter(
-    (t) => String(read(t, "tradeResult") || "").toLowerCase() === "loss"
+    (t) => String(read(t, "tradeResult") || "").toLowerCase() === "loss",
   );
 
   const totalLosses = closedLossTrades.length;

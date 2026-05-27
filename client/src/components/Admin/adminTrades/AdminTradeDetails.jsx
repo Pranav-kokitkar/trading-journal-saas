@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../../store/Auth";
 import styles from "./AdminTradeDetails.module.css";
 import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
+import { formatDateTimeUtc } from "../../../utils/formatDateTimeUtc";
 
 export const AdminTradeDetails = () => {
   const { id } = useParams();
@@ -70,7 +71,7 @@ export const AdminTradeDetails = () => {
       <div className={styles.header}>
         <div>
           <h2>Trade #{trade.tradeNumber}</h2>
-          <p>{new Date(trade.dateTime).toLocaleString()}</p>
+          <p>{formatDateTimeUtc(trade.dateTime)}</p>
         </div>
 
         <button onClick={() => navigate(-1)} className={styles.backBtn}>

@@ -230,6 +230,10 @@ const importTradesController = async (req, res) => {
               ? normalized.exitedPrice
               : [],
             dateTime: normalized.dateTime,
+            // Keep required timing fields aligned for imported historical trades.
+            entryTime: normalized.dateTime,
+            exitTime:
+              normalized.tradeStatus === "exited" ? normalized.dateTime : undefined,
             tags: tagIds,
             strategy: strategyId,
             session: normalized.sessionName || "",
