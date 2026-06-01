@@ -22,6 +22,12 @@ const formatDuration = (trade) => {
   return `${(minutes / 60).toFixed(minutes >= 240 ? 0 : 1)}h`;
 };
 
+const formatDirectionLabel = (value) => {
+  if (!value) return "—";
+  const normalized = String(value).trim();
+  return normalized.charAt(0).toUpperCase() + normalized.slice(1).toLowerCase();
+};
+
 export const Trade = () => {
   const { accountDetails, updateAccount } = useContext(AccountContext);
   const { deleteTradeByID } = useContext(TradeContext);
@@ -46,6 +52,20 @@ export const Trade = () => {
   const [selectedScreenshots, setSelectedScreenshots] = useState([]);
   const [isUploadingScreenshots, setIsUploadingScreenshots] = useState(false);
   const screenshotInputRef = useRef(null);
+  const [isConfidencePickerOpen, setIsConfidencePickerOpen] = useState(false);
+  const [confidenceDraft, setConfidenceDraft] = useState(null);
+  const [isGradePickerOpen, setIsGradePickerOpen] = useState(false);
+  const [isSessionPickerOpen, setIsSessionPickerOpen] = useState(false);
+  const [isStrategyPickerOpen, setIsStrategyPickerOpen] = useState(false);
+  const [availableStrategies, setAvailableStrategies] = useState([]);
+  const confidencePickerRef = useRef(null);
+  const confidenceToggleRef = useRef(null);
+  const gradePickerRef = useRef(null);
+  const gradeToggleRef = useRef(null);
+  const sessionPickerRef = useRef(null);
+  const sessionToggleRef = useRef(null);
+  const strategyPickerRef = useRef(null);
+  const strategyToggleRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [triedRefresh, setTriedRefresh] = useState(false);
@@ -67,6 +87,52 @@ export const Trade = () => {
     });
   };
 
+  const sessionLabels = {
+    london: "London",
+    newyork: "New York",
+    asia: "Asian",
+    sydney: "Sydney",
+    tokyo: "Tokyo",
+    european: "European",
+  };
+
+  const formatSessionLabel = (value) => {
+    if (!value) return null;
+    return sessionLabels[String(value).trim().toLowerCase()] || value;
+  };
+
+  const updateTradeMeta = async (payload) => {
+    if (!authorizationToken) {
+      throw new Error("You are not authenticated. Please log in.");
+    }
+
+    const response = await fetch(
+      `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id || trade.id}`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: authorizationToken,
+        },
+        body: JSON.stringify(payload),
+      },
+    );
+
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(data?.message || "Failed to update trade details");
+    }
+
+    const updatedTrade = data?.trade || data;
+    setFetchedTrade(updatedTrade);
+
+    if (typeof refreshTrades === "function") {
+      await refreshTrades();
+    }
+
+    return updatedTrade;
+  };
+
   // Try to find trade in context
   const contextTrade = findTradeById(trades, id);
 
@@ -79,6 +145,66 @@ export const Trade = () => {
       setTradeStatus(trade.tradeStatus ?? "live");
     }
   }, [trade]);
+
+  useEffect(() => {
+    const fetchStrategies = async () => {
+      if (!authorizationToken) return;
+
+      try {
+        const response = await fetch(
+          `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy`,
+          {
+            headers: {
+              Authorization: authorizationToken,
+            },
+          },
+        );
+
+        const data = await response.json();
+        if (response.ok && Array.isArray(data)) {
+          setAvailableStrategies(data);
+        }
+      } catch (error) {
+        console.error("Failed to load strategies", error);
+      }
+    };
+
+    fetchStrategies();
+  }, [authorizationToken]);
+
+  // Close pickers when clicking outside any open picker or their toggles
+  useEffect(() => {
+    const handler = (e) => {
+      const t = e.target;
+
+      if (isConfidencePickerOpen) {
+        const inMenu = confidencePickerRef.current && confidencePickerRef.current.contains(t);
+        const inToggle = confidenceToggleRef.current && confidenceToggleRef.current.contains(t);
+        if (!inMenu && !inToggle) setIsConfidencePickerOpen(false);
+      }
+
+      if (isGradePickerOpen) {
+        const inMenu = gradePickerRef.current && gradePickerRef.current.contains(t);
+        const inToggle = gradeToggleRef.current && gradeToggleRef.current.contains(t);
+        if (!inMenu && !inToggle) setIsGradePickerOpen(false);
+      }
+
+      if (isSessionPickerOpen) {
+        const inMenu = sessionPickerRef.current && sessionPickerRef.current.contains(t);
+        const inToggle = sessionToggleRef.current && sessionToggleRef.current.contains(t);
+        if (!inMenu && !inToggle) setIsSessionPickerOpen(false);
+      }
+
+      if (isStrategyPickerOpen) {
+        const inMenu = strategyPickerRef.current && strategyPickerRef.current.contains(t);
+        const inToggle = strategyToggleRef.current && strategyToggleRef.current.contains(t);
+        if (!inMenu && !inToggle) setIsStrategyPickerOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isConfidencePickerOpen, isGradePickerOpen, isSessionPickerOpen, isStrategyPickerOpen]);
 
   // if trade is not in context, fetch it directly from backend by ID
   useEffect(() => {
@@ -198,12 +324,12 @@ export const Trade = () => {
         }),
       );
 
-      const pnl = Number(updatedTrade.pnl || 0);
+      const netPnl = Number(updatedTrade.pnl || 0);
       const rr = Number(updatedTrade.rr || 0);
       const tradeResult = updatedTrade.tradeResult || "breakeven";
       const balanceAfterTrade = Number(
         updatedTrade.balanceAfterTrade ||
-          accountDetails?.currentBalance + pnl ||
+          accountDetails?.currentBalance + netPnl ||
           0,
       );
 
@@ -220,7 +346,7 @@ export const Trade = () => {
       const closedTrade = await closeTradeByID(
         trade._id || trade.id,
         exitedPrice,
-        pnl,
+        netPnl,
         rr,
         tradeResult,
         balanceAfterTrade,
@@ -355,7 +481,7 @@ export const Trade = () => {
 
   const confirmDeleteAccount = async (id) => {
     try {
-      await deleteTradeByID(id, trade.pnl);
+      await deleteTradeByID(id, trade);
       navigate("/app/trade-history");
     } catch (error) {
       console.log(error);
@@ -363,19 +489,127 @@ export const Trade = () => {
   };
 
   // Colors
-  const pnlColor = trade.pnl >= 0 ? "positive" : "negative";
+  const pnlNumber = Number(trade?.pnl ?? 0);
+  const pnlColor = Number.isFinite(pnlNumber)
+    ? pnlNumber > 0
+      ? "positive"
+      : pnlNumber < 0
+        ? "negative"
+        : "neutral"
+    : "neutral";
+  const isLiveTrade = String(trade?.tradeStatus || "").toLowerCase() === "live";
+  const resultValue = String(trade?.tradeResult || "").toLowerCase();
+  const resultColor = isLiveTrade
+    ? "neutral"
+    : resultValue === "win"
+      ? "positive"
+      : resultValue === "loss"
+        ? "negative"
+        : "neutral";
+  const resultToneClass = isLiveTrade ? styles.liveResult : styles[resultColor];
   const directionColor =
     trade.tradedirection?.toLowerCase() === "long" ? "long" : "short";
-  const confidenceValue = Math.max(
-    0,
-    Math.min(100, Number(trade.confidence ?? 50)),
-  );
+  const formatCurrency = (val) => {
+    const n = Number(val || 0);
+    if (!Number.isFinite(n)) return "$0.00";
+    return n < 0 ? `-$${Math.abs(n).toFixed(2)}` : `$${n.toFixed(2)}`;
+  };
+
+  const tradeGradeValue = (() => {
+    const grade = String(trade?.tradeGrade || "").trim().toUpperCase();
+    return ["C", "B", "B+", "A", "A+"].includes(grade) ? grade : null;
+  })();
+  const tradeGradeToneClass = (() => {
+    if (!tradeGradeValue) return styles.gradePending;
+    if (tradeGradeValue === "A" || tradeGradeValue === "A+") return styles.gradeA;
+    if (tradeGradeValue === "B" || tradeGradeValue === "B+") return styles.gradeB;
+    return styles.gradeC;
+  })();
+  const gradeOptions = ["C", "B", "B+", "A", "A+"];
+  const rawTradeConfidence = trade?.tradeConfidence ?? trade?.confidence;
+  const tradeConfidenceValue =
+    rawTradeConfidence === null || rawTradeConfidence === undefined || rawTradeConfidence === ""
+      ? null
+      : Number.isFinite(Number(rawTradeConfidence))
+        ? Math.max(0, Math.min(100, Number(rawTradeConfidence)))
+        : null;
+  const confidenceDraftValue = Number.isFinite(Number(confidenceDraft))
+    ? Math.max(0, Math.min(100, Number(confidenceDraft)))
+    : 50;
+  const hasTradeConfidence = tradeConfidenceValue !== null;
+  const tradeConfidenceLabel = hasTradeConfidence ? `${tradeConfidenceValue}%` : null;
+  const tradeConfidenceToneClass = hasTradeConfidence ? styles.gradeA : styles.gradePending;
+
+  const openConfidenceEditor = () => {
+    setConfidenceDraft(tradeConfidenceValue ?? 50);
+    setIsConfidencePickerOpen(true);
+  };
+
+  const handleGradeSelect = (selectedValue) => {
+    setIsGradePickerOpen(false);
+    updateTradeMeta({ tradeGrade: selectedValue || null })
+      .then(() => toastHelper.success("Trade grade updated"))
+      .catch((error) => {
+        console.error("Failed to update trade grade", error);
+        toastHelper.error(error.message || "Failed to update trade grade");
+      });
+  };
+
+  const saveTradeConfidence = () => {
+    const nextConfidence = confidenceDraftValue;
+    setIsConfidencePickerOpen(false);
+    updateTradeMeta({ tradeConfidence: nextConfidence, confidence: nextConfidence })
+      .then(() => toastHelper.success("Trade confidence added"))
+      .catch((error) => {
+        console.error("Failed to update trade confidence", error);
+        toastHelper.error(error.message || "Failed to update trade confidence");
+      });
+  };
+
+  const sessionOptions = [
+    { label: "London", value: "london" },
+    { label: "New York", value: "newyork" },
+    { label: "Asian", value: "asia" },
+    { label: "Sydney", value: "sydney" },
+    { label: "Tokyo", value: "tokyo" },
+    { label: "European", value: "european" },
+  ];
+
+  const handleSessionSelect = (selectedValue) => {
+    setIsSessionPickerOpen(false);
+    updateTradeMeta({ session: selectedValue })
+      .then(() => toastHelper.success("Session updated"))
+      .catch((error) => {
+        console.error("Failed to update session", error);
+        toastHelper.error(error.message || "Failed to update session");
+      });
+  };
+
+  const handleStrategySelect = (selectedValue) => {
+    setIsStrategyPickerOpen(false);
+    updateTradeMeta({ strategy: selectedValue || null })
+      .then(() => toastHelper.success("Strategy updated"))
+      .catch((error) => {
+        console.error("Failed to update strategy", error);
+        toastHelper.error(error.message || "Failed to update strategy");
+      });
+  };
   const tradeScreenshots = Array.isArray(trade.screenshots) ? trade.screenshots : [];
   const hasScreenshots = tradeScreenshots.length > 0;
   const screenshotUploadLimit = getMaxScreenshots(isPro);
   const entryTime = formatDateTimeUtc(trade.entryTime ?? trade.dateTime ?? trade.dateNtime);
   const exitTime = formatDateTimeUtc(trade.exitTime);
   const duration = formatDuration(trade);
+  const sessionValue = formatSessionLabel(trade.session);
+  const strategyValue =
+    typeof trade.strategy === "object"
+      ? trade.strategy?.name || "Strategy selected"
+      : availableStrategies.find((option) => String(option._id) === String(trade.strategy))?.name ||
+        (trade.strategy ? "Strategy selected" : null);
+  const strategyDescription =
+    typeof trade.strategy === "object"
+      ? trade.strategy?.description || "No strategy description added."
+      : null;
 
   const handleScreenshotSelection = (event) => {
     const files = Array.from(event.target.files || []);
@@ -450,6 +684,12 @@ export const Trade = () => {
     }
   };
 
+  const openSingleExitModal = () => {
+    setExitLevels([{ price: "", volume: "100" }]);
+    setIsMultipleTP(false);
+    setCloseTrade(true);
+  };
+
   return (
     <section className={styles.trade}>
       <div className={styles.tradeContainer}>
@@ -476,7 +716,7 @@ export const Trade = () => {
           <div
             className={`${styles.marketType} ${trade.marketType?.toLowerCase()}`}
           >
-            {trade.marketType}
+            {trade.marketType || "—"}
           </div>
         </header>
 
@@ -576,8 +816,12 @@ export const Trade = () => {
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Direction</span>
                 <span className={`${styles.metricValue} ${directionColor}`}>
-                  {trade.tradeDirection}
+                  {formatDirectionLabel(trade.tradeDirection)}
                 </span>
+              </div>
+              <div className={styles.metricCard}>
+                <span className={styles.metricLabel}>Market Type</span>
+                <span className={styles.metricValue}>{trade.marketType || "—"}</span>
               </div>
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Entry Price</span>
@@ -611,7 +855,7 @@ export const Trade = () => {
             <div className={styles.performanceGrid}>
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Risk Amount</span>
-                <span className={styles.metricValue}>${trade.riskAmount || 0}</span>
+                <span className={styles.metricValue}>{formatCurrency(trade.riskAmount)}</span>
               </div>
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Risk %</span>
@@ -623,15 +867,17 @@ export const Trade = () => {
               </div>
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>PnL</span>
-                <span className={`${styles.metricValue} ${pnlColor}`}>${trade.pnl || 0}</span>
+                <span className={`${styles.metricValue} ${styles[pnlColor]}`}>{formatCurrency(trade.pnl)}</span>
               </div>
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Balance After</span>
-                <span className={styles.metricValue}>${trade.balanceAfterTrade || 0}</span>
+                <span className={styles.metricValue}>{formatCurrency(trade.balanceAfterTrade)}</span>
               </div>
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Result</span>
-                <span className={styles.metricValue}>{trade.tradeResult || "—"}</span>
+                <span className={`${styles.metricValue} ${resultToneClass || ""}`}>
+                  {isLiveTrade ? "- (live)" : trade.tradeResult || "—"}
+                </span>
               </div>
             </div>
           </div>
@@ -639,68 +885,216 @@ export const Trade = () => {
           <div className={styles.tradeConfidence}>
             <h4>Additional Info</h4>
             <div className={styles.additionalInfoGrid}>
-              <div className={styles.metricCard}>
-                <span className={styles.metricLabel}>Confidence</span>
-                <span className={styles.metricValue}>{confidenceValue}%</span>
+              <div className={`${styles.metricCard} ${styles.confidenceMetricCard}`}>
+                <span className={styles.metricLabel}>Trade Grade</span>
+                {tradeGradeValue ? (
+                  <div className={styles.confidencePickerWrap}>
+                    <div className={styles.metaValueRow}>
+                      <span className={`${styles.gradeBadge} ${tradeGradeToneClass}`}>
+                        {tradeGradeValue}
+                      </span>
+                      <button
+                        type="button"
+                        className={`${styles.metaActionButton} ${styles.metaActionButtonMuted}`}
+                        ref={gradeToggleRef}
+                        onClick={() => setIsGradePickerOpen((open) => !open)}
+                      >
+                        Change
+                      </button>
+                    </div>
+                    {isGradePickerOpen && (
+                      <div className={styles.detailsPickerMenu} ref={gradePickerRef}>
+                        {gradeOptions.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            className={styles.detailsPickerItem}
+                            onClick={() => handleGradeSelect(option)}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className={styles.confidencePickerWrap}>
+                    <button
+                      type="button"
+                      className={styles.confidenceSetButton}
+                      ref={gradeToggleRef}
+                      onClick={() => setIsGradePickerOpen((open) => !open)}
+                    >
+                      + Set Grade
+                    </button>
+                    {isGradePickerOpen && (
+                      <div className={styles.detailsPickerMenu} ref={gradePickerRef}>
+                        {gradeOptions.map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            className={styles.detailsPickerItem}
+                            onClick={() => handleGradeSelect(option)}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className={`${styles.metricCard} ${styles.metaActionCard}`}>
+                <span className={styles.metricLabel}>Session</span>
+                {sessionValue ? (
+                  <div className={`${styles.metaValueRow} ${styles.metaValueRowSpread}`}>
+                    <span className={styles.metricValue}>{sessionValue}</span>
+                    <button
+                      type="button"
+                      className={`${styles.metaActionButton} ${styles.metaActionButtonMuted}`}
+                      ref={sessionToggleRef}
+                      onClick={() => setIsSessionPickerOpen((open) => !open)}
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : (
+                  <div className={styles.detailsPickerWrap}>
+                    <button
+                      type="button"
+                      className={styles.confidenceSetButton}
+                        ref={sessionToggleRef}
+                        onClick={() => setIsSessionPickerOpen((open) => !open)}
+                    >
+                      + Set Session
+                    </button>
+                  </div>
+                )}
+                {isSessionPickerOpen && (
+                  <div className={styles.detailsPickerMenu} ref={sessionPickerRef}>
+                    {sessionOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={styles.detailsPickerItem}
+                        onClick={() => handleSessionSelect(option.value)}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className={`${styles.metricCard} ${styles.confidenceMetricCard}`}>
+                <span className={styles.metricLabel}>Trade Confidence</span>
+                {hasTradeConfidence ? (
+                  <div className={styles.gradeWrap}>
+                    <span className={`${styles.gradeBadge} ${tradeConfidenceToneClass}`}>
+                      {tradeConfidenceLabel}
+                    </span>
+                  </div>
+                ) : isConfidencePickerOpen ? (
+                  <div className={styles.confidencePickerWrap} ref={confidencePickerRef}>
+                    <div className={styles.confidenceMeta}>{confidenceDraftValue}%</div>
+                    <div className={styles.confidenceTrack} style={{ "--confidence": `${confidenceDraftValue}%` }}>
+                      <div className={styles.confidenceTrackFill} />
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        step="1"
+                        value={confidenceDraftValue}
+                        onChange={(e) => setConfidenceDraft(Number(e.target.value))}
+                        aria-label="Trade confidence"
+                      />
+                    </div>
+                    <div className={styles.confidenceMarks} aria-hidden>
+                      <span>0</span>
+                      <span>25</span>
+                      <span>50</span>
+                      <span>75</span>
+                      <span>100</span>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.confidenceSetButton}
+                      onClick={saveTradeConfidence}
+                    >
+                      Save Confidence
+                    </button>
+                  </div>
+                ) : (
+                  <div className={styles.confidencePickerWrap}>
+                    <button
+                      type="button"
+                      className={styles.confidenceSetButton}
+                      ref={confidenceToggleRef}
+                      onClick={openConfidenceEditor}
+                    >
+                      + Set Trade Confidence
+                    </button>
+                  </div>
+                )}
               </div>
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Status</span>
-                <span className={`${styles.metricValue} ${trade.tradeStatus === "live" ? styles.statusLive : styles.statusExited}`}>
-                  {trade.tradeStatus || "—"}
+                <span
+                  className={`${styles.metricValue} ${
+                    String(trade.tradeStatus || "").toLowerCase() === "live"
+                      ? styles.statusLive
+                      : styles.statusExited
+                  }`}
+                >
+                  {String(trade.tradeStatus || "").toLowerCase() === "live"
+                    ? "Live"
+                    : String(trade.tradeStatus || "").toLowerCase() === "exited"
+                      ? "Exited"
+                      : String(trade.tradeStatus || "").toLowerCase() === "missed"
+                        ? "Missed"
+                        : trade.tradeStatus || "—"}
                 </span>
               </div>
-              <div className={styles.metricCard}>
-                <span className={styles.metricLabel}>Market Type</span>
-                <span className={styles.metricValue}>{trade.marketType || "—"}</span>
-              </div>
-              <div className={styles.metricCard}>
-                <span className={styles.metricLabel}>Account</span>
-                <span className={styles.metricValue}>
-                  {trade.accountId?.name || trade.accountId?.label || "—"}
-                </span>
-              </div>
+          
             </div>
-            <div className={styles.confidenceTrack} aria-label="Trade confidence">
-              <div
-                className={styles.confidenceFill}
-                style={{ width: `${confidenceValue}%` }}
-              />
-            </div>
+            {/* confidence progress bar removed in favor of grade badge */}
           </div>
 
           <div className={styles.exitPrice}>
             <h4>Exit Prices</h4>
-            {trade.tradeStatus === "live" ? (
-              <div className={styles.metricCard}>
-                <span className={styles.metricLabel}>Status</span>
-                <span className={styles.metricValue}>Trade is live — add exit prices</span>
+            {isLiveTrade ? (
+              <div className={styles.exitLiveState}>
+                <div className={styles.metricCard}>
+                  <span className={styles.metricLabel}>Status</span>
+                  <span className={styles.metricValue}>Trade is live — add exit prices</span>
+                </div>
+                <div className={styles.exitActionRow}>
+                  <button type="button" className={styles.exitActionButton} onClick={openSingleExitModal}>
+                    Add Exit Price
+                  </button>
+                </div>
               </div>
             ) : (
-              <div className={styles.exitGrid}>
-                {trade.exitedPrice.map((exitedPrice, index) => {
+              <div className={styles.exitList}>
+                <div className={styles.exitHeaderRow}>
+                  <span className={styles.exitHeaderCell}>Target</span>
+                  <span className={styles.exitHeaderCell}>Price</span>
+                  <span className={`${styles.exitHeaderCell} ${styles.exitHeaderRight}`}>Volume</span>
+                  <span className={`${styles.exitHeaderCell} ${styles.exitHeaderRight}`}>Executed Time</span>
+                </div>
+                {Array.isArray(trade.exitedPrice) && trade.exitedPrice.map((exitedPrice, index) => {
                   const exitTimestamp = trade.exitTimestamps?.[index]?.timestamp;
                   const formattedExitTimestamp = exitTimestamp
                     ? formatDateTimeUtc(exitTimestamp)
                     : exitTime;
+                  const hasExecutedTimestamp = Boolean(exitTimestamp || (formattedExitTimestamp && formattedExitTimestamp !== "—"));
 
                   return (
-                    <div key={index} className={styles.exitGroupCard}>
-                      <div className={styles.exitGroupHeader}>
-                        Exit {index + 1}
-                      </div>
-                      <div className={styles.exitMetricGrid}>
-                        <div className={styles.metricCard}>
-                          <span className={styles.metricLabel}>Price</span>
-                          <span className={styles.metricValue}>{exitedPrice.price}</span>
-                        </div>
-                        <div className={styles.metricCard}>
-                          <span className={styles.metricLabel}>Volume</span>
-                          <span className={styles.metricValue}>{exitedPrice.volume}%</span>
-                        </div>
-                        <div className={styles.metricCard}>
-                          <span className={styles.metricLabel}>Exit Time</span>
-                          <span className={styles.metricValue}>{formattedExitTimestamp}</span>
-                        </div>
+                    <div key={index} className={styles.exitRow}>
+                      <div className={styles.exitTarget}>Exit {index + 1}</div>
+                      <div className={styles.exitPriceValue}>{exitedPrice.price}</div>
+                      <div className={styles.exitVolumeValue}>{exitedPrice.volume}%</div>
+                      <div className={hasExecutedTimestamp ? styles.exitTimeValue : styles.exitTimePending}>
+                        {hasExecutedTimestamp ? formattedExitTimestamp : "Pending / Manual"}
                       </div>
                     </div>
                   );
@@ -711,14 +1105,49 @@ export const Trade = () => {
         </div>
 
         {/* Strategy Display */}
-        {trade.strategy && (
-          <div className={styles.tradeStrategy}>
+        <div className={styles.tradeStrategy}>
+          <div className={styles.notesHeader}>
             <h4>Strategy</h4>
+            <button
+              type="button"
+              className={styles.notebtn}
+              ref={strategyToggleRef}
+              onClick={() => setIsStrategyPickerOpen((open) => !open)}
+            >
+              {trade.strategy ? "Change" : "Set Strategy"}
+            </button>
+          </div>
+
+          <div className={styles.strategyPickerWrap}>
+            {isStrategyPickerOpen && (
+              <div className={styles.detailsPickerMenu} ref={strategyPickerRef}>
+                {availableStrategies.length > 0 ? (
+                  availableStrategies.map((option) => (
+                    <button
+                      key={option._id}
+                      type="button"
+                      className={styles.detailsPickerItem}
+                      onClick={() => handleStrategySelect(option._id)}
+                    >
+                      {option.name}
+                    </button>
+                  ))
+                ) : (
+                  <div className={styles.metricCard}>
+                    <span className={styles.metricLabel}>Strategy</span>
+                    <span className={styles.metricValue}>No strategies available. Create one first.</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {trade.strategy && (
             <div className={styles.strategyGrid}>
               <div className={styles.metricCard}>
                 <span className={styles.metricLabel}>Strategy Name</span>
                 <span className={styles.metricValue}>
-                  {typeof trade.strategy === 'object' ? trade.strategy.name : 'Strategy Selected'}
+                  {typeof trade.strategy === 'object' ? trade.strategy.name : strategyValue || 'Strategy Selected'}
                 </span>
               </div>
 
@@ -743,8 +1172,8 @@ export const Trade = () => {
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/*Tags*/}
         <div className={styles.tradeTags}>
@@ -774,7 +1203,7 @@ export const Trade = () => {
                   {trade.tags.map((tag) => (
                     <span
                       key={tag._id}
-                      className={styles.tagBadge}
+                      className={`${styles.tagBadge} ${tag.name && tag.name.length === 1 ? styles.tagInitial : ""}`}
                       style={{ backgroundColor: tag.colour }}
                     >
                       {tag.name}

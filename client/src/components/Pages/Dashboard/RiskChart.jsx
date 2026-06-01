@@ -50,11 +50,18 @@ const RiskChart = ({ trades }) => {
             <XAxis
               dataKey="tradeNumber"
               label={{ value: "Trade #", position: "insideBottom", offset: -5 }}
-              tick={{ fontSize: 12 }}
+              tick={{ fill: "#64748b", fontSize: 11 }}
+              tickMargin={10}
+              axisLine={false}
+              tickLine={false}
+              padding={{ left: 8, right: 8 }}
               interval="preserveStartEnd"
             />
             <YAxis
-              tick={{ fontSize: 12 }}
+              tick={{ fill: "#64748b", fontSize: 12 }}
+              tickMargin={8}
+              axisLine={false}
+              tickLine={false}
               label={{ value: "Risk", angle: -90, position: "outsideLeft" }}
               domain={["auto", "auto"]}
             />
@@ -66,8 +73,8 @@ const RiskChart = ({ trades }) => {
               }}
               formatter={(value, name) =>
                 name === "riskPercent"
-                  ? [`${value}%`, "Risk (%)"]
-                  : [`$${value}`, "Risk ($)"]
+                  ? [`${Number(value || 0).toFixed(2)}%`, "Risk (%)"]
+                  : [`$${Number(value || 0).toFixed(2)}`, "Risk ($)"]
               }
               labelFormatter={(label) => `Trade #${label}`}
             />
@@ -93,9 +100,15 @@ const RiskChart = ({ trades }) => {
         </ResponsiveContainer>
       </div>
 
-      <div className={styles.quickdata}>
-        <p>Highest Risk: ${performance.highestRisk}</p>
-        <p>Lowest Risk: ${performance.lowestRisk}</p>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Highest Risk</p>
+          <p className={styles.statValue}>${Number(performance.highestRisk || 0).toFixed(2)}</p>
+        </div>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Lowest Risk</p>
+          <p className={styles.statValue}>${Number(performance.lowestRisk || 0).toFixed(2)}</p>
+        </div>
       </div>
     </div>
   );

@@ -16,6 +16,20 @@ const parseOptionalNumber = (value) => {
   return Number.isFinite(numericValue) ? numericValue : NaN;
 };
 
+const parsePositiveCostField = (row, keys, fieldName) => {
+  const parsed = parseNumberField({
+    row,
+    keys,
+    required: false,
+    fieldName,
+  });
+
+  if (parsed.error) return parsed;
+  if (parsed.value === undefined) return { value: 0 };
+
+  return { value: Math.abs(parsed.value) };
+};
+
 const parseTagsInput = (input) => {
   if (input === undefined || input === null || input === "") return [];
 
@@ -160,6 +174,11 @@ const normalizeTradeStatus = (value, tradeResult) => {
   }
 
   return "exited";
+};
+
+const normalizeTradeMode = (value) => {
+  const mode = normalizeName(value);
+  return mode === "backtest" ? "backtest" : "live";
 };
 
 const parseDateField = (row) => {
@@ -334,6 +353,20 @@ const normalizeTrade = (row, defaultMarketType = DEFAULT_MARKET_TYPE) => {
   });
   if (pnlResult.error) return { error: pnlResult.error };
 
+  const slippageResult = parsePositiveCostField(
+    row,
+    ["slippage", "slippageCost"],
+    "slippage",
+  );
+  if (slippageResult.error) return { error: slippageResult.error };
+
+  const commissionResult = parsePositiveCostField(
+    row,
+    ["commission", "commissionCost"],
+    "commission",
+  );
+  if (commissionResult.error) return { error: commissionResult.error };
+
   const riskPercentResult = parseNumberField({
     row,
     keys: ["riskPercent"],
@@ -364,6 +397,9 @@ const normalizeTrade = (row, defaultMarketType = DEFAULT_MARKET_TYPE) => {
   const tradeStatus = normalizeTradeStatus(
     getFirstValue(row, ["tradeStatus", "status"]),
     tradeResult,
+  );
+  const tradeMode = normalizeTradeMode(
+    getFirstValue(row, ["tradeMode", "tradeType", "trade_type", "mode"]),
   );
 
   const marketType = normalizeName(
@@ -405,8 +441,11 @@ const normalizeTrade = (row, defaultMarketType = DEFAULT_MARKET_TYPE) => {
       riskPercent: riskPercentResult.value,
       riskAmount: riskAmountResult.value,
       pnl: pnlResult.value,
+      slippage: slippageResult.value,
+      commission: commissionResult.value,
       tradeResult,
       tradeStatus,
+      tradeMode,
       dateTime: dateResult.value,
       tagNames,
       strategyName,

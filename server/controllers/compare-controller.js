@@ -15,6 +15,21 @@ const parseIncludeImported = (value, defaultValue = true) => {
   return defaultValue;
 };
 
+const isCapitalTrade = (trade) => {
+  const status = String(trade?.tradeStatus || "")
+    .toLowerCase()
+    .trim();
+  if (status === "missed") return false;
+
+  const tradeMode = String(
+    trade?.tradeMode || trade?.tradeType || trade?.trade_type || "",
+  )
+    .toLowerCase()
+    .trim();
+
+  return tradeMode !== "backtest";
+};
+
 // Allowed dimension keys for validation
 const ALLOWED_DIMENSIONS = [
   "accountId",
@@ -39,15 +54,12 @@ const generateChartData = (trades) => {
     };
   }
 
-  // Filter only exited trades and sort by date
   const exitedTrades = trades
-    .filter((t) => t.tradeStatus === "exited")
+    .filter((t) => t.tradeStatus === "exited" && isCapitalTrade(t))
     .sort((a, b) => new Date(a.dateTime) - new Date(b.dateTime));
 
   let cumulativePnL = 0;
   let cumulativeR = 0;
-  let runningWins = 0;
-  let runningLosses = 0;
   let runningTotalPnL = 0;
 
   const equityCurve = [];
@@ -61,16 +73,9 @@ const generateChartData = (trades) => {
     cumulativeR += rValue;
     runningTotalPnL += pnl;
 
-    if (trade.tradeResult === "win") {
-      runningWins++;
-    } else if (trade.tradeResult === "loss") {
-      runningLosses++;
-    }
-
     const tradeNumber = index + 1;
-    const runningTotalTrades = tradeNumber;
     const runningExpectancy =
-      runningTotalTrades > 0 ? runningTotalPnL / runningTotalTrades : 0;
+      tradeNumber > 0 ? runningTotalPnL / tradeNumber : 0;
 
     equityCurve.push({
       tradeNumber,
@@ -111,7 +116,8 @@ const calculateStats = (trades) => {
     };
   }
 
-  const totalTrades = trades.length;
+  const capitalTrades = trades.filter((trade) => isCapitalTrade(trade));
+  const totalTrades = capitalTrades.length;
   let liveTrades = 0;
   let wins = 0;
   let losses = 0;
@@ -122,7 +128,7 @@ const calculateStats = (trades) => {
   let totalWinPnL = 0;
   let totalLossPnL = 0;
 
-  trades.forEach((trade) => {
+  capitalTrades.forEach((trade) => {
     // Skip live trades from statistics calculations
     if (trade.tradeStatus === "live") {
       liveTrades++;

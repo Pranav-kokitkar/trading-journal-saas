@@ -70,6 +70,75 @@ const getLatestDate = (items = []) => {
   }, null);
 };
 
+const toNonNegativeNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+};
+
+const getTradeResultFromPnl = (value) => {
+  const pnlValue = Number(value) || 0;
+  if (pnlValue > 0) return "win";
+  if (pnlValue < 0) return "loss";
+  return "breakeven";
+};
+
+const normalizeTradeMode = (value) => {
+  const normalizedMode = (value || "").toString().trim().toLowerCase();
+  return normalizedMode === "backtest" ? "backtest" : "live";
+};
+
+const normalizeTradeGrade = (value) => {
+  const normalizedGrade = (value || "").toString().trim().toUpperCase();
+  return ["C", "B", "B+", "A", "A+"].includes(normalizedGrade)
+    ? normalizedGrade
+    : "";
+};
+
+const normalizeTradeConfidence = (value) => {
+  if (value === undefined || value === null || value === "") return null;
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.max(0, Math.min(100, parsed));
+};
+
+const normalizeTradeResponse = (trade) => {
+  if (!trade) return trade;
+
+  const tradeConfidenceValue = normalizeTradeConfidence(
+    trade.tradeConfidence ?? trade.confidence,
+  );
+
+  return {
+    ...trade,
+    tradeConfidence: tradeConfidenceValue,
+    confidence: tradeConfidenceValue,
+    tradeGrade: normalizeTradeGrade(trade.tradeGrade),
+  };
+};
+
+const normalizeAccountingFields = ({
+  tradeStatus,
+  pnl,
+  slippage,
+  commission,
+  tradeResult,
+}) => {
+  const normalizedStatus = (tradeStatus || "").toString().trim().toLowerCase();
+
+  const normalizedPnl = Number(pnl);
+  const safePnl = Number.isFinite(normalizedPnl) ? normalizedPnl : 0;
+
+  return {
+    pnl: safePnl,
+    slippage: toNonNegativeNumber(slippage),
+    commission: toNonNegativeNumber(commission),
+    tradeResult:
+      normalizedStatus === "missed"
+        ? "missed"
+        : tradeResult || getTradeResultFromPnl(safePnl),
+  };
+};
+
 const auditService = require("../services/audit-service");
 
 const AddTrade = async (req, res) => {
@@ -106,7 +175,10 @@ const AddTrade = async (req, res) => {
       accountId,
       tags,
       strategy,
+      tradeGrade,
+      tradeConfidence,
       confidence,
+      tradeMode,
     } = req.body;
 
     if (
@@ -259,6 +331,19 @@ const AddTrade = async (req, res) => {
       toDate(exitTime) ||
       getLatestDate(normalizedExitTimestamps.map((e) => e.timestamp));
 
+    const normalizedTradeStatus = (tradeStatus || "")
+      .toString()
+      .trim()
+      .toLowerCase();
+    const normalizedTradeMode = normalizeTradeMode(tradeMode);
+    const normalizedAccounting = normalizeAccountingFields({
+      tradeStatus: normalizedTradeStatus,
+      pnl,
+      slippage,
+      commission,
+      tradeResult,
+    });
+
     const tradeToSave = {
       userId,
       accountId: new mongoose.Types.ObjectId(accountId),
@@ -279,12 +364,13 @@ const AddTrade = async (req, res) => {
         : [],
 
       rr: rr == null ? 0 : Number(rr),
-      pnl: pnl == null ? 0 : Number(pnl),
-      slippage: slippage == null ? 0 : Number(slippage),
-      commission: commission == null ? 0 : Number(commission),
-      tradeResult: tradeResult || "",
+      pnl: normalizedAccounting.pnl,
+      slippage: normalizedAccounting.slippage,
+      commission: normalizedAccounting.commission,
+      tradeResult: normalizedAccounting.tradeResult,
       riskAmount: riskAmount == null ? 0 : Number(riskAmount),
       riskPercent: riskPercent == null ? 0 : Number(riskPercent),
+      tradeMode: normalizedTradeMode,
       balanceAfterTrade:
         balanceAfterTrade == null ? 0 : Number(balanceAfterTrade),
       tradeNumber: tradeNumber == null ? 0 : Number(tradeNumber),
@@ -294,11 +380,10 @@ const AddTrade = async (req, res) => {
       entryTime: entryTimestamp,
       dateTime: entryTimestamp,
       tradeNotes: tradeNotes || "",
-      tradeStatus: (tradeStatus || "").toString().trim(),
-      confidence:
-        confidence == null || confidence === ""
-          ? 50
-          : Math.max(0, Math.min(100, Number(confidence))),
+      tradeStatus: normalizedTradeStatus,
+      tradeGrade: normalizeTradeGrade(tradeGrade),
+      tradeConfidence: normalizeTradeConfidence(tradeConfidence ?? confidence),
+      confidence: normalizeTradeConfidence(tradeConfidence ?? confidence),
       tags: validTagIds,
       strategy: validStrategyId,
     };
@@ -344,16 +429,26 @@ const AddTrade = async (req, res) => {
 
     // ✅ CRITICAL FIX: Recalculate account balance after adding trade
     try {
-      const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+      const {
+        recalculateAccountTrades,
+      } = require("../services/account-recalculation-service");
       await recalculateAccountTrades({
         userId,
         accountId: new mongoose.Types.ObjectId(accountId),
       });
     } catch (recalcError) {
-      console.error("Failed to recalculate account after adding trade:", recalcError);
+      console.error(
+        "Failed to recalculate account after adding trade:",
+        recalcError,
+      );
     }
 
-    return res.status(201).json({ success: true, trade: savedTrade });
+    return res.status(201).json({
+      success: true,
+      trade: normalizeTradeResponse(
+        savedTrade.toObject ? savedTrade.toObject() : savedTrade,
+      ),
+    });
   } catch (error) {
     console.error("AddTrade error:", error);
     return res.status(500).json({ success: false, message: "Server error" });
@@ -487,7 +582,7 @@ const getAllTrades = async (req, res) => {
     ]);
 
     res.status(200).json({
-      trades,
+      trades: trades.map(normalizeTradeResponse),
       stats: { filteredTrades: totalTrades, totalTrades },
       pagination: {
         page: Number(page),
@@ -508,7 +603,7 @@ const getTradeByID = async (req, res) => {
       .populate("strategy", "name description")
       .lean();
 
-    res.status(200).json(trade);
+    res.status(200).json(normalizeTradeResponse(trade));
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -532,12 +627,106 @@ const closeTradeByID = async (req, res, next) => {
       balanceAfterTrade,
       exitTimestamps,
       exitTime,
+      session,
+      tradeGrade,
+      tradeConfidence,
+      confidence,
+      strategy,
     } = req.body;
 
-    if (!Array.isArray(exitedPrice) || exitedPrice.length === 0) {
+    const trade = await Trade.findById(tradeId).lean();
+    if (!trade) return res.status(404).json({ message: "Trade not found" });
+
+    if (String(trade.userId) !== String(userId)) {
       return res
-        .status(400)
-        .json({ message: "exitedPrice must be a non-empty array" });
+        .status(403)
+        .json({ message: "Not allowed to close this trade" });
+    }
+
+    const hasExitLevels = Array.isArray(exitedPrice) && exitedPrice.length > 0;
+
+    if (!hasExitLevels) {
+      const update = {};
+
+      if (session !== undefined) {
+        update.session = (session || "").toString().trim().toLowerCase();
+      }
+
+      if (tradeGrade !== undefined) {
+        update.tradeGrade = normalizeTradeGrade(tradeGrade);
+      }
+
+      const incomingConfidence = normalizeTradeConfidence(
+        tradeConfidence ?? confidence,
+      );
+      const existingConfidence = normalizeTradeConfidence(
+        trade.tradeConfidence ?? trade.confidence,
+      );
+
+      if (incomingConfidence !== null) {
+        if (
+          existingConfidence !== null &&
+          Number(existingConfidence) !== Number(incomingConfidence)
+        ) {
+          return res.status(409).json({
+            message: "Trade confidence can only be set once.",
+          });
+        }
+
+        if (existingConfidence === null) {
+          update.tradeConfidence = incomingConfidence;
+          update.confidence = incomingConfidence;
+        }
+      }
+
+      if (strategy !== undefined) {
+        const normalizedStrategy = (strategy || "").toString().trim();
+        if (!normalizedStrategy) {
+          update.strategy = null;
+        } else if (mongoose.Types.ObjectId.isValid(normalizedStrategy)) {
+          update.strategy = new mongoose.Types.ObjectId(normalizedStrategy);
+        } else {
+          return res.status(400).json({ message: "Invalid strategy" });
+        }
+      }
+
+      if (Object.keys(update).length === 0) {
+        return res.status(400).json({
+          message: "No updatable trade fields were provided.",
+        });
+      }
+
+      const updated = await Trade.findOneAndUpdate(
+        { _id: tradeId, userId },
+        { $set: update },
+        { new: true },
+      )
+        .populate("tags", "name colour")
+        .populate("strategy", "name description")
+        .lean();
+
+      if (!updated) {
+        return res.status(404).json({ message: "Trade not found" });
+      }
+
+      try {
+        await auditService.log({
+          action: "update",
+          collection: "trades",
+          documentId: updated._id,
+          userId,
+          before: trade,
+          after: updated,
+          metadata: { source: req.ip },
+        });
+      } catch (e) {
+        console.error("Failed to write audit log for trade metadata update", e);
+      }
+
+      return res.status(200).json({
+        success: true,
+        trade: normalizeTradeResponse(updated),
+      });
     }
 
     for (const lvl of exitedPrice) {
@@ -581,14 +770,9 @@ const closeTradeByID = async (req, res, next) => {
         .json({ message: "balanceAfterTrade must be a valid number" });
     }
 
-    const trade = await Trade.findById(tradeId).lean();
-    if (!trade) return res.status(404).json({ message: "Trade not found" });
-
-    if (String(trade.userId) !== String(userId)) {
-      return res
-        .status(403)
-        .json({ message: "Not allowed to close this trade" });
-    }
+    const normalizedPnl = Number(pnl);
+    const safePnl = Number.isFinite(normalizedPnl) ? normalizedPnl : 0;
+    const safeTradeResult = tradeResult || getTradeResultFromPnl(safePnl);
 
     const rawStatus = (trade.tradeStatus || trade.status || "")
       .toString()
@@ -605,9 +789,9 @@ const closeTradeByID = async (req, res, next) => {
         price: Number(lvl.price),
         volume: Number(lvl.volume),
       })),
-      pnl: pnl !== undefined ? Number(pnl) : (trade.pnl ?? 0),
+      pnl: pnl !== undefined ? safePnl : (trade.pnl ?? 0),
       rr: rr !== undefined ? Number(rr) : (trade.rr ?? 0),
-      tradeResult: tradeResult || trade.tradeResult || "breakeven",
+      tradeResult: safeTradeResult || trade.tradeResult || "breakeven",
       balanceAfterTrade:
         balanceAfterTrade !== undefined
           ? Number(balanceAfterTrade)
@@ -674,7 +858,10 @@ const closeTradeByID = async (req, res, next) => {
 
     const filter = { _id: tradeId, userId: userId, tradeStatus: "live" };
     const opts = { new: true, returnDocument: "after" };
-    const updated = await Trade.findOneAndUpdate(filter, update, opts).lean();
+    const updated = await Trade.findOneAndUpdate(filter, update, opts)
+      .populate("tags", "name colour")
+      .populate("strategy", "name description")
+      .lean();
 
     if (!updated) {
       return res.status(409).json({
@@ -699,16 +886,24 @@ const closeTradeByID = async (req, res, next) => {
 
     // ✅ CRITICAL FIX: Recalculate account balance after closing trade
     try {
-      const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+      const {
+        recalculateAccountTrades,
+      } = require("../services/account-recalculation-service");
       await recalculateAccountTrades({
         userId,
         accountId: trade.accountId,
       });
     } catch (recalcError) {
-      console.error("Failed to recalculate account after closing trade:", recalcError);
+      console.error(
+        "Failed to recalculate account after closing trade:",
+        recalcError,
+      );
     }
 
-    return res.status(200).json({ success: true, trade: updated });
+    return res.status(200).json({
+      success: true,
+      trade: normalizeTradeResponse(updated),
+    });
   } catch (err) {
     console.error("closeTrade error:", err);
     return res.status(500).json({
@@ -749,13 +944,18 @@ const deleteTradeById = async (req, res, next) => {
 
     // ✅ CRITICAL FIX: Recalculate account balance after deletion
     try {
-      const { recalculateAccountTrades } = require("../services/account-recalculation-service");
+      const {
+        recalculateAccountTrades,
+      } = require("../services/account-recalculation-service");
       await recalculateAccountTrades({
         userId,
         accountId: trade.accountId,
       });
     } catch (recalcError) {
-      console.error("Failed to recalculate account after trade delete:", recalcError);
+      console.error(
+        "Failed to recalculate account after trade delete:",
+        recalcError,
+      );
     }
 
     res.status(200).json({ message: "trade soft-deleted", recalculated: true });

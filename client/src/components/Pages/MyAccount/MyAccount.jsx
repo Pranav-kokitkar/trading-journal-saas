@@ -9,7 +9,6 @@ import { CreateAccModal } from "../../modals/CreateAccModal/CreateAccModal";
 import { exportTrades } from "../../../services/exportService";
 import { ConfirmationModal } from "../../modals/ConfirmationModal/ConfirmationModal";
 import { ImportTrades } from "./ImportTrades";
-import { useTrades } from "../../../store/TradeContext";
 
 export const MyAccount = () => {
   const { getUser } = useContext(UserContext);
@@ -17,7 +16,6 @@ export const MyAccount = () => {
   const { logoutUser, authorizationToken } = useAuth();
   const { accounts, accountDetails } =
     useContext(AccountContext);
-  const { includeImportedTrades, setIncludeImportedTrades } = useTrades() || {};
   const [IsCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
@@ -82,17 +80,6 @@ export const MyAccount = () => {
         <div className={styles.accountdatacontainer}>
           <div className={styles.accountoverviewheader}>
             <h3>Account Overview</h3>
-            <label className={styles.importToggleLabel}>
-              <input
-                type="checkbox"
-                checked={Boolean(includeImportedTrades)}
-                onChange={(e) =>
-                  typeof setIncludeImportedTrades === "function" &&
-                  setIncludeImportedTrades(e.target.checked)
-                }
-              />
-              <span>Include Imported Trades</span>
-            </label>
           </div>
           <div className={styles.accountdata}>
             <div className={styles.accountbox}>

@@ -18,15 +18,20 @@ export const InputField = ({
       marginBottom: "1rem",
     },
     label: {
-      marginBottom: "0.3rem",
+      marginBottom: "0.35rem",
       fontSize: "0.8rem",
       fontWeight: 600,
       color: "var(--text-secondary)",
     },
     input: {
-      padding: "0.5rem",
-      border: "1px solid #ccc",
-      borderRadius: "4px",
+      padding: "0.8rem 0.95rem",
+      border: "1px solid var(--border-medium)",
+      borderRadius: "var(--radius-md)",
+      background: "var(--surface-card)",
+      color: "var(--text-primary)",
+      fontFamily: "inherit",
+      boxSizing: "border-box",
+      outline: "none",
     },
   };
 

@@ -37,11 +37,16 @@ const tradeSchema = new mongoose.Schema({
 
   rr: { type: Number, default: 0 },
   pnl: { type: Number, default: 0 },
-  slippage: { type: Number, default: 0 },
-  commission: { type: Number, default: 0 },
+  slippage: { type: Number, default: 0, min: 0 },
+  commission: { type: Number, default: 0, min: 0 },
   tradeResult: { type: String, default: "" },
   riskAmount: { type: Number, default: 0 },
   riskPercent: { type: Number, default: 0 },
+  tradeMode: {
+    type: String,
+    enum: ["live", "backtest"],
+    default: "live",
+  },
   isImported: { type: Boolean, default: false },
   balanceAfterTrade: { type: Number, default: 0 },
   tradeNumber: { type: Number, default: 0 },
@@ -50,7 +55,9 @@ const tradeSchema = new mongoose.Schema({
   tradeNotes: { type: String, default: "" },
   tradeStatus: { type: String, default: "" },
   session: { type: String, default: "" },
-  confidence: { type: Number, default: 50, min: 0, max: 100 },
+  tradeGrade: { type: String, default: "" },
+  tradeConfidence: { type: Number, default: null, min: 0, max: 100 },
+  confidence: { type: Number, default: null, min: 0, max: 100 },
   tags: [
     {
       type: mongoose.Schema.Types.ObjectId,

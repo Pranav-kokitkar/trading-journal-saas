@@ -19,14 +19,14 @@ export const AddPrice = ({ trade, handleChange }) => {
 
   const riskTypePlaceholder =
     trade.riskType === "percent"
-      ? "Enter risk %"
+      ? "Enter risk %..."
       : trade.riskType === "lots"
-      ? "Enter lot size"
-      : "Enter risk amount";
+      ? "Enter lot size..."
+      : "Enter risk amount...";
 
   return (
     <div className={styles.card}>
-      <h3>Price & Risk</h3>
+      <h3 className={styles.sectionHeader}>Price & Risk</h3>
       <p className={styles.subText}>
         Account Balance: ${accountDetails?.currentBalance?.toFixed(2)}
       </p>
@@ -35,7 +35,7 @@ export const AddPrice = ({ trade, handleChange }) => {
         <InputField
           label="Entry Price"
           type="number"
-          placeholder="Enter entry price"
+          placeholder="Enter entry price..."
           name="entryPrice"
           value={trade.entryPrice}
           onChange={handleChange}
@@ -55,7 +55,7 @@ export const AddPrice = ({ trade, handleChange }) => {
         <InputField
           label="Stop Loss"
           type="number"
-          placeholder="Enter stoploss"
+          placeholder="Enter stop loss..."
           name="stoplossPrice"
           value={trade.stoplossPrice}
           onChange={handleChange}
@@ -67,40 +67,71 @@ export const AddPrice = ({ trade, handleChange }) => {
         <InputField
           label="Take Profit"
           type="number"
-          placeholder="Enter TP price"
+          placeholder="Enter take profit..."
           name="takeProfitPrice"
           value={trade.takeProfitPrice}
           onChange={handleChange}
           required={true}
         />
-        <InputField
-          label={riskTypeLabel}
-          type="number"
-          placeholder={riskTypePlaceholder}
-          name="riskAmount"
-          value={trade.riskAmount}
-          onChange={handleChange}
-          required={true}
-        />
+        <div className={styles.riskStack}>
+          <div className={styles.riskTypeGroup}>
+            <span className={styles.riskTypeLabel}>Risk Type</span>
+            <div className={styles.riskTypeOptions}>
+              <label className={`${styles.riskTypeOption} ${trade.riskType === "dollar" ? styles.riskTypeOptionActive : ""}`}>
+                <input
+                  type="radio"
+                  name="riskType"
+                  value="dollar"
+                  checked={trade.riskType === "dollar"}
+                  onChange={handleChange}
+                />
+                <span>Dollar Risk</span>
+              </label>
+              <label className={`${styles.riskTypeOption} ${trade.riskType === "percent" ? styles.riskTypeOptionActive : ""}`}>
+                <input
+                  type="radio"
+                  name="riskType"
+                  value="percent"
+                  checked={trade.riskType === "percent"}
+                  onChange={handleChange}
+                />
+                <span>Percent Risk</span>
+              </label>
+              <label className={`${styles.riskTypeOption} ${trade.riskType === "lots" ? styles.riskTypeOptionActive : ""}`}>
+                <input
+                  type="radio"
+                  name="riskType"
+                  value="lots"
+                  checked={trade.riskType === "lots"}
+                  onChange={handleChange}
+                />
+                <span>Lots</span>
+              </label>
+            </div>
+          </div>
+
+          <InputField
+            label={riskTypeLabel}
+            type="number"
+            placeholder={riskTypePlaceholder}
+            name="riskAmount"
+            value={trade.riskAmount}
+            onChange={handleChange}
+            required={true}
+          />
+        </div>
       </div>
 
       <div className={styles.costToggleRow}>
         <button
           type="button"
+          className={styles.costToggleButton}
           onClick={() =>
             handleChange({
               target: { name: "showCosts", type: "checkbox", checked: !trade.showCosts },
             })
           }
           aria-pressed={Boolean(trade.showCosts)}
-          style={{
-            padding: "0.5rem 0.75rem",
-            borderRadius: "6px",
-            border: trade.showCosts ? "1px solid var(--accent)" : "1px solid #ccc",
-            background: trade.showCosts ? "var(--accent)" : "transparent",
-            color: trade.showCosts ? "#fff" : "var(--text-primary)",
-            cursor: "pointer",
-          }}
         >
           {trade.showCosts ? "Execution costs: On" : "Include slippage and commission"}
         </button>
@@ -111,7 +142,7 @@ export const AddPrice = ({ trade, handleChange }) => {
           <InputField
             label="Slippage"
             type="number"
-            placeholder="Enter slippage cost"
+            placeholder="Enter slippage cost..."
             name="slippage"
             value={trade.slippage}
             onChange={handleChange}
@@ -121,7 +152,7 @@ export const AddPrice = ({ trade, handleChange }) => {
           <InputField
             label="Commission"
             type="number"
-            placeholder="Enter commission cost"
+            placeholder="Enter commission cost..."
             name="commission"
             value={trade.commission}
             onChange={handleChange}
@@ -130,42 +161,6 @@ export const AddPrice = ({ trade, handleChange }) => {
           />
         </div>
       )}
-
-      <div
-        className={styles.row}
-        style={{ marginBottom: "1rem", alignItems: "center" }}
-      >
-        <label>
-          <input
-            type="radio"
-            name="riskType"
-            value="dollar"
-            checked={trade.riskType === "dollar"}
-            onChange={handleChange}
-          />
-          Dollar Risk
-        </label>
-        <label style={{ marginLeft: "1rem" }}>
-          <input
-            type="radio"
-            name="riskType"
-            value="percent"
-            checked={trade.riskType === "percent"}
-            onChange={handleChange}
-          />
-          Percent Risk
-        </label>
-        <label style={{ marginLeft: "1rem" }}>
-          <input
-            type="radio"
-            name="riskType"
-            value="lots"
-            checked={trade.riskType === "lots"}
-            onChange={handleChange}
-          />
-          Lots
-        </label>
-      </div>
     </div>
   );
 };

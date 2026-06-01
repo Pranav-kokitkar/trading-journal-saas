@@ -10,14 +10,25 @@ export const TradeInfo = ({
   setScreenshots,
 }) => {
   const { isPro, authorizationToken } = useAuth();
-  const confidenceValue = Math.max(
-    0,
-    Math.min(100, Number(trade.confidence ?? 50)),
-  );
-
+  const confidenceValue = trade.tradeConfidence === "" || trade.tradeConfidence == null
+    ? null
+    : Math.max(0, Math.min(100, Number(trade.tradeConfidence)));
+  const confidenceSteps = [
+    { value: 20, label: "C" },
+    { value: 40, label: "B" },
+    { value: 60, label: "B+" },
+    { value: 80, label: "A" },
+    { value: 100, label: "A+" },
+  ];
   const [tags, setTags] = useState([]);
-  const [strategies, setStrategies] = useState([]);
-  const [showTagPicker, setShowTagPicker] = useState(false);
+  const [showTags, setShowTags] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [showConfidence, setShowConfidence] = useState(Boolean(confidenceValue !== null));
+  const [confidenceDraft, setConfidenceDraft] = useState(50);
+
+  useEffect(() => {
+    setShowConfidence(confidenceValue !== null);
+  }, [confidenceValue]);
 
   const uploadLimit = getMaxScreenshots(isPro);
 
@@ -33,6 +44,48 @@ export const TradeInfo = ({
     }
 
     setScreenshots(files);
+  };
+
+  const handleRatingChange = (value) => {
+    const nextValue = String(value || "").toUpperCase();
+    handleChange({
+      target: {
+        name: "tradeGrade",
+        value: nextValue && nextValue === String(trade.tradeGrade || "").toUpperCase() ? "" : nextValue,
+      },
+    });
+  };
+
+  const handleConfidenceChange = (value) => {
+    handleChange({
+      target: {
+        name: "tradeConfidence",
+        value: value === "" ? "" : String(value),
+      },
+    });
+  };
+
+  const clearConfidence = () => {
+    setShowConfidence(false);
+    setConfidenceDraft(50);
+    handleConfidenceChange("");
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const files = Array.from(event.dataTransfer.files || []).filter((file) =>
+      file.type.startsWith("image/"),
+    );
+
+    if (files.length > uploadLimit) {
+      alert(`You can upload a maximum of ${uploadLimit} screenshots.`);
+      return;
+    }
+
+    if (files.length > 0) {
+      setScreenshots(files);
+    }
   };
 
   /* ---------------- FETCH TAGS (ACCOUNT BASED) ---------------- */
@@ -51,28 +104,8 @@ export const TradeInfo = ({
     }
   };
 
-  /* ---------------- FETCH STRATEGIES (ACCOUNT BASED) ---------------- */
-  const getAllStrategies = async () => {
-    try {
-      const response = await fetch(
-        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy`,
-        {
-          headers: {
-            Authorization: authorizationToken,
-          },
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) setStrategies(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     getAllTags();
-    getAllStrategies();
   }, []);
 
   /* ---------------- TAG TOGGLE ---------------- */
@@ -94,157 +127,178 @@ export const TradeInfo = ({
 
   return (
     <div className={styles.card}>
-      <h3>Additional Info</h3>
+      <h3 className={styles.sectionHeader}>Trade Context</h3>
 
-      {/* ---------------- STRATEGY SECTION ---------------- */}
+      <div className={styles.contextStack}>
+        <div className={styles.confidenceGroup}>
+          <div className={styles.confidenceHeader}>
+            <div className={styles.confidenceLabelGroup}>
+              <label htmlFor="tradeGrade">Trade Grade</label>
+              <span>Use this to capture the grade setup for the trade.</span>
+            </div>
+          </div>
 
-      <div className={styles.sectionSpacing}>
-        <div className={styles.inputGroup}>
-          <label htmlFor="strategy">Strategy (Optional)</label>
-          <select
-            id="strategy"
-            name="strategy"
-            value={trade.strategy || ""}
-            onChange={handleChange}
-          >
-            <option value="">-- Select Strategy --</option>
-            {strategies.map((s) => (
-              <option key={s._id} value={s._id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
-          {strategies.length === 0 && (
-            <small className={styles.helperText}>
-              No strategies available. Create one in Trade Setups page.
-            </small>
+          <div className={styles.ratingGroup} role="radiogroup" aria-label="Trade grade rating">
+            {confidenceSteps.map((step, index) => {
+              const currentGrade = String(trade.tradeGrade || "").trim().toUpperCase();
+              const isActive = currentGrade === step.label;
+              return (
+                <button
+                  key={step.label}
+                  type="button"
+                  className={`${styles.ratingChip} ${isActive ? styles.ratingChipActive : ""}`}
+                  onClick={() => handleRatingChange(step.label)}
+                  aria-pressed={isActive}
+                >
+                  <span>{step.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className={styles.confidenceGroup}>
+          <div className={styles.confidenceHeader}>
+            <div className={styles.confidenceLabelGroup}>
+              <label htmlFor="tradeConfidence">Trade Confidence</label>
+              <span>Optional. If you do not set it now, you can add it later from Trade Details.</span>
+            </div>
+            {!showConfidence && confidenceValue === null && (
+              <button
+                type="button"
+                className={styles.addTagToggle}
+                onClick={() => setShowConfidence(true)}
+              >
+                Add Confidence
+              </button>
+            )}
+            {(showConfidence || confidenceValue !== null) && (
+              <button
+                type="button"
+                className={styles.addTagToggleCompact}
+                onClick={clearConfidence}
+              >
+                Clear Confidence
+              </button>
+            )}
+          </div>
+
+          {(showConfidence || confidenceValue !== null) && (
+            <div className={styles.confidenceSliderBlock}>
+              <div className={styles.confidenceMeta}>
+                {confidenceValue === null ? `${confidenceDraft}%` : `${confidenceValue}%`}
+              </div>
+              <div className={styles.confidenceTrack} style={{ "--confidence": `${confidenceValue ?? confidenceDraft}%` }}>
+                <div className={styles.confidenceTrackFill} />
+                <input
+                  id="tradeConfidence"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value={confidenceValue ?? confidenceDraft}
+                  onChange={(e) => handleConfidenceChange(e.target.value)}
+                  onInput={(e) => setConfidenceDraft(Number(e.target.value))}
+                  aria-label="Trade confidence"
+                />
+              </div>
+              <div className={styles.confidenceMarks} aria-hidden>
+                <span>0</span>
+                <span>25</span>
+                <span>50</span>
+                <span>75</span>
+                <span>100</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.tagsGroup}>
+          {!showTags ? (
+            <button
+              type="button"
+              className={styles.addTagToggle}
+              onClick={() => setShowTags(true)}
+            >
+              + Add Tags
+            </button>
+          ) : (
+            <div className={styles.tagDisclosurePanel}>
+              <div className={styles.tagDisclosureHeader}>
+                <span>
+                  {(trade.tags || []).length > 0
+                    ? `${(trade.tags || []).length} selected`
+                    : "Pick one or more tags"}
+                </span>
+                <button
+                  type="button"
+                  className={styles.addTagToggleCompact}
+                  onClick={() => setShowTags(false)}
+                >
+                  Hide Tags
+                </button>
+              </div>
+              <div className={styles.tagPicker}>
+                {tags.length === 0 ? (
+                  <p className={styles.noTagsText}>
+                    No tags available. Create tags in the Tags page.
+                  </p>
+                ) : (
+                  tags.map((t) => {
+                    const isSelected = (trade.tags || []).includes(t._id);
+
+                    return (
+                      <button
+                        key={t._id}
+                        type="button"
+                        onClick={() => toggleTag(t._id)}
+                        className={`${styles.tagPill} ${isSelected ? styles.tagPillSelected : styles.tagPillUnselected}`}
+                      >
+                        {t.name}
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            </div>
           )}
         </div>
       </div>
 
-      {/* ---------------- TAG SECTION ---------------- */}
-
       <div className={styles.sectionSpacing}>
-        <button
-          type="button"
-          className={styles.addTagBtn}
-          onClick={() => setShowTagPicker((prev) => !prev)}
-        >
-          {showTagPicker ? "− Hide Tags" : "+ Add Tags"}
-        </button>
-
-        {showTagPicker && (
-          <div className={styles.tagPicker}>
-            {tags.length === 0 ? (
-              <p className={styles.noTagsText}>
-                No tags available. Create tags in the Tags page.
-              </p>
-            ) : (
-              tags.map((t) => {
-                const isSelected = (trade.tags || []).includes(t._id);
-
-                return (
-                  <button
-                    key={t._id}
-                    type="button"
-                    onClick={() => toggleTag(t._id)}
-                    className={
-                      isSelected ? styles.tagSelected : styles.tagUnselected
-                    }
-                    style={{
-                      backgroundColor: isSelected ? t.colour : "transparent",
-                      color: isSelected ? "#fff" : t.colour,
-                      borderColor: t.colour,
-                    }}
-                  >
-                    {t.name}
-                  </button>
-                );
-              })
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* ---------------- SESSION (DROPDOWN) ---------------- */}
-
-      <div className={styles.sectionSpacing}>
-        <div className={styles.inputGroup}>
-          <label htmlFor="session">Trading Session (Optional)</label>
-          <select
-            id="session"
-            name="session"
-            value={trade.session || ""}
-            onChange={handleChange}
-          >
-            <option value="">-- Select Session --</option>
-            <option value="london">London</option>
-            <option value="newyork">New York</option>
-            <option value="asia">Asian</option>
-            <option value="sydney">Sydney</option>
-            <option value="tokyo">Tokyo</option>
-            <option value="european">European</option>
-          </select>
-        </div>
-      </div>
-
-      {/* ---------------- CONFIDENCE ---------------- */}
-
-      <div className={styles.sectionSpacing}>
-        <div
-          className={styles.confidenceGroup}
-          style={{ "--confidence": `${confidenceValue}%` }}
-        >
-          <div className={styles.confidenceHeader}>
-            <div className={styles.confidenceLabelGroup}>
-              <label htmlFor="confidence">Confidence</label>
-              <span>How sure are you?</span>
-            </div>
-            <span className={styles.confidenceMeta}>{confidenceValue}%</span>
-          </div>
-          <div className={styles.confidenceTrack}>
-            <div className={styles.confidenceTrackFill} />
-            <input
-              id="confidence"
-              name="confidence"
-              type="range"
-              min="0"
-              max="100"
-              step="1"
-              value={trade.confidence ?? 50}
-              onChange={handleChange}
-              aria-valuenow={confidenceValue}
-              aria-valuetext={`${confidenceValue}% confidence`}
-            />
-          </div>
-          <div className={styles.confidenceMarks} aria-hidden="true">
-            <span>Low</span>
-            <span>Medium</span>
-            <span>High</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ---------------- SCREENSHOTS ---------------- */}
-
-      <div className={`${styles.col2} ${styles.sectionSpacing}`}>
-        <div>
-          <label>Upload Screenshot (max {uploadLimit})</label>
+        <label className={styles.uploadZone} onDragOver={(e) => e.preventDefault()} onDragEnter={() => setIsDragging(true)} onDragLeave={() => setIsDragging(false)} onDrop={handleDrop}>
+          <span className={styles.uploadSectionLabel}>Screenshot Upload</span>
           <input
             type="file"
             accept="image/*"
             multiple
             onChange={handleFileChange}
+            className={styles.hiddenFileInput}
           />
-          {screenshots && screenshots.length > 0 && (
-            <small>
-              {screenshots.length}/{uploadLimit} selected
-            </small>
-          )}
-        </div>
+          <div className={`${styles.uploadZoneInner} ${isDragging ? styles.uploadZoneActive : ""}`}>
+            <div className={styles.uploadIcon} aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 16V4" />
+                <path d="m8 8 4-4 4 4" />
+                <path d="M20 16.5a4.5 4.5 0 0 0-4.5-4.5H14a6 6 0 1 0-10 4.2" />
+                <path d="M7 16.5V17" />
+                <path d="M12 20h.01" />
+              </svg>
+            </div>
+            <div className={styles.uploadCopy}>
+              <p className={styles.uploadPrimaryText}>
+                Drag &amp; drop your screenshots here, or <span className={styles.uploadBrowseText}>click to browse</span>
+              </p>
+              <p className={styles.uploadSecondaryText}>Max 2 images. Supports PNG, JPG.</p>
+            </div>
+          </div>
+        </label>
+        {screenshots && screenshots.length > 0 && (
+          <small className={styles.uploadCount}>
+            {screenshots.length}/{uploadLimit} selected
+          </small>
+        )}
       </div>
-
-      {/* ---------------- NOTES ---------------- */}
 
       <div className={`${styles.textareaGroup} ${styles.sectionSpacing}`}>
         <label htmlFor="tradeNotes">Trade Notes</label>

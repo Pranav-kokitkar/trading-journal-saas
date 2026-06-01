@@ -17,6 +17,7 @@ import {
   getDimensionLabel,
 } from "./utils";
 import { SkeletonCard, SkeletonInput, SkeletonText } from "../../ui/skeleton/Skeleton";
+import { useTrades } from "../../../store/TradeContext";
 
 const AVAILABLE_DIMENSIONS = [
   { key: "accountId", label: "Account", type: "select" },
@@ -29,12 +30,13 @@ const AVAILABLE_DIMENSIONS = [
 ];
 
 const DIRECTION_OPTIONS = ["long", "short"];
-const STATUS_OPTIONS = ["live", "exited"];
+const STATUS_OPTIONS = ["live", "exited", "missed"];
 const MARKET_TYPE_OPTIONS = ["forex", "crypto", "stocks"];
 
 export const Compare = () => {
   const { authorizationToken, isPro } = useAuth();
   const { accountDetails } = useContext(AccountContext);
+  const { includeImportedTrades } = useTrades() || {};
   const { accounts, strategies, tags, loadingData } = useCompareData(authorizationToken);
   const maxCompareDimensions = getMaxCompareDimensions(isPro);
 
@@ -42,7 +44,6 @@ export const Compare = () => {
   const [dimensionValues, setDimensionValues] = useState({});
   const [comparisonResults, setComparisonResults] = useState(null);
   const [isComparing, setIsComparing] = useState(false);
-  const [includeImported, setIncludeImported] = useState(true);
 
   /* -------------------- TOGGLE DIMENSION -------------------- */
   const toggleDimension = (dimensionKey) => {
@@ -233,6 +234,7 @@ export const Compare = () => {
         const getStatusLabel = (status) => {
           if (status === "live") return "Live (Ongoing)";
           if (status === "exited") return "Exited (Completed)";
+          if (status === "missed") return "Missed";
           return status;
         };
 
@@ -278,63 +280,6 @@ export const Compare = () => {
     }
   };
 
-  /* -------------------- HANDLE INCLUDE IMPORTED CHANGE -------------------- */
-  const handleIncludeImportedChange = async (e) => {
-    const newValue = e.target.checked;
-    setIncludeImported(newValue);
-
-    // If there are existing comparison results, reload with new includeImported value
-    if (comparisonResults && isCompareEnabled()) {
-      setIsComparing(true);
-      try {
-        const dimensions = {};
-
-        selectedDimensions.forEach((dimKey) => {
-          const values = dimensionValues[dimKey];
-          if (values && (values.A || values.B)) {
-            dimensions[dimKey] = {
-              A: values.A || "",
-              B: values.B || "",
-            };
-          }
-        });
-
-        const payload = {
-          dimensions,
-          includeImported: newValue,
-        };
-
-        // Add currentAccountId if accountId dimension is not selected
-        if (!dimensions.accountId && accountDetails?._id) {
-          payload.currentAccountId = accountDetails._id;
-        }
-
-        const response = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/compare`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authorizationToken,
-          },
-          body: JSON.stringify(payload),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          setComparisonResults(data.comparison);
-          toast.success("Comparison updated successfully");
-        } else {
-          toast.error(data.message || "Failed to update comparison");
-        }
-      } catch (error) {
-        console.error("Error updating comparison:", error);
-        toast.error("Error updating comparison");
-      } finally {
-        setIsComparing(false);
-      }
-    }
-  };
-
   /* -------------------- HANDLE COMPARE -------------------- */
   const handleCompare = async () => {
     // Build dimensions object for API call
@@ -360,7 +305,7 @@ export const Compare = () => {
     try {
       const payload = {
         dimensions,
-        includeImported,
+        includeImported: Boolean(includeImportedTrades),
       };
 
       // Add currentAccountId if accountId dimension is not selected
@@ -481,14 +426,6 @@ export const Compare = () => {
             )}
           </button>
 
-          <label className={styles.importedTradesLabel}>
-            <input
-              type="checkbox"
-              checked={includeImported}
-              onChange={handleIncludeImportedChange}
-            />{" "}
-            Include Imported Trades
-          </label>
         </div>
 
             {/* Results Section */}

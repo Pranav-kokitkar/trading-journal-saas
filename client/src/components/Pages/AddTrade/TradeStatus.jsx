@@ -49,7 +49,7 @@ const MultipleExit = ({
         <div className={styles.col2}>
           <input
             type="number"
-            placeholder={`Exit Price ${index + 1}`}
+            placeholder={`Enter exit price ${index + 1}...`}
             value={level.price}
             required
             onChange={(e) => handleExitChange(index, "price", e.target.value)}
@@ -58,7 +58,7 @@ const MultipleExit = ({
         <div className={styles.col2}>
           <input
             type="number"
-            placeholder="Volume %"
+            placeholder="Enter volume %..."
             value={level.volume}
             required
             onChange={(e) => handleExitChange(index, "volume", e.target.value)}
@@ -94,15 +94,6 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
     timestamp: trade.entryTime || "",
   });
   const defaultExitTime = trade.entryTime || "";
-
-  /** Force exited when backtesting */
-  useEffect(() => {
-    if (trade.tradeMode === "backtest" && trade.tradeStatus !== "exited") {
-      handleChange({
-        target: { name: "tradeStatus", value: "exited" },
-      });
-    }
-  }, [trade.tradeMode, trade.tradeStatus, handleChange]);
 
   useEffect(() => {
     setSingleExit((prev) => ({
@@ -164,85 +155,66 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
   };
 
   return (
-    <>
-      {/* TRADE MODE */}
-      <div className={styles.card}>
-        <h3>Trade Mode</h3>
-        <div className={styles.radioContainer}>
-          <div>
-            <input
-              type="radio"
-              id="mode-live"
-              name="tradeMode"
-              value="live"
-              checked={trade.tradeMode === "live"}
-              onChange={handleChange}
-              required
-            />
-            <label htmlFor="mode-live">Live</label>
-          </div>
+    <div className={styles.card}>
+      <h3 className={styles.sectionHeader}>Trade Execution</h3>
 
-          <div>
+      <div className={styles.stackSpacing}>
+        <div className={styles.segmentedControlStatus} role="radiogroup" aria-label="Trade status">
+          <label className={`${styles.segmentedOption} ${styles.segmentedOptionOpen} ${trade.tradeStatus === "live" ? styles.segmentedOptionActive : ""}`}>
             <input
               type="radio"
-              id="mode-backtest"
-              name="tradeMode"
-              value="backtest"
-              checked={trade.tradeMode === "backtest"}
+              id="status-open"
+              name="tradeStatus"
+              value="live"
+              checked={trade.tradeStatus === "live"}
               onChange={handleChange}
               required
             />
-            <label htmlFor="mode-backtest">Backtest</label>
-          </div>
+            <span>Open</span>
+          </label>
+
+          <label className={`${styles.segmentedOption} ${styles.segmentedOptionExited} ${trade.tradeStatus === "exited" ? styles.segmentedOptionActive : ""}`}>
+            <input
+              type="radio"
+              id="status-exited"
+              name="tradeStatus"
+              value="exited"
+              checked={trade.tradeStatus === "exited"}
+              onChange={handleChange}
+              required
+            />
+            <span>Exited</span>
+          </label>
+
+          <label className={`${styles.segmentedOption} ${styles.segmentedOptionMissed} ${trade.tradeStatus === "missed" ? styles.segmentedOptionActive : ""}`}>
+            <input
+              type="radio"
+              id="status-missed"
+              name="tradeStatus"
+              value="missed"
+              checked={trade.tradeStatus === "missed"}
+              onChange={handleChange}
+              required
+            />
+            <span>Missed</span>
+          </label>
         </div>
       </div>
 
-      {/* TRADE STATUS (ONLY FOR LIVE MODE) */}
-      {trade.tradeMode === "live" && (
-        <div className={styles.card}>
-          <h3>Trade Status</h3>
-          <div className={styles.radioContainer}>
-            <div>
-              <input
-                type="radio"
-                id="status-live"
-                name="tradeStatus"
-                value="live"
-                checked={trade.tradeStatus === "live"}
-                onChange={handleChange}
-                required
-              />
-              <label htmlFor="status-live">Live (Ongoing)</label>
-            </div>
-
-            <div>
-              <input
-                type="radio"
-                id="status-exited"
-                name="tradeStatus"
-                value="exited"
-                checked={trade.tradeStatus === "exited"}
-                onChange={handleChange}
-                required
-              />
-              <label htmlFor="status-exited">Exited (Completed)</label>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* EXIT SECTION */}
       {trade.tradeStatus === "exited" && (
-        <div className={styles.card}>
-          <h3>Exit Details</h3>
+        <div className={styles.outcomePanel}>
+          <div className={styles.outcomeHeaderRow}>
+            <h4>Exit Details</h4>
 
-          <label>
-            <input
-              type="checkbox"
-              checked={isMultipleTP}
-              onChange={() => setIsMultipleTP(!isMultipleTP)}
-            />
-            Multiple Take Profit
-          </label>
+            <label className={styles.checkboxPill}>
+              <input
+                type="checkbox"
+                checked={isMultipleTP}
+                onChange={() => setIsMultipleTP(!isMultipleTP)}
+              />
+              <span>Multiple Take Profit</span>
+            </label>
+          </div>
 
           {isMultipleTP ? (
             <MultipleExit
@@ -277,6 +249,6 @@ export const TradeStatus = ({ trade, handleChange, onExitChange }) => {
           )}
         </div>
       )}
-    </>
+    </div>
   );
 };

@@ -416,6 +416,50 @@
   font-weight: 600;
 }
 
+/* Modal grade badge for confidence */
+.modalGradeRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-top: 0.5rem;
+}
+
+.modalGradeBadge {
+  min-width: 40px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  color: var(--bg-primary);
+}
+
+.gradeA {
+  background: var(--success);
+  color: var(--bg-primary);
+}
+
+.gradeB {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.gradeC {
+  background: var(--muted);
+  color: var(--text-primary);
+}
+
+.gradePending {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
 .modalScreenshotSection {
   margin-top: var(--space-5);
 }
@@ -753,6 +797,32 @@
   border-radius: 999px;
 }
 
+.backtestBadge,
+.missedBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  line-height: 1;
+}
+
+.backtestBadge {
+  border-color: #334155;
+  color: #94a3b8;
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.missedBadge {
+  border-color: rgba(245, 158, 11, 0.7);
+  color: #fbbf24;
+  background: rgba(120, 53, 15, 0.28);
+}
+
 .direction {
   text-transform: capitalize;
   font-weight: 600;
@@ -766,6 +836,11 @@
 
 .pnlNegative {
   color: var(--color-loss);
+  font-weight: 600;
+}
+
+.pnlNeutral {
+  color: var(--text-secondary);
   font-weight: 600;
 }
 

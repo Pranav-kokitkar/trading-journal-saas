@@ -59,6 +59,9 @@ const getAnalyticsByDimension = async ({
     pnl: { $type: "number" },
     rr: { $type: "number" },
     deleted: { $ne: true }, // ✅ CRITICAL FIX: Exclude soft-deleted trades
+    tradeMode: { $ne: "backtest" },
+    tradeType: { $ne: "backtest" },
+    trade_type: { $ne: "backtest" },
   };
 
   if (accountId) {

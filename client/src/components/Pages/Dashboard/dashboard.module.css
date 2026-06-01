@@ -6,11 +6,13 @@
   min-height: 100vh;
   display: grid;
   gap: var(--space-6);
+  font-family:
+    "Inter", "Plus Jakarta Sans", "SF Pro Text", "Segoe UI", sans-serif;
 }
 
 .pageHero {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-8);
 }
 
 .dashboardHeaderRow {
@@ -18,7 +20,7 @@
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-4);
+  gap: 30px;
 }
 
 .sectionHeader {
@@ -80,9 +82,10 @@
 }
 
 .insightValue span {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-weight: 500;
+  font-family:
+    "Inter", "Plus Jakarta Sans", "SF Pro Text", "Segoe UI", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .insightNote {
@@ -106,6 +109,131 @@
   margin: 0;
   font-size: var(--text-xl);
   color: var(--text-primary);
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.kpiCard {
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-left-width: 3px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+}
+
+.kpiCard p {
+  margin: 0;
+  color: #64748b;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.kpiCard strong {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: clamp(1.15rem, 2vw, 1.6rem);
+  line-height: 1.1;
+  font-weight: 600;
+  font-family:
+    "Inter", "Plus Jakarta Sans", "SF Pro Text", "Segoe UI", sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.growthBadge {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.growthBadgePositive {
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+}
+
+.growthBadgeNegative {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.kpiBlue {
+  border-left-color: var(--accent-primary);
+}
+
+.kpiGreen {
+  border-left-color: var(--color-profit);
+}
+
+.kpiAmber {
+  border-left-color: var(--color-neutral);
+}
+
+.kpiRed {
+  border-left-color: var(--color-loss);
+}
+
+.overviewCard {
+  background: var(--surface-card-strong);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-elevated);
+  padding: var(--space-5);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.overviewCard h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-lg);
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.overviewItem {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  min-height: 96px;
+  padding: var(--space-3);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.overviewItem span {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.overviewItem strong {
+  color: var(--text-primary);
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.2;
+  font-family:
+    "Inter", "Plus Jakarta Sans", "SF Pro Text", "Segoe UI", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .controlsBar {
@@ -226,37 +354,32 @@
 
 .blue {
   color: var(--text-accent);
-  font-weight: 500;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .yellow {
   color: var(--color-neutral);
-  font-weight: 500;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .profit {
   color: var(--color-profit);
-  font-weight: 500;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .loss {
   color: var(--color-loss);
-  font-weight: 500;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .neutral {
   color: var(--color-neutral);
-  font-weight: 500;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .tradingperformance {
@@ -264,6 +387,89 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-md);
   margin-top: var(--space-2);
+}
+
+.advancedSection {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.advancedGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  gap: var(--space-md);
+}
+
+.sessionChartWrap {
+  flex: 1;
+  min-height: 290px;
+}
+
+.efficiencyGrid {
+  display: grid;
+  gap: var(--space-3);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--space-sm);
+}
+
+.efficiencyItem {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.025);
+  padding: var(--space-3);
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.efficiencyItem span {
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.efficiencyItem strong {
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-family:
+    "Inter", "Plus Jakarta Sans", "SF Pro Text", "Segoe UI", sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.statsGrid {
+  display: grid;
+  gap: var(--space-sm);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: auto;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-default);
+}
+
+.statCard {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+  padding: var(--space-sm) var(--space-md);
+  display: grid;
+  gap: 4px;
+}
+
+.statLabel {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.statValue {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .chartCard {
@@ -339,6 +545,14 @@
 }
 
 @media (max-width: 1024px) {
+  .kpiGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .overviewGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .tradingdata {
     grid-template-columns: 1fr;
   }
@@ -354,9 +568,29 @@
   .tradingperformance {
     grid-template-columns: 1fr;
   }
+
+  .advancedGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 768px) {
+  .kpiGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .overviewGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .efficiencyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
   .chartCard {
     padding: var(--space-4);
     min-height: 340px;

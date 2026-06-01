@@ -36,7 +36,6 @@ export const TradeHistory = () => {
     trades = [],
     refreshTrades,
     includeImportedTrades,
-    setIncludeImportedTrades,
     page,
     setPage,
     totalPages,
@@ -78,13 +77,6 @@ export const TradeHistory = () => {
       ...defaultFilters,
       includeImported: includeImportedTrades,
     });
-  };
-
-  const handleIncludeImportedToggle = (e) => {
-    const checked = e.target.checked;
-    setIncludeImportedTrades(checked);
-    setPage(1);
-    setFilters((prev) => ({ ...prev, includeImported: checked }));
   };
 
   const handleDateInputOpen = (e) => {
@@ -384,14 +376,6 @@ export const TradeHistory = () => {
 
           <div className={styles.filterActionRow}>
             <p>Showing {totalTrades} trades</p>
-            <label>
-              <input
-                type="checkbox"
-                checked={filters.includeImported}
-                onChange={handleIncludeImportedToggle}
-              />{" "}
-              Include Imported Trades
-            </label>
             <button type="button" onClick={handleClearFilters}>
               Clear Filters
             </button>

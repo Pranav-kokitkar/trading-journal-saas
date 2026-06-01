@@ -33,16 +33,6 @@ interface TradeChartProps {
   trade: TradeOverlayTrade;
 }
 
-const TIMEFRAME_OPTIONS: Array<{ value: TradeReplayTimeframe; label: string }> =
-  [
-    { value: "1D", label: "1D" },
-    { value: "1W", label: "1W" },
-    { value: "1M", label: "1M" },
-    { value: "3M", label: "3M" },
-    { value: "6M", label: "6M" },
-    { value: "ALL", label: "All" },
-  ];
-
 const formatPrice = (value: number | null | undefined) => {
   if (value == null || Number.isNaN(value)) return "—";
   return value.toLocaleString(undefined, { maximumFractionDigits: 8 });
@@ -59,12 +49,9 @@ export const TradeChart = ({ trade }: TradeChartProps) => {
   const markersRef = useRef<ISeriesMarkersPluginApi<number> | null>(null);
   const drawFrameRef = useRef<number | null>(null);
 
-  const [timeframe, setTimeframe] = useState<TradeReplayTimeframe>("1M");
-
   const { candles, loading, error, metadata } = useHistoricalCandles(
     trade,
     true,
-    timeframe,
   );
 
   const overlay = useMemo(() => buildTradeOverlayConfig(trade), [trade]);
@@ -443,23 +430,7 @@ export const TradeChart = ({ trade }: TradeChartProps) => {
         </p>
       </div>
 
-      <div className={styles.toolbarRow}>
-        <div className={styles.toolbarGroup}>
-          <span className={styles.toolbarLabel}>Timeframe</span>
-          <div className={styles.toolbarButtons}>
-            {TIMEFRAME_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                className={`${styles.toolButton} ${timeframe === option.value ? styles.toolButtonActive : ""}`}
-                onClick={() => setTimeframe(option.value)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Timeframe selector removed to simplify replay view */}
 
       <div className={styles.chartFrame}>
         {loading ? (

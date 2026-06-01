@@ -75,6 +75,32 @@
   gap: 0.35rem;
 }
 
+.globalToggleWrap {
+  margin-top: 0.9rem;
+  padding: 0.3rem 0.25rem 0.75rem;
+}
+
+.globalToggleLabel {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.globalToggleLabel input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--accent-primary);
+}
+
 .nav li {
   display: flex;
   align-items: center;

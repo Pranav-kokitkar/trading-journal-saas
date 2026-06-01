@@ -50,12 +50,19 @@ const PnLChart = ({ trades }) => {
             <XAxis
               dataKey="tradeNumber"
               label={{ value: "Trade #", position: "insideBottom", offset: -5 }}
-              tick={{ fontSize: 12 }}
+              tick={{ fill: "#64748b", fontSize: 11 }}
+              tickMargin={10}
+              axisLine={false}
+              tickLine={false}
+              padding={{ left: 8, right: 8 }}
               interval="preserveStartEnd"
             />
             <YAxis
               label={{ value: "PnL ($)", angle: -90, position: "insideLeft" }}
-              tick={{ fontSize: 12 }}
+              tick={{ fill: "#64748b", fontSize: 12 }}
+              tickMargin={8}
+              axisLine={false}
+              tickLine={false}
             />
             <Tooltip
               contentStyle={{
@@ -64,7 +71,7 @@ const PnLChart = ({ trades }) => {
                 borderRadius: "12px",
               }}
               formatter={(value) => [
-                `${value >= 0 ? "+" : ""}$${value}`,
+                `${Number(value || 0) >= 0 ? "+" : ""}$${Number(value || 0).toFixed(2)}`,
                 "PnL",
               ]}
               labelFormatter={(label) => `Trade #${label}`}
@@ -81,9 +88,15 @@ const PnLChart = ({ trades }) => {
         </ResponsiveContainer>
       </div>
 
-      <div className={styles.quickdata}>
-        <p>Best Trade: ${performance.highestWin}</p>
-        <p>Worst Trade: ${performance.lowestLoss}</p>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Best Trade</p>
+          <p className={styles.statValue}>${Number(performance.highestWin || 0).toFixed(2)}</p>
+        </div>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Worst Trade</p>
+          <p className={styles.statValue}>${Number(performance.lowestLoss || 0).toFixed(2)}</p>
+        </div>
       </div>
     </div>
   );

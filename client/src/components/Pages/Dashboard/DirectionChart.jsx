@@ -112,13 +112,20 @@ const DirectionChart = ({ trades }) => {
             <XAxis
               dataKey="direction"
               stroke={chartVar("--text-muted", "var(--text-muted)")}
-              tick={{ fontSize: 12 }}
+              tick={{ fill: "#64748b", fontSize: 11 }}
+              tickMargin={10}
+              axisLine={false}
+              tickLine={false}
+              padding={{ left: 8, right: 8 }}
             />
             <YAxis
               domain={[0, 100]}
               tickFormatter={(val) => `${val}%`}
               stroke={chartVar("--text-muted", "var(--text-muted)")}
-              tick={{ fontSize: 12 }}
+              tick={{ fill: "#64748b", fontSize: 12 }}
+              tickMargin={8}
+              axisLine={false}
+              tickLine={false}
             />
             <Tooltip
               contentStyle={{
@@ -154,13 +161,15 @@ const DirectionChart = ({ trades }) => {
           </BarChart>
         </ResponsiveContainer>
 
-      <div className={styles.quickdata}>
-        <p>
-          Long Win Rate: {longTotal ? Number(longSuccessRate.toFixed(1)) : 0}%
-        </p>
-        <p>
-          Short Win Rate: {shortTotal ? Number(shortSuccessRate.toFixed(1)) : 0}%
-        </p>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Long Win Rate</p>
+          <p className={styles.statValue}>{longTotal ? Number(longSuccessRate.toFixed(2)) : 0}%</p>
+        </div>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Short Win Rate</p>
+          <p className={styles.statValue}>{shortTotal ? Number(shortSuccessRate.toFixed(2)) : 0}%</p>
+        </div>
       </div>
     </div>
   );

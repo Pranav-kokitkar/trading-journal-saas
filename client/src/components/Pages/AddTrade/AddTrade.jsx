@@ -1,60 +1,54 @@
 import styles from "./addtrade.module.css";
+import { TradeSetup } from "./TradeSetup";
 import { TradeStatus } from "./TradeStatus";
-import { TradeDetails } from "./TradeDetails";
 import { AddPrice } from "./AddPrice";
 import { TradeInfo } from "./TradeInfo";
 import { TradeCalculator } from "./TradeCalculator";
 import { useContext, useState } from "react";
-import { UserContext } from "../../../context/UserContext";
 import { calculateTradeValues } from "../../../utils/tradeUtils";
 import { useAuth } from "../../../store/Auth";
 import { useTrades } from "../../../store/TradeContext";
-import { PerformanceContext } from "../../../context/PerformanceContext";
 import { toastHelper } from "../../../utils/toastHelper";
 import { AccountContext } from "../../../context/AccountContext";
 
-const toDateTimeLocalValue = (date = new Date()) => {
-  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
-  return local.toISOString().slice(0, 16);
-};
+const createInitialTrade = () => ({
+  id: "",
+  tradeMode: "live",
+  marketType: "",
+  symbol: "",
+  tradedirection: "",
+  entryPrice: "",
+  stoplossPrice: "",
+  riskType: "",
+  takeProfitPrice: "",
+  showCosts: false,
+  slippage: "",
+  commission: "",
+  entryTime: "",
+  tradeStatus: "live",
+  exitedPrice: [],
+  rr: "",
+  pnl: "",
+  tradeResult: "",
+  riskamount: "",
+  riskPercent: "",
+  balanceAfterTrade: "",
+  tradeNumber: "",
+  dateNtime: "",
+  tradeNotes: "",
+  session: "",
+  tradeGrade: "",
+  tradeConfidence: "",
+  tags: [],
+  strategy: "",
+});
 
 export const AddTrade = () => {
   const { authorizationToken } = useAuth();
   const { AddTrade: addTradeFromContext } = useTrades();
-
   const { accountDetails } = useContext(AccountContext);
 
-  const [trade, setTrade] = useState({
-    id: "",
-    marketType: "",
-    symbol: "",
-    tradedirection: "",
-    entryPrice: "",
-    stoplossPrice: "",
-    riskType: "",
-    takeProfitPrice: "",
-    showCosts: false,
-    slippage: "",
-    commission: "",
-    entryTime: "",
-    tradeStatus: "",
-    exitedPrice: [],
-    rr: "",
-    pnl: "",
-    tradeResult: "",
-    riskamount: "",
-    riskPercent: "",
-    balanceAfterTrade: "",
-    tradeNumber: "",
-    dateNtime: "",
-    tradeNotes: "",
-    session: "",
-    confidence: "",
-    tags: [],
-    strategy: "",
-  });
-
-  // ✅ NEW: hold up to 2 screenshot files selected in the UI
+  const [trade, setTrade] = useState(createInitialTrade);
   const [screenshots, setScreenshots] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -91,7 +85,6 @@ export const AddTrade = () => {
       return;
     }
 
-    // Protect against accountDetails missing
     const prevBalance = Number(accountDetails?.currentBalance || 0);
     const prevTotalTrades = Number(accountDetails?.totalTrades || 0);
     const entrySource = trade.entryTime || trade.tradeDate || new Date();
@@ -101,25 +94,20 @@ export const AddTrade = () => {
       alert("Entry time cannot be in the future.");
       return;
     }
+
     const entryIso = Number.isNaN(entryDate.getTime())
       ? new Date().toISOString()
       : entryDate.toISOString();
 
-    const { pnl, rr, riskamount } = calculateTradeValues({
+    const { pnl: netPnl, rr, riskamount } = calculateTradeValues({
       trade,
       accountBalance: prevBalance,
     });
 
     let tradeResult = "breakeven";
-    if (pnl > 0) tradeResult = "win";
-    else if (pnl < 0) tradeResult = "loss";
+    if (netPnl > 0) tradeResult = "win";
+    else if (netPnl < 0) tradeResult = "loss";
 
-    const isoDate = entryIso;
-
-    const tradeNumber = prevTotalTrades + 1;
-    const balanceAfterTrade = Number(
-      Math.round((prevBalance + pnl) * 100) / 100
-    );
     const riskPercent =
       riskamount && prevBalance
         ? Number(((riskamount / prevBalance) * 100).toFixed(2))
@@ -155,6 +143,26 @@ export const AddTrade = () => {
       .toString()
       .trim()
       .toLowerCase();
+    const isMissedTrade = normalizedStatus === "missed";
+    const normalizedTradeMode = String(trade.tradeMode || "live")
+      .trim()
+      .toLowerCase();
+    const isCapitalTrade = !isMissedTrade && normalizedTradeMode !== "backtest";
+
+    const effectivePnl = Number(netPnl || 0);
+    const effectiveTradeResult = isMissedTrade ? "missed" : tradeResult;
+    const effectiveBalanceAfterTrade = isCapitalTrade
+      ? Number(Math.round((prevBalance + effectivePnl) * 100) / 100)
+      : prevBalance;
+
+    const confidenceStateValue = trade.tradeConfidence;
+    const isConfidenceSet =
+      confidenceStateValue !== "" &&
+      confidenceStateValue !== null &&
+      confidenceStateValue !== undefined;
+    const normalizedConfidence = isConfidenceSet
+      ? Number(confidenceStateValue)
+      : null;
 
     const normalizedTrade = {
       marketType: (trade.marketType || "").toString(),
@@ -171,16 +179,17 @@ export const AddTrade = () => {
       riskType: (trade.riskType || "").toString(),
       exitedPrice: normalizedExits,
       rr: Number(rr || 0),
-      pnl: Number(pnl || 0),
-      tradeResult,
+      pnl: Number(effectivePnl || 0),
+      tradeResult: effectiveTradeResult,
+      tradeMode: normalizedTradeMode,
       riskAmount: Number(
         riskamount ?? trade.riskamount ?? trade.riskAmount ?? 0,
       ),
       riskPercent: Number(riskPercent || 0),
-      balanceAfterTrade: Number(balanceAfterTrade),
-      tradeNumber: Number(tradeNumber),
-      dateTime: isoDate,
-      entryTime: isoDate,
+      balanceAfterTrade: Number(effectiveBalanceAfterTrade),
+      tradeNumber: Number(prevTotalTrades + 1),
+      dateTime: entryIso,
+      entryTime: entryIso,
       exitTime:
         trade.tradeStatus === "exited" && normalizedExits.length > 0
           ? new Date(
@@ -197,11 +206,25 @@ export const AddTrade = () => {
       accountId,
       tags: trade.tags || [],
       strategy: trade.strategy || undefined,
-      confidence:
-        trade.confidence === "" || trade.confidence == null
-          ? 50
-          : Number(trade.confidence),
+      tradeGrade: (trade.tradeGrade || "").toString().trim().toUpperCase(),
+      tradeConfidence: normalizedConfidence,
+      confidence: normalizedConfidence,
     };
+
+    if (
+      !isConfidenceSet ||
+      normalizedTrade.confidence === "" ||
+      normalizedTrade.confidence === null ||
+      normalizedTrade.confidence === undefined ||
+      Number.isNaN(normalizedTrade.confidence)
+    ) {
+      normalizedTrade.tradeConfidence = null;
+      normalizedTrade.confidence = null;
+    }
+
+    console.log("🔍 [DEBUG] RAW CONFIDENCE STATE VALUE:", confidenceStateValue, typeof confidenceStateValue);
+    console.log("🚨 [DEBUG] FULL TRADE SUBMISSION PAYLOAD:", normalizedTrade);
+    console.log("💾 [DEBUG] POST-CLEANUP PAYLOAD CONFIDENCE BEING SENT TO DB:", normalizedTrade.confidence);
 
     if (
       !normalizedTrade.marketType ||
@@ -211,6 +234,7 @@ export const AddTrade = () => {
       alert("Please fill market type, symbol and trade direction.");
       return;
     }
+
     if (
       normalizedTrade.entryPrice === 0 ||
       Number.isNaN(normalizedTrade.entryPrice) ||
@@ -235,24 +259,33 @@ export const AddTrade = () => {
     <section className={`${styles.addtrade} app-page`}>
       <form onSubmit={handleSubmit}>
         <PageHeading />
-        <TradeDetails trade={trade} handleChange={handleChange} />
-        <AddPrice trade={trade} handleChange={handleChange} />
-        <TradeStatus
-          trade={trade}
-          handleChange={handleChange}
-          onExitChange={(levels) =>
-            setTrade((prev) => ({ ...prev, exitedPrice: levels }))
-          }
-        />
-        <TradeCalculator trade={trade} setTrade={setTrade} />
-        {/* ✅ now passes screenshot state + setter down */}
-        <TradeInfo
-          trade={trade}
-          handleChange={handleChange}
-          screenshots={screenshots}
-          setScreenshots={setScreenshots}
-        />
-        <Buttons setTrade={setTrade} isSubmitting={isSubmitting} />
+
+        <div className={styles.addtradeGrid}>
+          <div className={styles.leftColumn}>
+            <TradeSetup trade={trade} handleChange={handleChange} />
+            <AddPrice trade={trade} handleChange={handleChange} />
+            <TradeStatus
+              trade={trade}
+              handleChange={handleChange}
+              onExitChange={(levels) =>
+                setTrade((prev) => ({ ...prev, exitedPrice: levels }))
+              }
+            />
+            <div className={styles.summarySection}>
+              <TradeCalculator trade={trade} setTrade={setTrade} />
+            </div>
+            <TradeInfo
+              trade={trade}
+              handleChange={handleChange}
+              screenshots={screenshots}
+              setScreenshots={setScreenshots}
+            />
+          </div>
+        </div>
+
+        <div className={styles.formFooter}>
+          <Buttons setTrade={setTrade} isSubmitting={isSubmitting} />
+        </div>
       </form>
     </section>
   );
@@ -261,9 +294,11 @@ export const AddTrade = () => {
 const PageHeading = () => (
   <div className={`${styles.heading} app-page-heading`}>
     <h2 className={`${styles.title} app-page-title`}>
-              Add <span>Trade</span>
-            </h2>
-    <p className="app-page-subtitle">Fill this to add new trade to your journal</p>
+      Add <span>Trade</span>
+    </h2>
+    <p className="app-page-subtitle">
+      Fill in the details below to log a new trade to your journal.
+    </p>
   </div>
 );
 
@@ -272,31 +307,7 @@ const Buttons = ({ setTrade, isSubmitting }) => (
     <button
       type="reset"
       disabled={isSubmitting}
-      onClick={() =>
-        setTrade({
-          id: "",
-          marketType: "",
-          symbol: "",
-          tradedirection: "",
-          entryPrice: "",
-          stoplossPrice: "",
-          riskType: "",
-          takeProfitPrice: "",
-          showCosts: false,
-          slippage: "",
-          commission: "",
-          entryTime: "",
-          tradeStatus: "",
-          exitedPrice: [],
-          rr: "",
-          pnl: "",
-          tradeResult: "",
-          riskamount: "",
-          dateNtime: "",
-          tradeNotes: "",
-          confidence: "",
-        })
-      }
+      onClick={() => setTrade(createInitialTrade())}
     >
       Clear All
     </button>

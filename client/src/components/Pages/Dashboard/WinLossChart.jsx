@@ -34,6 +34,7 @@ const WinLossChart = ({ trades }) => {
     { name: "Losses", value: losses },
     { name: "Breakeven", value: breakeven },
   ];
+  const total = Math.max(1, wins + losses + breakeven);
 
   return (
     <div className={styles.chartcontainer}>
@@ -44,12 +45,10 @@ const WinLossChart = ({ trades }) => {
               data={data}
               cx="50%"
               cy="50%"
-              outerRadius={100}
+              innerRadius={72}
+              outerRadius={110}
+              paddingAngle={4}
               dataKey="value"
-              label={({ name, percent }) =>
-                `${name} ${(percent * 100).toFixed(0)}%`
-              }
-              labelLine={false}
             >
               {data.map((entry, index) => (
                 <Cell
@@ -69,6 +68,14 @@ const WinLossChart = ({ trades }) => {
             />
           </PieChart>
         </ResponsiveContainer>
+      </div>
+      <div className={styles.quickdata}>
+        {data.map((item, index) => (
+          <p key={item.name}>
+            <span style={{ color: colors[index % colors.length] }}>{item.name}</span>
+            {`: ${item.value} (${((item.value / total) * 100).toFixed(1)}%)`}
+          </p>
+        ))}
       </div>
       <div className={styles.quickdata}>
         <p>Win Rate: {performance.winRate}%</p>

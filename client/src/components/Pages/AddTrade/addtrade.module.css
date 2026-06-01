@@ -6,17 +6,47 @@
 .addtrade {
   display: flex;
   justify-content: center;
-  padding: clamp(20px, 2vw, 32px);
+  padding: clamp(28px, 3vw, 48px);
   min-height: 100vh;
-  gap: 2rem;
-  flex-wrap: wrap;
+  --trade-info: var(--accent-bright);
+  --trade-info-soft: var(--accent-subtle);
+  --trade-success: var(--success);
+  --trade-success-soft: var(--color-profit-subtle);
+  --trade-warning: var(--warning);
+  --trade-warning-soft: var(--color-warning-subtle);
+  --trade-error: var(--error);
+  --trade-error-soft: var(--color-loss-subtle);
+  --trade-border-strong: rgba(154, 166, 255, 0.22);
+  --trade-surface-highlight: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.025),
+    rgba(255, 255, 255, 0.012)
+  );
 }
 
 /* ===== Form Container ===== */
 .addtrade form {
   width: 100%;
-  max-width: 1080px;
+  max-width: 1440px;
   box-sizing: border-box;
+}
+
+.addtradeGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.leftColumn,
+.rightColumn {
+  min-width: 0;
+}
+
+.summarySection {
+  width: 100%;
+  margin-top: 0.2rem;
+  margin-bottom: 1.2rem;
 }
 
 /* ===== Heading ===== */
@@ -43,7 +73,8 @@
 /* ===== Card Layout (Matches Admin Panel) ===== */
 .card {
   background: var(--surface-card);
-  padding: 1.25rem;
+  background-image: var(--trade-surface-highlight);
+  padding: 1rem 1.1rem;
   border-radius: var(--radius-xl);
   margin-bottom: 1.25rem;
   border: 1px solid var(--border-subtle);
@@ -55,19 +86,20 @@
   border-color: var(--border-light);
 }
 
-.card h3 {
-  margin-bottom: 1rem;
-  color: var(--text-primary);
-  font-size: 0.95rem;
-  font-weight: 600;
+.sectionHeader {
+  margin: 0 0 1.05rem;
+  padding-bottom: 0.7rem;
   border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 0.75rem;
+  color: var(--text-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .subText {
   font-size: 0.75rem;
   color: var(--muted);
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   padding: 0.5rem 0.75rem;
   background: var(--accent-subtle);
   border-radius: var(--radius-sm);
@@ -76,14 +108,55 @@
 
 /* ===== Section Spacing ===== */
 .sectionSpacing {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.15rem;
+}
+
+.sectionSpacingCompact {
+  margin-bottom: 0.5rem;
+}
+
+.setupGridTop,
+.setupGridBottom,
+.contextStack {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.setupGridTop,
+.setupGridBottom {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.setupMetaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.contextStack {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.stackSpacing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin-bottom: 1.2rem;
+}
+
+.sectionLabel {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 /* ===== Input Group ===== */
 .inputGroup {
   display: flex;
   flex-direction: column;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .inputGroup label {
@@ -99,7 +172,7 @@
 .inputGroup input,
 .inputGroup select,
 .inputGroup textarea {
-  padding: 0 0.9rem;
+  padding: 0.8rem 0.95rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
   background: var(--surface-card);
@@ -113,6 +186,10 @@
 .inputGroup textarea::placeholder {
   color: var(--text-muted);
   opacity: 0.72;
+}
+
+.inputGroup input::placeholder {
+  text-transform: none;
 }
 
 .inputGroup input:focus,
@@ -144,6 +221,21 @@
   background-color: #ffffff;
 }
 
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea,
+.inputGroup input[type="datetime-local"] {
+  box-sizing: border-box;
+  font-family: inherit;
+  border-color: var(--border-medium);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-card);
+}
+
+.inputGroup input[type="datetime-local"] {
+  color-scheme: dark;
+}
+
 .inputGroup select:hover {
   background-color: var(--surface-card-strong);
   background-image: linear-gradient(
@@ -173,7 +265,7 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.55rem;
 }
 
 .col2 {
@@ -182,7 +274,37 @@
 }
 
 .costToggleRow {
-  margin: 0.25rem 0 0.9rem;
+  margin: 1rem 0 0;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.costToggleButton {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-medium);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.costToggleButton:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: rgba(110, 124, 255, 0.08);
+}
+
+.costToggleButton[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--accent-subtle);
 }
 
 .costToggle {
@@ -204,7 +326,7 @@
 
 /* ===== Radio Buttons ===== */
 .tradedirection {
-  margin: 1rem 0;
+  margin: 0;
 }
 
 .tradedirection > label {
@@ -219,8 +341,9 @@
 
 .radioContainer {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .radioContainer > div {
@@ -249,15 +372,15 @@
 }
 
 .confidenceGroup {
-  margin-top: 1rem;
+  margin-top: 0;
   padding: 1rem;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--trade-border-strong);
   background:
     radial-gradient(
       circle at top right,
-      rgba(110, 124, 255, 0.08),
-      transparent 36%
+      var(--trade-info-soft),
+      transparent 42%
     ),
     linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 55%);
 }
@@ -267,7 +390,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  margin-bottom: 0.85rem;
+  margin-bottom: 1rem;
 }
 
 .confidenceHeader label {
@@ -290,14 +413,20 @@
   color: var(--muted);
 }
 
+.confidenceSliderBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
 .confidenceMeta {
   font-size: 0.8rem;
   color: var(--text-primary);
   font-weight: 700;
   padding: 0.4rem 0.65rem;
   border-radius: var(--radius-pill);
-  background: var(--accent-subtle);
-  border: 1px solid rgba(110, 124, 255, 0.16);
+  background: var(--trade-info-soft);
+  border: 1px solid rgba(154, 166, 255, 0.16);
 }
 
 .confidenceTrack {
@@ -411,15 +540,588 @@
   color: var(--text-primary);
 }
 
+.directionControl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.directionOption {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 58px;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-medium);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.directionOption input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.directionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 800;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+}
+
+.directionCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.directionCopy strong {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.directionCopy small {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.directionOptionLong {
+  border-color: rgba(61, 214, 166, 0.18);
+}
+
+.directionOptionShort {
+  border-color: rgba(246, 197, 110, 0.18);
+}
+
+.directionOptionLong .directionIcon {
+  color: var(--trade-success);
+  background: var(--trade-success-soft);
+}
+
+.directionOptionShort .directionIcon {
+  color: var(--trade-warning);
+  background: var(--trade-warning-soft);
+}
+
+.directionOptionActive {
+  border-color: var(--trade-info);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(110, 124, 255, 0.12),
+      rgba(255, 255, 255, 0.03)
+    ),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: 0 0 0 1px rgba(110, 124, 255, 0.1);
+}
+
+.directionOptionLong.directionOptionActive {
+  border-color: rgba(61, 214, 166, 0.4);
+  box-shadow: 0 0 0 1px rgba(61, 214, 166, 0.14);
+}
+
+.directionOptionShort.directionOptionActive {
+  border-color: rgba(246, 197, 110, 0.4);
+  box-shadow: 0 0 0 1px rgba(246, 197, 110, 0.14);
+}
+
 /* ===== Warning Text ===== */
 .warning {
-  color: var(--accent);
+  color: var(--trade-warning);
   font-size: 0.75rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.65rem;
   padding: 0.5rem 0.75rem;
-  background: var(--accent-subtle);
+  background: var(--trade-warning-soft);
   border-radius: var(--radius-sm);
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--trade-warning);
+}
+
+.segmentedControl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.segmentedControlStatus {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.segmentedOption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-medium);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.segmentedOption input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmentedControlStatus .segmentedOption {
+  min-height: 48px;
+  justify-content: center;
+}
+
+.segmentedOptionActive {
+  color: var(--text-primary);
+  box-shadow: 0 0 0 1px rgba(110, 124, 255, 0.18);
+}
+
+.segmentedOptionLong {
+  border-color: rgba(61, 214, 166, 0.18);
+}
+
+.segmentedOptionShort {
+  border-color: rgba(246, 197, 110, 0.18);
+}
+
+.segmentedOptionOpen {
+  border-color: rgba(110, 124, 255, 0.18);
+}
+
+.segmentedOptionLive {
+  border-color: rgba(110, 124, 255, 0.18);
+}
+
+.segmentedOptionExited {
+  border-color: rgba(61, 214, 166, 0.18);
+}
+
+.segmentedOptionMissed {
+  border-color: rgba(246, 197, 110, 0.18);
+}
+
+.segmentedOptionLive.segmentedOptionActive {
+  border-color: var(--trade-info);
+  background: rgba(110, 124, 255, 0.12);
+}
+
+.segmentedOptionOpen.segmentedOptionActive {
+  border-color: var(--trade-info);
+  background: rgba(110, 124, 255, 0.12);
+}
+
+.segmentedOptionExited.segmentedOptionActive {
+  border-color: var(--trade-success);
+  background: var(--trade-success-soft);
+}
+
+.segmentedOptionMissed.segmentedOptionActive {
+  border-color: var(--trade-warning);
+  background: var(--trade-warning-soft);
+}
+
+.segmentedOption:hover {
+  border-color: var(--trade-info);
+  color: var(--text-primary);
+}
+
+.segmentedControlStatus .segmentedOptionOpen {
+  background: rgba(110, 124, 255, 0.05);
+}
+
+.segmentedControlStatus .segmentedOptionExited {
+  background: rgba(61, 214, 166, 0.05);
+}
+
+.segmentedControlStatus .segmentedOptionMissed {
+  background: rgba(246, 197, 110, 0.05);
+}
+
+.segmentedOptionLong.segmentedOptionActive {
+  border-color: var(--trade-success);
+  background: var(--trade-success-soft);
+}
+
+.segmentedOptionShort.segmentedOptionActive {
+  border-color: var(--trade-warning);
+  background: var(--trade-warning-soft);
+}
+
+.outcomePanel {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--trade-border-strong);
+  background: var(--bg-level-1);
+}
+
+.outcomeHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.outcomeHeaderRow h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.checkboxPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-medium);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.checkboxPill input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+.summaryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0 0 0.95rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--trade-border-strong);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.summaryBadgeLabel {
+  letter-spacing: 0.02em;
+}
+
+.summaryBadgeValue {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.summaryMetric {
+  padding: 0.8rem;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(154, 166, 255, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.summaryMetricEmphasis {
+  border-color: rgba(154, 166, 255, 0.22);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(110, 124, 255, 0.08),
+      rgba(255, 255, 255, 0.02)
+    ),
+    rgba(255, 255, 255, 0.025);
+  box-shadow: 0 0 0 1px rgba(110, 124, 255, 0.04);
+}
+
+.summaryLabel {
+  font-size: 0.73rem;
+  color: var(--text-secondary);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.summaryMetric strong {
+  font-size: 0.98rem;
+  color: var(--text-primary);
+}
+
+.summaryMessages {
+  margin-top: 0.95rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.summaryError,
+.summaryWarning {
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.summaryError {
+  color: var(--error);
+  background: var(--color-loss-subtle);
+  border-color: rgba(255, 90, 90, 0.16);
+}
+
+.summaryWarning {
+  color: var(--warning);
+  background: var(--color-warning-subtle);
+  border-color: rgba(246, 197, 110, 0.16);
+}
+
+.ratingGroup {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.ratingChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  min-height: 72px;
+  padding: 0.8rem 0.7rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-medium);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ratingChip span {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ratingChip small {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ratingChipActive {
+  border-color: var(--trade-info);
+  background: var(--trade-info-soft);
+  color: var(--text-primary);
+  box-shadow:
+    0 0 0 1px rgba(110, 124, 255, 0.12),
+    0 10px 24px rgba(110, 124, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.tagsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.addTagToggle,
+.addTagToggleCompact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  border: 1px dashed var(--border-medium);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addTagToggle {
+  width: 100%;
+  min-height: 46px;
+}
+
+.addTagToggleCompact {
+  padding: 0.45rem 0.8rem;
+  min-height: 34px;
+  color: var(--text-secondary);
+}
+
+.addTagToggle:hover,
+.addTagToggleCompact:hover {
+  border-color: var(--trade-info);
+  background: var(--trade-info-soft);
+  color: var(--text-primary);
+}
+
+.tagDisclosurePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.tagDisclosureHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 0.15rem;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.tagPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem;
+  background: var(--bg-level-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  margin-bottom: 0;
+  max-height: 210px;
+  overflow-y: auto;
+}
+
+.tagPill {
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-medium);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tagPillUnselected {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+}
+
+.tagPillSelected {
+  background: var(--trade-info-soft);
+  color: var(--text-primary);
+  border-color: var(--trade-info);
+  box-shadow: 0 0 0 1px rgba(110, 124, 255, 0.12);
+}
+
+.uploadZone {
+  display: block;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 0.15rem;
+}
+
+.hiddenFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.uploadZoneInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  text-align: center;
+  width: 100%;
+  min-height: 160px;
+  padding: 1.5rem;
+  border-radius: var(--radius-xl);
+  border: 1px dashed rgba(148, 163, 184, 0.45);
+  background: rgba(15, 23, 42, 0.2);
+  transition: all 0.2s ease;
+}
+
+.uploadZoneInner:hover,
+.uploadZoneActive {
+  border-color: rgba(96, 165, 250, 0.7);
+  background: rgba(15, 23, 42, 0.28);
+}
+
+.uploadCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  text-align: center;
+  max-width: 30rem;
+}
+
+.uploadIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(148, 163, 184, 0.08);
+  color: #64748b;
+}
+
+.uploadIcon svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.uploadPrimaryText {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.uploadSecondaryText {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.uploadBrowseText {
+  color: var(--accent-bright);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.uploadCount {
+  display: block;
+  margin-top: 0.45rem;
+  font-size: 0.72rem;
+  color: var(--muted);
 }
 
 /* ===== Exited Section ===== */
@@ -474,13 +1176,41 @@
   background: var(--accent-subtle);
 }
 
+.missedTradeRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0.25rem 0 1rem;
+}
+
+.missedTradeButton {
+  padding: 0.7rem 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-pill);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.missedTradeButton:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
+}
+
 /* ===== Buttons Container ===== */
 .btncontainer {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
-  margin-top: 2rem;
+  margin-top: 0;
+  margin-bottom: 0;
   align-items: center;
+  width: 100%;
 }
 
 .btncontainer button {
@@ -488,6 +1218,9 @@
   height: 46px;
   border: none;
   border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
@@ -498,39 +1231,61 @@
 
 /* Reset button */
 .btncontainer button[type="reset"] {
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-secondary);
+  background: transparent;
+  color: var(--text-primary);
   border: 1px solid var(--border-medium);
 }
 
 .btncontainer button[type="reset"]:hover {
-  border-color: var(--error);
-  color: var(--error);
-  background: var(--color-loss-subtle);
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-subtle);
 }
 
 /* Submit button */
 .btncontainer button[type="submit"] {
-  background: var(--btn-primary-bg);
+  background: linear-gradient(135deg, var(--accent), var(--accent-bright));
   color: var(--btn-primary-text);
   font-weight: 700;
-  box-shadow: var(--btn-primary-shadow);
+  box-shadow:
+    0 14px 30px rgba(110, 124, 255, 0.24),
+    0 0 0 1px rgba(110, 124, 255, 0.14);
+  min-width: 160px;
 }
 
 .btncontainer button[type="submit"]:hover {
-  background: var(--btn-primary-bg-hover);
-  box-shadow: 0 18px 34px rgba(110, 124, 255, 0.3);
+  background: linear-gradient(135deg, var(--accent-bright), var(--accent));
+  box-shadow:
+    0 18px 34px rgba(110, 124, 255, 0.3),
+    0 0 0 1px rgba(110, 124, 255, 0.18);
   transform: translateY(-2px);
+}
+
+.formFooter {
+  width: 100%;
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
 }
 
 /* ===== Textarea Group ===== */
 .textareaGroup {
   display: flex;
   flex-direction: column;
-  margin-top: 1rem;
+  margin-top: 0.4rem;
 }
 
 .textareaGroup label {
+  margin-bottom: 0.4rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: 0.01em;
+}
+
+.uploadSectionLabel {
+  display: block;
   margin-bottom: 0.4rem;
   font-size: 0.8rem;
   color: var(--text-secondary);
@@ -559,6 +1314,67 @@
   box-shadow: 0 0 0 3px var(--accent-subtle);
 }
 
+.riskStack {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.riskTypeGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.riskTypeLabel {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.riskTypeOptions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.riskTypeOption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 44px;
+  padding: 0.65rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-medium);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.riskTypeOption input {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.riskTypeOptionActive {
+  border-color: var(--accent);
+  background: var(--accent-subtle);
+  color: var(--text-primary);
+}
+
+.riskStack .inputGroup {
+  margin-bottom: 0;
+}
+
 /* ===== File Input Styling ===== */
 .col2 > div {
   display: flex;
@@ -568,29 +1384,18 @@
 
 .col2 > div label {
   font-size: 0.8rem;
-  color: var(--text-secondary);
-  font-weight: 600;
-  text-transform: none;
-  letter-spacing: 0.01em;
 }
 
 .col2 input[type="file"] {
   padding: 0.5rem;
-  border-radius: var(--radius-md);
   border: 1px solid var(--border-medium);
-  background: rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
   font-size: 0.8rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.col2 input[type="file"]:hover {
-  border-color: var(--accent);
-}
-
 .col2 input[type="file"]::file-selector-button {
-  padding: 0.4rem 0.8rem;
   margin-right: 0.75rem;
   background: var(--accent);
   color: var(--bg-primary);
@@ -637,19 +1442,6 @@
 }
 
 /* Tag/Strategy Picker Dropdown */
-.tagPicker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: var(--bg-level-1);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  margin-bottom: 1rem;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
 /* Tag Picker Scrollbar */
 .tagPicker::-webkit-scrollbar {
   width: 6px;
@@ -681,13 +1473,13 @@
 }
 
 .tagUnselected {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.03);
   transform: scale(1);
 }
 
 .tagSelected {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transform: scale(1.02);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
 }
 
 /* Strategy Buttons */
@@ -780,12 +1572,26 @@
 /* ===== Responsiveness ===== */
 @media (max-width: 1024px) {
   .addtrade {
-    gap: 1.5rem;
     padding: 1.25rem;
   }
 
   .addtrade form {
-    width: 95%;
+    width: 100%;
+  }
+
+  .addtradeGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .contextStack,
+  .setupGridTop,
+  .setupGridBottom,
+  .setupMetaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -800,6 +1606,19 @@
 
   .row {
     flex-direction: column;
+  }
+
+  .segmentedControl {
+    grid-template-columns: 1fr;
+  }
+
+  .ratingGroup {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .uploadZoneInner {
+    flex-direction: column;
+    align-items: stretch;
   }
 
   .col2 {
@@ -819,6 +1638,14 @@
 
   .btncontainer button {
     width: 100%;
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ratingGroup {
+    grid-template-columns: 1fr;
   }
 }
 

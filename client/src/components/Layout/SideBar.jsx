@@ -1,10 +1,12 @@
 import styles from "./SideBar.module.css";
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../store/Auth";
+import { useTrades } from "../../store/TradeContext";
 
 export const Sidebar = ({ onClose }) => {
 
   const { user, isAdmin, isPro, isAuthLoading } = useAuth();
+  const { includeImportedTrades, setIncludeImportedTrades } = useTrades() || {};
   const userInitial = user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
 
   const getNavLinkClass = ({ isActive }) => {
@@ -80,6 +82,20 @@ export const Sidebar = ({ onClose }) => {
           </li>
         </ul>
       </nav>
+
+      <div className={styles.globalToggleWrap}>
+        <label className={styles.globalToggleLabel}>
+          <input
+            type="checkbox"
+            checked={Boolean(includeImportedTrades)}
+            onChange={(e) =>
+              typeof setIncludeImportedTrades === "function" &&
+              setIncludeImportedTrades(e.target.checked)
+            }
+          />
+          <span>Include Imported Data</span>
+        </label>
+      </div>
 
       {/* Bottom User Info */}
       <Link to="/app/my-account" className={styles.user}>

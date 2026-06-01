@@ -46,7 +46,11 @@ const EquityCurveChart = ({ trades }) => {
           <XAxis
             dataKey="x"
             label={{ value: "Trade #", position: "insideBottom", offset: -5 }}
-            tick={{ fontSize: 12 }}
+            tick={{ fill: "#64748b", fontSize: 11 }}
+            tickMargin={10}
+            axisLine={false}
+            tickLine={false}
+            padding={{ left: 8, right: 8 }}
             interval="preserveStartEnd"
           />
           <YAxis
@@ -55,7 +59,10 @@ const EquityCurveChart = ({ trades }) => {
               angle: -90,
               position: "insideLeft",
             }}
-            tick={{ fontSize: 12 }}
+            tick={{ fill: "#64748b", fontSize: 12 }}
+            tickMargin={8}
+            axisLine={false}
+            tickLine={false}
             domain={["auto", "auto"]}
           />
           <Tooltip
@@ -64,7 +71,7 @@ const EquityCurveChart = ({ trades }) => {
               border: `1px solid ${chartVar("--chart-tooltip-border", "var(--chart-tooltip-border)")}`,
               borderRadius: "12px",
             }}
-            formatter={(value) => [`$${value}`, "Balance"]}
+            formatter={(value) => [`$${Number(value || 0).toFixed(2)}`, "Balance"]}
             labelFormatter={(label) => `Trade #${label}`}
           />
           <Line
@@ -78,9 +85,15 @@ const EquityCurveChart = ({ trades }) => {
         </LineChart>
       </ResponsiveContainer>
 
-      <div className={styles.quickdata}>
-        <p>Highest Balance: ${performance.highestBalance}</p>
-        <p>Lowest Balance: ${performance.lowestBalance}</p>
+      <div className={styles.statsGrid}>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Highest Balance</p>
+          <p className={styles.statValue}>${Number(performance.highestBalance || 0).toFixed(2)}</p>
+        </div>
+        <div className={styles.statCard}>
+          <p className={styles.statLabel}>Lowest Balance</p>
+          <p className={styles.statValue}>${Number(performance.lowestBalance || 0).toFixed(2)}</p>
+        </div>
       </div>
     </div>
   );

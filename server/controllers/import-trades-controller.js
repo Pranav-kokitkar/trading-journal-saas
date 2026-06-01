@@ -233,7 +233,9 @@ const importTradesController = async (req, res) => {
             // Keep required timing fields aligned for imported historical trades.
             entryTime: normalized.dateTime,
             exitTime:
-              normalized.tradeStatus === "exited" ? normalized.dateTime : undefined,
+              normalized.tradeStatus === "exited"
+                ? normalized.dateTime
+                : undefined,
             tags: tagIds,
             strategy: strategyId,
             session: normalized.sessionName || "",
@@ -242,12 +244,19 @@ const importTradesController = async (req, res) => {
             isImported: true,
             rr: Number.isFinite(normalized.rr) ? normalized.rr : 0,
             pnl: Number.isFinite(normalized.pnl) ? normalized.pnl : 0,
+            slippage: Number.isFinite(normalized.slippage)
+              ? normalized.slippage
+              : 0,
+            commission: Number.isFinite(normalized.commission)
+              ? normalized.commission
+              : 0,
             riskAmount: Number.isFinite(normalized.riskAmount)
               ? normalized.riskAmount
               : 0,
             riskPercent: Number.isFinite(normalized.riskPercent)
               ? normalized.riskPercent
               : 0,
+            tradeMode: normalized.tradeMode || "live",
             balanceAfterTrade: Number.isFinite(normalized.balanceAfterTrade)
               ? normalized.balanceAfterTrade
               : 0,

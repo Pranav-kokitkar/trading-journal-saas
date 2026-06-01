@@ -6,7 +6,7 @@
 .trade {
   display: flex;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 0;
   min-height: 100vh;
 }
 
@@ -14,8 +14,6 @@
 .tradeContainer {
   width: 100%;
   max-width: 1280px;
-  /* Remove visual chrome per user request */
-  background: transparent;
   border-radius: 0;
   padding: 1.5rem;
   border: none;
@@ -25,14 +23,14 @@
 /* ===== Header ===== */
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
   padding-bottom: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   border-bottom: 1px solid var(--border-subtle);
 }
-
 .header h2 {
   margin: 0;
   font-size: 1.4rem;
@@ -44,8 +42,9 @@
 .headerTitle {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
+  flex: 1 1 auto;
 }
 
 .header p {
@@ -56,14 +55,19 @@
 
 /* Market Type Badge */
 .marketType {
-  padding: 0.5rem 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  width: auto;
+  padding: 0.35rem 0.75rem;
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  background: var(--accent);
-  color: var(--bg-primary);
-  letter-spacing: 0.5px;
+  background: rgba(99, 102, 241, 0.1);
+  color: #818cf8;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  align-self: flex-start;
 }
 
 /* ===== Trade Data Grid ===== */
@@ -220,6 +224,8 @@
   border-radius: var(--radius-sm);
   background: var(--bg-tertiary);
   border: 1px solid var(--border-subtle);
+  width: 100%;
+  min-width: 0;
 }
 
 .metricLabel {
@@ -253,7 +259,13 @@
 .additionalInfoGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 1rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+.additionalInfoGrid > .metricCard {
+  grid-column: span 1;
 }
 
 .statusLive {
@@ -277,6 +289,261 @@
   border-radius: inherit;
   background: linear-gradient(90deg, var(--accent), var(--success));
   transition: width 0.2s ease;
+}
+
+/* Grade badge (replaces confidence progress bar) */
+.gradeWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gradeBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-weight: 800;
+  color: var(--text-on-accent, #08121a);
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+}
+
+.gradeA {
+  background: var(--success);
+  color: var(--bg-primary);
+}
+
+.gradeB {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+
+.gradeC {
+  background: var(--muted);
+  color: var(--text-primary);
+}
+
+.confidenceMetricCard {
+  position: relative;
+  justify-content: flex-start;
+}
+
+.confidencePickerWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.confidenceSetButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #141622;
+  color: #94a3b8;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.confidenceSetButton:hover {
+  border-color: #64748b;
+  color: #cbd5e1;
+}
+
+.confidencePickerMenu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  z-index: 30;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.35rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(51, 65, 85, 0.75);
+  background: #0f111a;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+}
+
+.confidencePickerItem {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.confidencePickerItem:hover {
+  background: rgba(51, 65, 85, 0.45);
+}
+
+.confidenceDraftLabel {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.detailsPickerWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+}
+
+.strategyPickerWrap {
+  position: relative;
+  min-height: 0;
+}
+
+.detailsPickerMenu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  z-index: 30;
+  min-width: 170px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.35rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(51, 65, 85, 0.75);
+  background: #0f111a;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+}
+
+.detailsPickerItem {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.detailsPickerItem:hover {
+  background: rgba(51, 65, 85, 0.45);
+}
+
+.detailsHintText {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.metaActionCard {
+  position: relative;
+}
+
+.metaValueRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.metaValueRowSpread {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.metaValueStack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.metaActionButton {
+  appearance: none;
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  background: #141622;
+  color: #94a3b8;
+  padding: 0.3rem 0.55rem;
+  border-radius: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.metaActionButtonMuted {
+  opacity: 0.72;
+}
+
+.metaActionButtonWhite {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(226, 232, 240, 0.9);
+  color: #0f172a;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.metaActionButtonWhite:hover {
+  background: #ffffff;
+  border-color: rgba(203, 213, 225, 1);
+  color: #020617;
+}
+
+.metaActionButton:hover {
+  border-color: #64748b;
+  color: #cbd5e1;
+  opacity: 0.92;
+}
+
+.exitLiveState {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.exitActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.exitActionButton,
+.exitActionButtonSecondary {
+  appearance: none;
+  border: 1px solid transparent;
+  padding: 0.68rem 1rem;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.exitActionButton {
+  background: rgba(61, 214, 166, 0.16);
+  color: var(--color-profit);
+  box-shadow: 0 10px 18px rgba(61, 214, 166, 0.1);
+}
+
+.exitActionButton:hover {
+  background: rgba(61, 214, 166, 0.24);
+  transform: translateY(-1px);
 }
 
 .exitGrid {
@@ -328,6 +595,16 @@
 
 .negative {
   color: var(--error) !important;
+  font-weight: 700;
+}
+
+.neutral {
+  color: var(--text-secondary) !important;
+  font-weight: 700;
+}
+
+.liveResult {
+  color: var(--text-secondary) !important;
   font-weight: 700;
 }
 
@@ -637,6 +914,7 @@
 .tagBadge {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 0.4rem 0.9rem;
   border-radius: var(--radius-full);
   font-size: 0.8rem;
@@ -645,6 +923,115 @@
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.2s ease;
   cursor: default;
+  line-height: 1;
+}
+
+.tagInitial {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.tagsListCard {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.25rem;
+}
+
+.tagPickerCard {
+  margin-top: 0.25rem;
+}
+
+.tagPicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* Exit prices vertical list */
+.exitList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.exitHeaderRow {
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr 0.8fr 1.2fr;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.exitHeaderCell {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.exitHeaderRight {
+  text-align: right;
+}
+
+.exitRow {
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr 0.8fr 1.2fr;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  background: rgba(20, 22, 34, 0.6);
+}
+
+.exitTarget {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.exitPriceValue {
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+}
+
+.exitVolumeValue {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: right;
+}
+
+.exitTimeValue {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: right;
+}
+
+.exitTimePending {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-style: italic;
+  font-weight: 300;
+  text-align: right;
 }
 
 .tagBadge:hover {
@@ -659,29 +1046,28 @@
   gap: 0.75rem;
 }
 
-.tagsListCard,
-.tagPickerCard {
-  grid-column: 1 / -1;
-  padding: 0.95rem;
-  border-radius: var(--radius-sm);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-}
+@media (max-width: 760px) {
+  .exitHeaderRow {
+    display: none;
+  }
 
-.tagsListCard {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
+  .exitRow {
+    grid-template-columns: 1fr;
+    align-items: flex-start;
+    gap: 0.55rem;
+  }
 
-.tagPickerCard {
-  margin-top: 0.25rem;
-}
+  .exitTarget,
+  .exitPriceValue,
+  .exitVolumeValue,
+  .exitTimeValue,
+  .exitTimePending {
+    text-align: left;
+  }
 
-.tagPicker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  .tagsGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ===== Action Buttons ===== */

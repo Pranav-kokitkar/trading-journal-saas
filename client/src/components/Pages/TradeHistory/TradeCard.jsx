@@ -35,12 +35,24 @@ export const TradeCard = ({ savedTrade, currentPage = 1, onTradeClick }) => {
         const pnlValue =
           tradeData.tradeStatus === "live"
             ? "Live"
+            : tradeData.tradeStatus === "missed"
+            ? "Missed"
             : tradeData.pnl !== null && tradeData.pnl !== undefined
             ? `$${tradeData.pnl}`
             : "$0";
 
-        const confidence = Number(tradeData.confidence ?? tradeData.confidenceLevel ?? 0);
+        const confidence = Number(
+          tradeData.tradeConfidence ?? tradeData.confidence ?? tradeData.confidenceLevel ?? 0,
+        );
         const strategyName = tradeData.strategy && typeof tradeData.strategy === 'object' ? tradeData.strategy.name : tradeData.strategy;
+        const normalizedStatus = String(tradeData.tradeStatus || "").toLowerCase().trim();
+        const normalizedTradeMode = String(
+          tradeData.tradeMode || tradeData.tradeType || tradeData.trade_type || "",
+        )
+          .toLowerCase()
+          .trim();
+        const isBacktestTrade = normalizedTradeMode === "backtest";
+        const isMissedTrade = normalizedStatus === "missed";
 
         const cardContent = (
             <div className={styles.tradecard}>
@@ -83,6 +95,12 @@ export const TradeCard = ({ savedTrade, currentPage = 1, onTradeClick }) => {
                   <div className={styles.leftMeta}>
                     <span className={styles.direction}>{tradeData.tradedirection ?? tradeData.tradeDirection ?? "—"}</span>
                     {strategyName && <span className={styles.strategyBadgeSmall}>📊 {strategyName}</span>}
+                    {isBacktestTrade && (
+                      <span className={styles.backtestBadge}>BACKTEST</span>
+                    )}
+                    {isMissedTrade && (
+                      <span className={styles.missedBadge}>MISSED</span>
+                    )}
                   </div>
                   <span className={tradeData.pnl >= 0 ? styles.pnlPositive : styles.pnlNegative}>{pnlValue}</span>
                 </div>

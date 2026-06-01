@@ -416,7 +416,6 @@ export const AnalyticsDashboard = () => {
     trades = [],
     refreshAllAccountTrades,
     includeImportedTrades,
-    setIncludeImportedTrades,
   } = useTrades() || {};
 
   const [activeDimension, setActiveDimension] = useState("strategy");
@@ -574,18 +573,6 @@ export const AnalyticsDashboard = () => {
             </button>
           ))}
         </div>
-
-        <label className={styles.importToggleLabel}>
-          <input
-            type="checkbox"
-            checked={Boolean(includeImportedTrades)}
-            onChange={(e) =>
-              typeof setIncludeImportedTrades === "function" &&
-              setIncludeImportedTrades(e.target.checked)
-            }
-          />
-          <span>Include Imported Trades</span>
-        </label>
       </div>
 
       <div className={styles.filtersCard}>

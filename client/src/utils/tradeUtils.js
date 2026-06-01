@@ -8,6 +8,8 @@ const getTradeCosts = (trade) => ({
   commission: Math.max(0, toNumber(trade?.commission ?? trade?.commissionCost)),
 });
 
+const roundCurrency = (value) => Number(Number(value).toFixed(2));
+
 export const calculateTradeOnExit = ({
   trade,
   exitLevels,
@@ -95,7 +97,7 @@ export const calculateTradeOnExit = ({
   const riskamount = priceDiff > 0 ? parseFloat(actualRisk.toFixed(2)) : 0;
 
   // PnL Calculation (volume-aware)
-  let pnl = 0;
+  let grossPnl = 0;
   if (priceDiff > 0) {
     exitLevels.forEach((lvl) => {
       const exitPrice = Number(lvl.price);
@@ -105,37 +107,44 @@ export const calculateTradeOnExit = ({
           ? entry - exitPrice
           : exitPrice - entry;
       const positionSize = actualRisk / priceDiff;
-      pnl += rewardDiff * positionSize * volumePercent;
+      grossPnl += rewardDiff * positionSize * volumePercent;
     });
   } else {
-    pnl = 0;
+    grossPnl = 0;
   }
 
   // ✅ CRITICAL FIX: Cap PnL to reasonable limits (max 100x risk)
   const maxPnL = Math.abs(actualRisk) * 100;
-  if (Math.abs(pnl) > maxPnL) {
-    console.warn(`⚠️ PnL capped: ${pnl} → ${pnl > 0 ? maxPnL : -maxPnL}. Check Entry/SL/TP values.`);
-    pnl = pnl > 0 ? maxPnL : -maxPnL;
+  if (Math.abs(grossPnl) > maxPnL) {
+    console.warn(
+      `⚠️ PnL capped: ${grossPnl} → ${grossPnl > 0 ? maxPnL : -maxPnL}. Check Entry/SL/TP values.`,
+    );
+    grossPnl = grossPnl > 0 ? maxPnL : -maxPnL;
   }
 
   const { slippage, commission } = getTradeCosts(updatedTrade);
-  pnl -= slippage + commission;
+  const executionCost = slippage + commission;
+  let netPnl = grossPnl - executionCost;
 
   // cap extreme loss
-  if (pnl < 0 && Math.abs(pnl) > accountBalance) pnl = -accountBalance;
-  pnl = parseFloat(pnl.toFixed(2));
+  if (netPnl < 0 && Math.abs(netPnl) > accountBalance) netPnl = -accountBalance;
+  grossPnl = roundCurrency(grossPnl);
+  netPnl = roundCurrency(netPnl);
 
   // Set tradeResult for performance calculation
-  const tradeResult = pnl > 0 ? "win" : pnl < 0 ? "loss" : "breakeven";
+  const tradeResult = netPnl > 0 ? "win" : netPnl < 0 ? "loss" : "breakeven";
 
   // Update balance after this trade
-  const balanceAfterTrade = parseFloat((accountBalance + pnl).toFixed(2));
+  const balanceAfterTrade = roundCurrency(accountBalance + netPnl);
 
   return {
     ...updatedTrade,
     rr,
     riskamount,
-    pnl,
+    grossPnl,
+    executionCost,
+    pnl: netPnl,
+    netPnl,
     tradeResult,
     balanceAfterTrade,
   };
@@ -154,6 +163,17 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
   const marketType = (trade.marketType || "").toString().toLowerCase();
   const riskAmount = Number(trade.riskAmount) || 0;
   const tradeStatus = trade.tradeStatus || "";
+  const tradeMode = (
+    trade.tradeMode ||
+    trade.tradeType ||
+    trade.trade_type ||
+    ""
+  )
+    .toString()
+    .toLowerCase()
+    .trim();
+  const isSimulationTrade =
+    tradeStatus === "missed" || tradeMode === "backtest";
   const symbol = (trade.symbol || "").toString().toUpperCase();
   const riskType = trade.riskType || "dollar";
   const priceDiff = Math.abs(entry - stoploss);
@@ -207,7 +227,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
     !missingFields.includes("entry") &&
     !missingFields.includes("stoploss") &&
     !missingFields.includes("tradedirection") &&
-    tradeStatus === "exited" &&
+    (tradeStatus === "exited" || isSimulationTrade) &&
     (takeprofit || (trade.exitedPrice && trade.exitedPrice.length > 0))
   ) {
     const rrExit =
@@ -282,14 +302,26 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
   }
 
   // ===== Potential Profit / PNL =====
-  let pnl = "-";
+  let grossPnl = 0;
+  let executionCost = 0;
+  let netPnl = 0;
   let profitError = "";
 
-  if (tradeStatus === "live") {
-    profitError =
-      "Trade is live. Add exit price to calculate potential profit.";
-  } else if (tradeStatus === "exited" && trade.exitedPrice?.length > 0) {
-    const totalVolume = trade.exitedPrice.reduce(
+  const { slippage, commission } = getTradeCosts(trade);
+  executionCost = slippage + commission;
+
+  const calculatedExitLevels =
+    Array.isArray(trade.exitedPrice) && trade.exitedPrice.length > 0
+      ? trade.exitedPrice
+      : takeprofit
+        ? [{ price: takeprofit, volume: 100 }]
+        : [];
+
+  if (tradeStatus === "live" && !isSimulationTrade) {
+    grossPnl = 0;
+    netPnl = -executionCost;
+  } else if (calculatedExitLevels.length > 0) {
+    const totalVolume = calculatedExitLevels.reduce(
       (sum, lvl) => sum + Number(lvl.volume || 0),
       0,
     );
@@ -300,7 +332,7 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
       let totalProfit = 0;
       const priceDiff = Math.abs(entry - stoploss);
       if (priceDiff > 0) {
-        trade.exitedPrice.forEach((lvl) => {
+        calculatedExitLevels.forEach((lvl) => {
           const exitPrice = Number(lvl.price);
           const volumePercent = Number(lvl.volume) / 100;
           const rewardDiff =
@@ -313,26 +345,27 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
       }
 
       if (totalProfit < 0 && Math.abs(totalProfit) > accountBalance) {
-        pnl = (-accountBalance).toFixed(2);
+        grossPnl = -accountBalance;
         profitError = "Loss capped at account balance.";
       } else {
-        pnl = totalProfit.toFixed(2);
+        grossPnl = totalProfit;
         if (totalProfit < 0 && Math.abs(totalProfit) > 0.2 * accountBalance) {
           lossWarning = "Warning: Loss exceeds 20% of account balance.";
         }
       }
+
+      netPnl = grossPnl - executionCost;
     }
   } else {
     profitError = "Exit price required to calculate potential profit.";
   }
 
-  const { slippage, commission } = getTradeCosts(trade);
-  let netPnl = Number(pnl) - slippage - commission;
-
   // ✅ CRITICAL FIX: Cap PnL to reasonable limits (max 100x risk)
   const maxPnL = Math.abs(parseFloat(riskamount) || 0) * 100;
   if (Math.abs(netPnl) > maxPnL) {
-    console.warn(`⚠️ PnL capped: ${netPnl} → ${netPnl > 0 ? maxPnL : -maxPnL}. Check Entry/SL/TP values.`);
+    console.warn(
+      `⚠️ PnL capped: ${netPnl} → ${netPnl > 0 ? maxPnL : -maxPnL}. Check Entry/SL/TP values.`,
+    );
     netPnl = netPnl > 0 ? maxPnL : -maxPnL;
   }
 
@@ -346,7 +379,10 @@ export const calculateTradeValues = ({ trade, accountBalance }) => {
     riskamount: parseFloat(riskamount) || 0,
     lossError,
     lossWarning: slTpWarning || lossWarning, // ✅ Show SL/TP validation warning
-    pnl: parseFloat(netPnl.toFixed(2)) || 0,
+    grossPnl: roundCurrency(grossPnl),
+    executionCost: roundCurrency(executionCost),
+    pnl: roundCurrency(netPnl),
+    netPnl: roundCurrency(netPnl),
     profitError,
     generalError,
   };

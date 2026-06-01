@@ -154,7 +154,7 @@ const editAccountDetails = async (req, res) => {
     const updatedAccount = await Account.findByIdAndUpdate(
       id,
       { $set: updateData },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedAccount) {
@@ -212,13 +212,18 @@ const getAccountPerformance = async (req, res) => {
     }
 
     const accountObjectId = new mongoose.Types.ObjectId(accountId);
+    const capitalTradeMatch = {
+      accountId: accountObjectId,
+      tradeStatus: { $ne: "missed" },
+      tradeMode: { $ne: "backtest" },
+      tradeType: { $ne: "backtest" },
+      trade_type: { $ne: "backtest" },
+    };
 
     /** ---------------- SUMMARY STATS ---------------- */
     const summaryResult = await Trade.aggregate([
       {
-        $match: {
-          accountId: accountObjectId,
-        },
+        $match: capitalTradeMatch,
       },
       {
         $group: {
@@ -375,7 +380,7 @@ const getAccountPerformance = async (req, res) => {
     const tradesTimeSeries = await Trade.aggregate([
       {
         $match: {
-          accountId: accountObjectId,
+          ...capitalTradeMatch,
           tradeStatus: "exited",
           pnl: { $ne: null },
           dateTime: { $type: "date" },

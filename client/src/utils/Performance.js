@@ -3,14 +3,32 @@ export const calculatePerformance = (trades = []) => {
   // Ensure we always work with an array
   const allTrades = Array.isArray(trades) ? trades : [];
 
+  const getTradeMode = (trade) =>
+    String(trade?.tradeMode || trade?.tradeType || trade?.trade_type || "")
+      .toLowerCase()
+      .trim();
+
+  const isCapitalTrade = (trade) => {
+    const status = String(trade?.tradeStatus || "")
+      .toLowerCase()
+      .trim();
+    if (status === "missed") return false;
+    return getTradeMode(trade) !== "backtest";
+  };
+
   // Treat "closed" and "exited" as finished trades
   const isClosedStatus = (s) =>
     typeof s === "string" &&
     ["closed", "exited"].includes(s.toString().toLowerCase());
 
   // Split into closed/exited and live/other
-  const closedTrades = allTrades.filter((t) => isClosedStatus(t.tradeStatus));
-  const liveTrades = allTrades.filter((t) => !isClosedStatus(t.tradeStatus));
+  const capitalTrades = allTrades.filter((t) => isCapitalTrade(t));
+  const closedTrades = capitalTrades.filter((t) =>
+    isClosedStatus(t.tradeStatus),
+  );
+  const liveTrades = capitalTrades.filter(
+    (t) => !isClosedStatus(t.tradeStatus),
+  );
 
   // Helper: read a value with flexible field names / casing
   const read = (t, ...keys) => {

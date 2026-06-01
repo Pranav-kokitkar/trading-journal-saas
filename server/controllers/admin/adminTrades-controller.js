@@ -72,6 +72,14 @@ const getAllTrades = async (req, res) => {
       }
     }
 
+    const capitalFilter = {
+      ...filter,
+      tradeStatus: { $ne: "missed" },
+      tradeMode: { $ne: "backtest" },
+      tradeType: { $ne: "backtest" },
+      trade_type: { $ne: "backtest" },
+    };
+
     // --- FETCH TRADES ---
     const trades = await Trades.find(filter)
       .sort({ dateTime: -1 })
@@ -81,33 +89,33 @@ const getAllTrades = async (req, res) => {
       .populate("accountId", "name status");
 
     // --- GET STATS WITH FILTER APPLIED ---
-    const totalTrades = await Trades.countDocuments(filter);
+    const totalTrades = await Trades.countDocuments(capitalFilter);
     const totalLiveTrades = await Trades.countDocuments({
-      ...filter,
+      ...capitalFilter,
       tradeStatus: "live",
     });
     const totalExitedTrades = await Trades.countDocuments({
-      ...filter,
+      ...capitalFilter,
       tradeStatus: "exited",
     });
 
     // Additional stats
     const totalWins = await Trades.countDocuments({
-      ...filter,
+      ...capitalFilter,
       tradeResult: "win",
     });
     const totalLosses = await Trades.countDocuments({
-      ...filter,
+      ...capitalFilter,
       tradeResult: "loss",
     });
     const totalBreakeven = await Trades.countDocuments({
-      ...filter,
+      ...capitalFilter,
       tradeResult: "breakeven",
     });
 
     // Calculate total PnL
     const pnlResult = await Trades.aggregate([
-      { $match: filter },
+      { $match: capitalFilter },
       {
         $group: {
           _id: null,

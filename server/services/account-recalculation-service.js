@@ -6,6 +6,21 @@ const toNumber = (value) => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const isCapitalTrade = (trade) => {
+  const tradeStatus = String(trade?.tradeStatus || "")
+    .toLowerCase()
+    .trim();
+  if (tradeStatus === "missed") return false;
+
+  const tradeMode = String(
+    trade?.tradeMode || trade?.tradeType || trade?.trade_type || "",
+  )
+    .toLowerCase()
+    .trim();
+
+  return tradeMode !== "backtest";
+};
+
 const writeInChunks = async (operations, chunkSize = 1000) => {
   if (!Array.isArray(operations) || operations.length === 0) return;
 
@@ -26,15 +41,19 @@ const recalculateAccountTrades = async ({ userId, accountId }) => {
 
   // ✅ CRITICAL FIX: Exclude soft-deleted trades
   const trades = await Trade.find({ userId, accountId, deleted: { $ne: true } })
-    .select("_id pnl")
+    .select("_id pnl tradeStatus tradeMode tradeType trade_type")
     .sort({ dateTime: 1, _id: 1 })
     .lean();
 
   let runningBalance = toNumber(account.initialCapital);
+  let includedTradeCount = 0;
 
   if (trades.length > 0) {
     const bulkOps = trades.map((trade, index) => {
-      runningBalance += toNumber(trade.pnl);
+      if (isCapitalTrade(trade)) {
+        runningBalance += toNumber(trade.pnl);
+        includedTradeCount += 1;
+      }
 
       return {
         updateOne: {
@@ -58,13 +77,13 @@ const recalculateAccountTrades = async ({ userId, accountId }) => {
     {
       $set: {
         currentBalance: runningBalance,
-        totalTrades: trades.length,
+        totalTrades: includedTradeCount,
       },
     },
   );
 
   return {
-    recalculatedTrades: trades.length,
+    recalculatedTrades: includedTradeCount,
     finalBalance: runningBalance,
   };
 };

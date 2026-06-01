@@ -89,7 +89,10 @@ export const getDimensionLabel = (key, value, accounts, strategies, tags) => {
     }
 
     case "tradeStatus":
-      return value === "live" ? "Live (Ongoing)" : "Exited (Completed)";
+      if (value === "live") return "Live (Ongoing)";
+      if (value === "exited") return "Exited (Completed)";
+      if (value === "missed") return "Missed";
+      return value;
 
     case "marketType":
       return value.charAt(0).toUpperCase() + value.slice(1);

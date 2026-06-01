@@ -30,6 +30,7 @@ export const TradeProvider = ({ children }) => {
 
   const [trade, setTrade] = useState({
     id: "",
+    tradeMode: "live",
     marketType: "",
     symbol: "",
     tradedirection: "",
@@ -52,7 +53,8 @@ export const TradeProvider = ({ children }) => {
     tradeNumber: "",
     dateNtime: "",
     tradeNotes: "",
-    confidence: "50",
+    tradeGrade: "",
+    tradeConfidence: "",
   });
 
   const { authorizationToken, isLoggedIn } = useAuth();
@@ -65,6 +67,19 @@ export const TradeProvider = ({ children }) => {
     if (["false", "0", "no", "off"].includes(normalized)) return false;
     if (["true", "1", "yes", "on"].includes(normalized)) return true;
     return defaultValue;
+  };
+
+  const isCapitalTrade = (tradeData) => {
+    const status = String(tradeData?.tradeStatus || "").toLowerCase().trim();
+    if (status === "missed") return false;
+
+    const tradeMode = String(
+      tradeData?.tradeMode || tradeData?.tradeType || tradeData?.trade_type || "",
+    )
+      .toLowerCase()
+      .trim();
+
+    return tradeMode !== "backtest";
   };
 
   const fetchJsonWithRetry = async (url, options = {}, retries = 2) => {
@@ -255,9 +270,13 @@ export const TradeProvider = ({ children }) => {
         // Update account details after successful add
         try {
           if (typeof updateAccount === "function") {
+            const shouldAffectAccount = isCapitalTrade(normalizedTrade);
+            const pnlDelta = shouldAffectAccount
+              ? Number(normalizedTrade.pnl || 0)
+              : 0;
             await updateAccount({
-              pnl: Number(normalizedTrade.pnl || 0),
-              deltaTrades: 1,
+              pnl: pnlDelta,
+              deltaTrades: shouldAffectAccount ? 1 : 0,
             });
           }
           if (typeof getActiveAccount === "function") {
@@ -269,6 +288,7 @@ export const TradeProvider = ({ children }) => {
         // reset local trade state
         setTrade({
           id: "",
+          tradeMode: "live",
           marketType: "",
           symbol: "",
           tradedirection: "",
@@ -291,7 +311,8 @@ export const TradeProvider = ({ children }) => {
           tradeNumber: "",
           dateNtime: "",
           tradeNotes: "",
-          confidence: "50",
+          tradeGrade: "",
+          tradeConfidence: "",
         });
       } else {
         toast.error("Failed to add trade");
@@ -375,7 +396,7 @@ export const TradeProvider = ({ children }) => {
     }
   };
 
-  const deleteTradeByID = async (id, pnl) => {
+  const deleteTradeByID = async (id, tradeData) => {
 
     try {
       const response = await fetch(
@@ -391,8 +412,14 @@ export const TradeProvider = ({ children }) => {
         toast.success("Trade deleted");
         try {
           if (typeof updateAccount === "function") {
-            const pnlToAdjust = -parseFloat(pnl || 0) || 0;
-            await updateAccount({ pnl: pnlToAdjust, deltaTrades: -1 });
+            const shouldAffectAccount = isCapitalTrade(tradeData);
+            const pnlToAdjust = shouldAffectAccount
+              ? (-parseFloat(tradeData?.pnl || 0) || 0)
+              : 0;
+            await updateAccount({
+              pnl: pnlToAdjust,
+              deltaTrades: shouldAffectAccount ? -1 : 0,
+            });
             await getAllTrades();
             await getAllAccountTrades(accountDetails?._id);
             if (typeof getActiveAccount === "function") {

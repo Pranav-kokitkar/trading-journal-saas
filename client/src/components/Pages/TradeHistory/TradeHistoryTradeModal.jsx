@@ -12,8 +12,9 @@ const formatDuration = (trade) => {
 };
 
 const formatMoney = (value) => {
-  const numeric = Number(value);
-  return Number.isFinite(numeric) ? `$${numeric}` : "—";
+  const numeric = Number(value || 0);
+  if (!Number.isFinite(numeric)) return "—";
+  return numeric < 0 ? `-$${Math.abs(numeric).toFixed(2)}` : `$${numeric.toFixed(2)}`;
 };
 
 const getTradeId = (trade) => trade?.id ?? trade?._id ?? trade?.tradeNumber;
@@ -29,16 +30,43 @@ export const TradeHistoryTradeModal = ({ trade, onClose, page }) => {
   const remaining = Math.max(0, tradeScreenshots.length - 1);
 
   const pnlValue = Number(trade.pnl);
-  const confidenceValue = Number(trade.confidence ?? trade.confidenceLevel ?? 0);
+  const rawConfidence = trade?.tradeConfidence ?? trade?.confidence;
+  const confidenceValue =
+    rawConfidence === null || rawConfidence === undefined || rawConfidence === ""
+      ? null
+      : Number.isFinite(Number(rawConfidence))
+        ? Math.max(0, Math.min(100, Number(rawConfidence)))
+        : null;
+  const isLiveTrade = String(trade?.tradeStatus || "").toLowerCase() === "live";
   const direction = trade.tradedirection ?? trade.tradeDirection ?? "—";
-  const isPositive = Number.isFinite(pnlValue) ? pnlValue >= 0 : false;
   const strategyName =
     trade.strategy && typeof trade.strategy === "object" ? trade.strategy.name : trade.strategy || "—";
-  const statusText = trade.tradeStatus;
+  const statusText =
+    String(trade.tradeStatus || "").toLowerCase() === "missed"
+      ? "Missed"
+      : trade.tradeStatus;
   const showStatus = statusText && String(statusText).toLowerCase() !== "exited";
 
   const riskAmount = trade.risk ?? trade.riskAmount ?? trade.riskAmt ?? null;
   const riskPercent = trade.riskPercent ?? trade.riskPct ?? trade.riskPercentage ?? null;
+  const pnlStateClass = Number.isFinite(pnlValue)
+    ? pnlValue > 0
+      ? styles.pnlPositive
+      : pnlValue < 0
+        ? styles.pnlNegative
+        : styles.pnlNeutral
+    : styles.pnlNeutral;
+  const resultValue = String(trade.tradeResult || "").toLowerCase();
+  const resultClass =
+    resultValue === "win"
+      ? styles.pnlPositive
+      : resultValue === "loss"
+        ? styles.pnlNegative
+        : styles.pnlNeutral;
+  const resultLabel = trade.tradeResult || "—";
+  const hasConfidence = confidenceValue !== null;
+  const confidenceFallbackLabel = hasConfidence ? `${confidenceValue}%` : "-";
+  const confidenceToneClass = hasConfidence ? styles.gradeA : styles.gradePending;
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
@@ -84,7 +112,7 @@ export const TradeHistoryTradeModal = ({ trade, onClose, page }) => {
             <div className={styles.modalMetricsGrid}>
               <div className={styles.modalMetricCard}>
                 <span className={styles.modalMetricLabel}>PnL</span>
-                <span className={`${styles.modalMetricValue} ${isPositive ? styles.pnlPositive : styles.pnlNegative}`}>
+                <span className={`${styles.modalMetricValue} ${pnlStateClass}`}>
                   {formatMoney(trade.pnl)}
                 </span>
               </div>
@@ -105,8 +133,25 @@ export const TradeHistoryTradeModal = ({ trade, onClose, page }) => {
               </div>
 
               <div className={styles.modalMetricCard}>
-                <span className={styles.modalMetricLabel}>Confidence</span>
-                <span className={styles.modalMetricValue}>{confidenceValue}%</span>
+                <span className={styles.modalMetricLabel}>Trade Confidence</span>
+                {hasConfidence ? (
+                  <div className={styles.modalGradeRow}>
+                    <span className={`${styles.modalGradeBadge} ${confidenceToneClass}`}>
+                      {confidenceFallbackLabel}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex w-full items-center justify-center">
+                    <span className="text-slate-500 font-medium">—</span>
+                  </div>
+                )}
+              </div>
+
+              <div className={styles.modalMetricCard}>
+                <span className={styles.modalMetricLabel}>Result</span>
+                <span className={`${styles.modalMetricValue} ${resultClass}`}>
+                  {isLiveTrade ? "- (live)" : resultLabel}
+                </span>
               </div>
 
               <div className={styles.modalMetricCard}>
