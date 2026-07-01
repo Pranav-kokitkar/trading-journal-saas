@@ -52,7 +52,12 @@ export const MyAccount = () => {
 
   const handleExport = async (format) => {
     try {
-      await exportTrades(format);
+      if (!accountDetails?._id) {
+        alert("Please select an active account first.");
+        return;
+      }
+
+      await exportTrades(format, accountDetails._id);
     } catch (error) {
       alert("Failed to export trades");
     }

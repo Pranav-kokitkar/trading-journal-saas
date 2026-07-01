@@ -1,16 +1,23 @@
-const API_URL = (import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"));
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.PROD ? window.location.origin : "http://localhost:3000");
 
-export const exportTrades = async (format) => {
+export const exportTrades = async (format, accountId) => {
   const token = localStorage.getItem("token");
+  const query = new URLSearchParams({ format });
+
+  if (accountId) {
+    query.set("accountId", accountId);
+  }
 
   const response = await fetch(
-    `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/export/trades?format=${format}`,
+    `${API_URL}/api/export/trades?${query.toString()}`,
     {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }
+    },
   );
 
   if (!response.ok) {

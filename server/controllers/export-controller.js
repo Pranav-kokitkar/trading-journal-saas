@@ -1,4 +1,5 @@
 const Trade = require("../models/trade-model");
+const mongoose = require("mongoose");
 
 const toIsoString = (value) => {
   if (!value) return "";
@@ -8,13 +9,27 @@ const toIsoString = (value) => {
 
 const exportTrades = async (req, res) => {
   try {
-    const { format } = req.query; // csv | json
+    const { format, accountId } = req.query; // csv | json
     const userId = req.userID;
+
+    if (accountId && !mongoose.Types.ObjectId.isValid(accountId)) {
+      return res.status(400).json({ message: "Invalid accountId" });
+    }
+
+    const tradeFilter = {
+      userId,
+      deleted: { $ne: true },
+    };
+
+    if (accountId) {
+      tradeFilter.accountId = accountId;
+    }
 
     // ✅ PERFORMANCE: Only select needed fields, use lean()
     // ✅ CRITICAL FIX: Exclude soft-deleted trades
-    const trades = await Trade.find({ userId, deleted: { $ne: true } })
+    const trades = await Trade.find(tradeFilter)
       .select("-__v -userId") // Exclude unnecessary fields
+      .populate({ path: "tags", select: "name colour" })
       .sort({ dateTime: 1 })
       .lean();
 
@@ -50,12 +65,17 @@ const exportTrades = async (req, res) => {
             : [],
           rr: t.rr,
           pnl: t.pnl,
-          durationMinutes: t.durationMinutes,
-          durationHours: t.durationHours,
-          durationText: t.durationText,
           riskAmount: t.riskAmount,
           result: t.tradeResult,
           notes: t.tradeNotes,
+          session: t.session,
+          tags: Array.isArray(t.tags)
+            ? t.tags.map((tag) => ({
+                id: tag?._id,
+                name: tag?.name || "",
+                colour: tag?.colour || "",
+              }))
+            : [],
           screenshots: t.screenshots,
         })),
       };
@@ -83,11 +103,10 @@ const exportTrades = async (req, res) => {
         "ExitTimestamp",
         "RR",
         "PNL",
-        "DurationMinutes",
-        "DurationHours",
-        "Duration",
         "Risk",
         "Result",
+        "Session",
+        "Tags",
         "Notes",
       ];
 
@@ -100,6 +119,12 @@ const exportTrades = async (req, res) => {
         t.exitedPrice.forEach((exit, index) => {
           const exitTimestamp =
             exitTimestamps[index]?.timestamp || t.exitTime || "";
+          const tagNames = Array.isArray(t.tags)
+            ? t.tags
+                .map((tag) => tag?.name || "")
+                .filter(Boolean)
+                .join("; ")
+            : "";
           rows.push(
             [
               toIsoString(t.entryTime || t.dateTime),
@@ -115,11 +140,10 @@ const exportTrades = async (req, res) => {
               toIsoString(exitTimestamp),
               t.rr,
               t.pnl,
-              t.durationMinutes ?? "",
-              t.durationHours ?? "",
-              t.durationText ?? "",
               t.riskAmount,
               t.tradeResult,
+              t.session || "",
+              `"${tagNames.replace(/"/g, '""')}"`,
               `"${(t.tradeNotes || "").replace(/"/g, '""')}"`,
             ].join(","),
           );
