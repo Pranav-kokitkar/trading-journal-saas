@@ -65,13 +65,13 @@ https://kyrosjournal.dev
 
 ## 📊 Dashboard
 
-![Dashboard](./screenshots/dashboard.png)
+![Dashboard](./screenshots/Dashboard.png)
 
 ---
 
 ## ➕ Add Trade
 
-![Add Trade](./screenshots/addtrade.png)
+![Add Trade](./screenshots/AddTrade.png)
 
 ---
 
@@ -87,15 +87,15 @@ https://kyrosjournal.dev
 
 *Chart replay, screenshots, notes, and trade management.*
 
-![Trade Details](./screenshots/tardedetails1.png)
+![Trade Details](./screenshots/tradedetails1.png)
 
-![Trade Details](./screenshots/tardedetails2.png)
+![Trade Details](./screenshots/tradedetails2.png)
 
 ---
 
 ## 📞 Contact
 
-![Contact](./screenshots/contactl.png)
+![Contact](./screenshots/contact.png)
 
 ---
 
@@ -147,7 +147,7 @@ https://kyrosjournal.dev
 
 ## 📱 Mobile Responsive
 
-| Home | Dashboard |
+| Dashboard | Add Trade |
 |------|-----------|
 | ![](./screenshots/mobileview1.png) | ![](./screenshots/mobileview2.png) |
 
