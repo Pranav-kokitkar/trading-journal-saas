@@ -1,10 +1,12 @@
 <div align="center">
-<img src="./client/public/favicon2.ico" alt="Kyros Journal Logo" width="80">
-#  Kyros Journal
 
-### Professional Trading Journal built for serious traders.
+<img src="./screenshots/logo.png" alt="Kyros Journal Logo" width="90">
 
-Track every trade • Discover your edge • Improve your execution
+<h1>Kyros Journal</h1>
+
+<h3>Professional Trading Journal built for serious traders.</h3>
+
+<p>Track every trade • Discover your edge • Improve your execution</p>
 
 <br>
 
