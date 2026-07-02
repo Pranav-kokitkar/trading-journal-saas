@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./screenshots/logo.png" alt="Kyros Journal Logo" width="90">
+<img src="./client/favicon2.ico" alt="Kyros Journal Logo" width="90">
 
 <h1>Kyros Journal</h1>
 
