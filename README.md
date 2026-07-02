@@ -1,356 +1,232 @@
-# Kyros Journal
+<div align="center">
 
-Professional Trading Journal built for serious traders.
+# 📈 Kyros Journal
 
-Track every trade.
-Discover your edge.
-Improve your execution.
+### Professional Trading Journal built for serious traders.
 
-⭐ Trade Analytics
-⭐ Multi Account Support
-⭐ Chart Replay
-⭐ Psychology Tracking
-⭐ Strategy Analytics
-⭐ Admin Dashboard
+Track every trade • Discover your edge • Improve your execution
 
-Most trading journals only record trades.
-Kyros Journal helps traders analyze their performance, discover statistical edges, review execution, organize strategies, and continuously improve through data-driven insights.
+<br>
 
-## Live Demo
-**Live URL:** https://kyrosjournal.dev
-Test Account
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![Node.js](https://img.shields.io/badge/Node.js-22-339933?logo=node.js)
+![Express](https://img.shields.io/badge/Express-000000?logo=express)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?logo=mongodb)
+![JWT](https://img.shields.io/badge/Auth-JWT-orange)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-Email: import@gmail.com
-Password: import
+<br>
 
-## Screenshots
+**A full-stack SaaS platform that helps traders journal, analyze, and improve their trading performance through data-driven insights.**
 
-### Landing Pgae
-![Landing page](./screenshots/Landingpage.png)
+[🌐 Live Demo](https://kyrosjournal.dev) • [📄 Documentation](#features)
 
-### Dashboard
+</div>
+
+---
+
+# ✨ Overview
+
+Most trading journals simply record trades.
+
+**Kyros Journal** goes beyond journaling by helping traders:
+
+- 📊 Analyze performance with advanced analytics
+- 📈 Discover statistical trading edges
+- 🧠 Improve execution through trade reviews
+- 🎯 Compare strategies and setups
+- 💼 Manage multiple trading accounts
+- 🔄 Replay trades using historical market data
+- 👨‍💼 Manage users through an admin dashboard
+
+---
+
+# 🚀 Live Demo
+
+### 🌐 Website
+
+https://kyrosjournal.dev
+
+### 🧪 Demo Account
+
+| Email | Password |
+|--------|----------|
+| **import@gmail.com** | **import** |
+
+---
+
+# 📸 Screenshots
+
+## 🏠 Landing Page
+
+![Landing Page](./screenshots/Landingpage.png)
+
+---
+
+## 📊 Dashboard
+
 ![Dashboard](./screenshots/dashboard.png)
 
-### Add Trade
+---
+
+## ➕ Add Trade
+
 ![Add Trade](./screenshots/addtrade.png)
 
-### Trade History (with Filters)
+---
+
+## 📜 Trade History
+
+*Advanced filtering, sorting, and trade preview.*
+
 ![Trade History](./screenshots/tradehistory.png)
 
-### Trade Details Page
+---
+
+## 📈 Trade Details
+
+*Chart replay, screenshots, notes, and trade management.*
+
 ![Trade Details](./screenshots/tardedetails1.png)
+
 ![Trade Details](./screenshots/tardedetails2.png)
 
-### Contact
+---
+
+## 📞 Contact
+
 ![Contact](./screenshots/contactl.png)
 
-### Account Page
-![Account Page](./screenshots/myaccount.png)
+---
 
-### Trade Setups
+## 👤 Account Management
+
+![Account](./screenshots/myaccount.png)
+
+---
+
+## ⚙️ Trade Setups
+
 ![Trade Setups](./screenshots/tradesetups.png)
 
-### Upgrade
+---
+
+## 💎 Upgrade
+
 ![Upgrade](./screenshots/upgrade.png)
 
-### Compare
+---
+
+## ⚖️ Compare Trades
+
 ![Compare](./screenshots/compare.png)
 
-### Notes
-![Compare](./screenshots/notes.png)
+---
 
-### Analytics
+## 📝 Notes
+
+![Notes](./screenshots/notes.png)
+
+---
+
+## 📊 Analytics Dashboard
+
 ![Analytics](./screenshots/analytics.png)
 
-### Admin
+---
+
+## 👨‍💼 Admin Dashboard
+
 ![Admin](./screenshots/admin1.png)
+
 ![Admin](./screenshots/admin2.png)
+
 ![Admin](./screenshots/admin3.png)
 
-### Mobile Responsive View
-![Mobile Responsive View](./screenshots/mobileview1.png)
-![Mobile Responsive View](./screenshots/mobileview2.png)
+---
 
+## 📱 Mobile Responsive
 
-
-## 🚀 Future Roadmap
-
-Kyros Journal is actively evolving. Here are the major features planned for future releases.
-
-### 🤖 AI Trading Assistant
-- AI-powered trade reviews and mistake detection
-- Personalized performance insights based on trading history
-- AI-generated weekly and monthly trading reports
-- Smart recommendations to improve consistency
-- Trade quality scoring based on execution
+| Home | Dashboard |
+|------|-----------|
+| ![](./screenshots/mobileview1.png) | ![](./screenshots/mobileview2.png) |
 
 ---
 
-### 📊 Advanced Analytics
-- Equity curve analysis with custom date ranges
-- Monte Carlo simulation
-- Risk of Ruin calculator
-- Advanced drawdown analysis
-- Correlation analysis between strategies, symbols, and sessions
-- Custom analytics dashboard
-- Trade distribution heatmaps
+# ✨ Features
 
----
+## 📈 Trading Journal
 
-### 🎯 Goals & Risk Management
-- Daily, weekly, and monthly trading goals
-- Maximum daily loss and profit limits
-- Rule violation tracker
-- Consistency score
-- Trading discipline score
-- Risk management dashboard
-- Trading streak tracking
+- Record Live & Backtest Trades
+- Multi-Exit Position Support
+- Position Size & Risk Calculator
+- Screenshot Uploads
+- Trade Notes
+- Entry & Exit Planning
+- Trade Confidence Rating
+- Pre-Trade Checklist
+- Session Tracking
+- Market Type Classification
 
----
+### 📊 Analytics
 
-### 📅 Trading Calendar
-- Trading calendar with daily PnL
-- Economic news integration
-- Session calendar
-- Trading activity heatmap
-- Performance by day, week, and month
+- Win Rate
+- Profit Factor
+- Expectancy
+- Session Performance
+- Strategy Analytics
+- Symbol Analytics
+- Direction Analysis
+- Duration Analysis
+- Drawdown Analysis
+- Equity Curve
 
----
+### 🔍 Trade Review
 
-### 📈 Broker & Platform Integration
-- MT4/MT5 trade synchronization
-- cTrader integration
-- TradeLocker integration
-- DXTrade integration
-- Automatic trade imports
-- TradingView webhook integration
-
----
-
-### 📸 Enhanced Trade Review
-- Before & After chart comparison
-- Multi-timeframe chart replay
-- Drawing tools for chart annotations
-- Voice notes for trades
-- Video attachments
-- Replay timeline improvements
-
----
-
-### 🧠 Psychology & Journal
-- Daily trading journal
-- Mood tracker
-- Emotion tracking during trades
-- Habit tracking
-- Pre-market and post-market journals
-- Trading routine checklist
-
----
-
-### 📁 Data Management
-- CSV, Excel, and PDF exports
-- Advanced import wizard
-- Automatic backups
-- Cloud synchronization
-- Archive completed accounts
-
----
-
-### 👥 Community & Collaboration
-- Share trade setups publicly
-- Public trader profiles
-- Strategy marketplace
-- Mentor and student workspaces
-- Team trading journals
-- Community challenges and leaderboards
-
----
-
-### 📱 Mobile Experience
-- Progressive Web App (PWA)
-- Native Android application
-- Native iOS application
-- Offline mode
-- Push notifications
-- Cross-device synchronization
-
----
-
-### 🎨 Customization
-- Fully customizable dashboard
-- Multiple themes
-- Custom widgets
-- Personalized analytics layouts
-- Keyboard shortcuts
-- Custom notification preferences
-
----
-
-### 🔒 Security
-- Two-factor authentication (2FA)
-- Login history
-- Active session management
-- Device management
-- Email verification
-- Security audit logs
-
----
-
-### 🌍 Additional Features
-- Multi-language support
-- Multiple currency support
-- Timezone customization
-- Tax reports
-- Performance certificates
-- Public API
-- Webhooks for third-party integrations
-
-## 🛠 Tech Stack
-
-### Frontend
-- React 19
-- Vite
-- React Router DOM
-- Context API
-- Axios
-- Chart.js
-- TradingView Lightweight Charts
-- CSS3
-- React Toastify
-- Lucide React
-
-### Backend
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-
-### Authentication
-- JWT Authentication
-- bcrypt
-- Protected Routes
-- Role-Based Access Control (RBAC)
-
-### Storage & Media
-- Cloudinary
-- Multer
-
-### Payments
-- Razorpay
-
-### Validation
-- Zod
-- Express Validator
-
-### External APIs
-- Binance Market Data API
-- Yahoo Finance API
-
-### Deployment
-- Netlify
-- Render
-- MongoDB Atlas
-
-
-## 🏗 Architecture
-
-Frontend (React + Vite)
-        │
-        ▼
- REST API (Express.js)
-        │
-        ▼
- MongoDB Atlas
-        │
- ├── Cloudinary
- ├── Razorpay
- ├── Binance API
- └── Yahoo Finance API
-
-
- ## 🗄 Database Models
-
-- User
-- Account
-- Trade
-- Strategy
-- Tags
-- Notes
-- Contact
-- Payment
-- Audit Log
-
-Relationships
-
-User
- ├── Accounts
- │     ├── Trades
- │     ├── Tags
- │     └── Strategies
- ├── Notes
- ├── Payments
- └── Contacts
-
-
- ## 🔒 Security
-
-- JWT Authentication
-- Password Hashing (bcrypt)
-- Protected Routes
-- Admin Authorization
-- Rate Limiting
-- Request Validation
-- Secure Payment Verification
-- Cloud Storage Security
-- Server-side Trade Validation
-
-
-## 📊 Core Modules
-
-- Authentication System
-- Dashboard
-- Trade Management
-- Trade History
-- Chart Replay
-- Analytics Dashboard
-- Strategy Management
-- Tag Management
-- Notes
-- Compare Trades
-- Account Management
-- Subscription System
-- Contact System
-- Admin Dashboard
-
-## 🚀 Project Highlights
-
-- 100+ REST API endpoints
-- JWT Authentication
-- Role-Based Access Control
-- Multi-Account Architecture
-- Cloud Image Uploads
-- Payment Gateway Integration
-- Advanced Analytics Engine
 - Interactive Chart Replay
-- Admin Dashboard
-- Mobile Responsive Design
-- Soft Delete & Restore
-- Audit Logging System
-- Multi-step Trade Workflow
+- Historical Market Data
+- Screenshot Gallery
+- Edit Trades
+- Close Live Trades
+- Restore Deleted Trades
+- Undo Actions
 
+### 💼 Account Management
 
+- Multiple Trading Accounts
+- Active Account Switching
+- Account Performance Tracking
+- Import & Export Trades
+- Automatic Balance Recalculation
 
-## 📌 Project Statistics
+### 🏷️ Organization
 
-- 15+ Major Features
-- 100+ REST API Endpoints
-- 9 MongoDB Collections
-- 20+ React Pages
-- 30+ Reusable Components
+- Custom Tags
+- Strategy Management
+- Powerful Filters
+- Trade Search
+- Notes Management
+
+### 🔐 Authentication & Security
+
 - JWT Authentication
-- Admin Panel
-- Payment Integration
-- Multi-Account Support
-- Advanced Trading Analytics
-- Chart Replay System
-- Mobile Responsive Design
+- Protected Routes
+- Role-Based Access Control
+- Password Hashing
+- Request Validation
+- Rate Limiting
+
+### 💳 Subscription System
+
+- Razorpay Integration
+- Free & Pro Plans
+- Feature Gating
+- Plan Expiration Handling
+
+### 👨‍💼 Admin Panel
+
+- User Management
+- Account Management
+- Trade Management
+- Contact Ticket Management
+- Dashboard Analytics
