@@ -21,7 +21,7 @@
 
 **Kyros Journal is a full-stack trading journal SaaS that enables traders to record, analyze, review, and optimize their trading performance through advanced analytics, chart replay, and performance insights.**
 
-[🌐 Live Demo](https://kyrosjournal.dev) 
+[ Live Demo](https://kyrosjournal.dev) 
 
 </div>
 
@@ -33,13 +33,13 @@ Most trading journals simply record trades.
 
 **Kyros Journal** goes beyond journaling by helping traders:
 
-• Analyze performance with advanced analytics
-• Discover statistical trading edges
-• Improve execution through trade reviews
-• Compare strategies and setups
-• Manage multiple trading accounts
-• Replay trades using historical market data
-• Manage users through an admin dashboard
+- Analyze performance with advanced analytics
+- Discover statistical trading edges
+- Improve execution through trade reviews
+- Compare strategies and setups
+- Manage multiple trading accounts
+- Replay trades using historical market data
+- Manage users through an admin dashboard
 
 ---
 
