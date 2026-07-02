@@ -1,6 +1,6 @@
 <div align="center">
-
-# 📈 Kyros Journal
+<img src="./client/public/favicon2.ico" alt="Kyros Journal Logo" width="80">
+#  Kyros Journal
 
 ### Professional Trading Journal built for serious traders.
 
@@ -17,9 +17,9 @@ Track every trade • Discover your edge • Improve your execution
 
 <br>
 
-**A full-stack SaaS platform that helps traders journal, analyze, and improve their trading performance through data-driven insights.**
+**Kyros Journal is a full-stack trading journal SaaS that enables traders to record, analyze, review, and optimize their trading performance through advanced analytics, chart replay, and performance insights.**
 
-[🌐 Live Demo](https://kyrosjournal.dev) • [📄 Documentation](#features)
+[🌐 Live Demo](https://kyrosjournal.dev) 
 
 </div>
 
@@ -31,51 +31,48 @@ Most trading journals simply record trades.
 
 **Kyros Journal** goes beyond journaling by helping traders:
 
-- 📊 Analyze performance with advanced analytics
-- 📈 Discover statistical trading edges
-- 🧠 Improve execution through trade reviews
-- 🎯 Compare strategies and setups
-- 💼 Manage multiple trading accounts
-- 🔄 Replay trades using historical market data
-- 👨‍💼 Manage users through an admin dashboard
+• Analyze performance with advanced analytics
+• Discover statistical trading edges
+• Improve execution through trade reviews
+• Compare strategies and setups
+• Manage multiple trading accounts
+• Replay trades using historical market data
+• Manage users through an admin dashboard
 
 ---
 
-# 🚀 Live Demo
+## Live Demo
 
-### 🌐 Website
-
-https://kyrosjournal.dev
-
-### 🧪 Demo Account
-
-| Email | Password |
-|--------|----------|
-| **import@gmail.com** | **import** |
+| Live Website | Demo Credentials |
+|--------------|------------------|
+| **https://kyrosjournal.dev** | **Email:** `import@gmail.com`<br>**Password:** `import` |
 
 ---
 
-# 📸 Screenshots
+#  Screenshots
 
-## 🏠 Landing Page
+Below are some of the major interfaces available in Kyros Journal.
+
+
+##  Landing Page
 
 ![Landing Page](./screenshots/Landingpage.png)
 
 ---
 
-## 📊 Dashboard
+##  Dashboard
 
 ![Dashboard](./screenshots/Dashboard.png)
 
 ---
 
-## ➕ Add Trade
+##  Add Trade
 
 ![Add Trade](./screenshots/AddTrade.png)
 
 ---
 
-## 📜 Trade History
+##  Trade History
 
 *Advanced filtering, sorting, and trade preview.*
 
@@ -83,7 +80,7 @@ https://kyrosjournal.dev
 
 ---
 
-## 📈 Trade Details
+##  Trade Details
 
 *Chart replay, screenshots, notes, and trade management.*
 
@@ -93,49 +90,49 @@ https://kyrosjournal.dev
 
 ---
 
-## 📞 Contact
+##  Contact
 
 ![Contact](./screenshots/contact.png)
 
 ---
 
-## 👤 Account Management
+##  Account Management
 
 ![Account](./screenshots/myaccount.png)
 
 ---
 
-## ⚙️ Trade Setups
+##  Trade Setups
 
 ![Trade Setups](./screenshots/tradesetups.png)
 
 ---
 
-## 💎 Upgrade
+##  Upgrade
 
 ![Upgrade](./screenshots/upgrade.png)
 
 ---
 
-## ⚖️ Compare Trades
+##  Compare Trades
 
 ![Compare](./screenshots/compare.png)
 
 ---
 
-## 📝 Notes
+##  Notes
 
 ![Notes](./screenshots/notes.png)
 
 ---
 
-## 📊 Analytics Dashboard
+##  Analytics Dashboard
 
 ![Analytics](./screenshots/analytics.png)
 
 ---
 
-## 👨‍💼 Admin Dashboard
+##  Admin Dashboard
 
 ![Admin](./screenshots/admin1.png)
 
@@ -145,7 +142,7 @@ https://kyrosjournal.dev
 
 ---
 
-## 📱 Mobile Responsive
+##  Mobile Responsive
 
 | Dashboard | Add Trade |
 |------|-----------|
