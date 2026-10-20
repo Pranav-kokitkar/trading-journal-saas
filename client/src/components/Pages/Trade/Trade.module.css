@@ -727,6 +727,7 @@
   border-radius: var(--radius-md);
   margin-bottom: 0;
   border: 1px solid var(--border-medium);
+  display: flow-root;
 }
 
 .tradeScreenshot > p:first-child {
@@ -800,16 +801,38 @@
 
 .screenshotList {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
   margin-top: 0.75rem;
+  align-items: start;
 }
 
-.screenshotList img {
+.screenshotItem {
+  position: relative;
+  min-width: 0;
   width: 100%;
-  max-width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  aspect-ratio: 16 / 9;
+  align-self: start;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: var(--bg-secondary);
+}
+
+.screenshotImageButton {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.screenshotImageButton img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-light);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -1344,18 +1367,57 @@
   background: var(--accent-hover);
 }
 
-/* Screenshot Item with Delete */
-.screenshotItem {
-  position: relative;
-  width: 100%;
-  max-width: 420px;
+.screenshotImageButton:focus-visible,
+.deleteScreenshotBtn:focus-visible,
+.fullscreenDelete:focus-visible,
+.fullscreenClose:focus-visible,
+.fullscreenNav:focus-visible,
+.screenshotExpansionButton:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 3px;
 }
 
-.screenshotItem img {
-  width: 100%;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-light);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+.screenshotExpansionButton {
+  display: block;
+  margin: 1rem auto 0;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  background: var(--btn-secondary-bg);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.screenshotExpansionButton:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-glow);
+}
+
+.fullscreenDelete {
+  position: absolute;
+  left: 2rem;
+  bottom: 2rem;
+  z-index: 10001;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(217, 109, 120, 0.7);
+  border-radius: 50%;
+  background: rgba(217, 109, 120, 0.9);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.fullscreenDelete:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .deleteScreenshotBtn {
@@ -1382,6 +1444,13 @@
   background: var(--error);
   transform: scale(1.1);
   box-shadow: 0 4px 12px rgba(217, 109, 120, 0.4);
+}
+
+.deleteScreenshotBtn svg,
+.fullscreenDelete svg {
+  display: block;
+  width: 0.85rem;
+  height: 0.85rem;
 }
 
 /* Tag Picker */
@@ -1517,15 +1586,12 @@
   }
 }
 
-/* Make screenshot thumbnails look clickable */
-.screenshotItem img {
+/* Make screenshot images look clickable */
+.screenshotImageButton img {
   transition: all 0.3s ease;
-  width: 100%;
-  max-width: 760px;
-  display: block;
 }
 
-.screenshotItem img:hover {
+.screenshotImageButton:hover img {
   transform: scale(1.02);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   border-color: var(--accent);
@@ -1709,6 +1775,15 @@
     width: 92%;
     padding: 1.25rem;
   }
+
+  .screenshotList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fullscreenDelete {
+    left: 1rem;
+    bottom: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1716,11 +1791,7 @@
     font-size: 1.15rem;
   }
 
-  .screenshotList img {
-    max-width: 100%;
-  }
-
-  .screenshotItem img {
-    max-width: 100%;
+  .screenshotList {
+    grid-template-columns: 1fr;
   }
 }

@@ -61,6 +61,23 @@ export const AddPrice = ({ trade, handleChange }) => {
           onChange={handleChange}
           required={true}
         />
+        <div className={styles.riskTypeGroup}>
+          <span className={styles.riskTypeLabel}>Risk Type</span>
+          <div className={styles.riskTypeOptions}>
+            <label className={`${styles.riskTypeOption} ${trade.riskType === "dollar" ? styles.riskTypeOptionActive : ""}`}>
+              <input type="radio" name="riskType" value="dollar" checked={trade.riskType === "dollar"} onChange={handleChange} />
+              <span>Dollar Risk</span>
+            </label>
+            <label className={`${styles.riskTypeOption} ${trade.riskType === "percent" ? styles.riskTypeOptionActive : ""}`}>
+              <input type="radio" name="riskType" value="percent" checked={trade.riskType === "percent"} onChange={handleChange} />
+              <span>Percent Risk</span>
+            </label>
+            <label className={`${styles.riskTypeOption} ${trade.riskType === "lots" ? styles.riskTypeOptionActive : ""}`}>
+              <input type="radio" name="riskType" value="lots" checked={trade.riskType === "lots"} onChange={handleChange} />
+              <span>Lots</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div className={styles.row}>
@@ -73,53 +90,15 @@ export const AddPrice = ({ trade, handleChange }) => {
           onChange={handleChange}
           required={true}
         />
-        <div className={styles.riskStack}>
-          <div className={styles.riskTypeGroup}>
-            <span className={styles.riskTypeLabel}>Risk Type</span>
-            <div className={styles.riskTypeOptions}>
-              <label className={`${styles.riskTypeOption} ${trade.riskType === "dollar" ? styles.riskTypeOptionActive : ""}`}>
-                <input
-                  type="radio"
-                  name="riskType"
-                  value="dollar"
-                  checked={trade.riskType === "dollar"}
-                  onChange={handleChange}
-                />
-                <span>Dollar Risk</span>
-              </label>
-              <label className={`${styles.riskTypeOption} ${trade.riskType === "percent" ? styles.riskTypeOptionActive : ""}`}>
-                <input
-                  type="radio"
-                  name="riskType"
-                  value="percent"
-                  checked={trade.riskType === "percent"}
-                  onChange={handleChange}
-                />
-                <span>Percent Risk</span>
-              </label>
-              <label className={`${styles.riskTypeOption} ${trade.riskType === "lots" ? styles.riskTypeOptionActive : ""}`}>
-                <input
-                  type="radio"
-                  name="riskType"
-                  value="lots"
-                  checked={trade.riskType === "lots"}
-                  onChange={handleChange}
-                />
-                <span>Lots</span>
-              </label>
-            </div>
-          </div>
-
-          <InputField
-            label={riskTypeLabel}
-            type="number"
-            placeholder={riskTypePlaceholder}
-            name="riskAmount"
-            value={trade.riskAmount}
-            onChange={handleChange}
-            required={true}
-          />
-        </div>
+        <InputField
+          label={riskTypeLabel}
+          type="number"
+          placeholder={riskTypePlaceholder}
+          name="riskAmount"
+          value={trade.riskAmount}
+          onChange={handleChange}
+          required={true}
+        />
       </div>
 
       <div className={styles.costToggleRow}>

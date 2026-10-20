@@ -1,0 +1,257 @@
+.page {
+  min-height: 100vh;
+  padding: 1.5rem;
+  color: var(--text-primary);
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.header h2 {
+  margin: 0.25rem 0;
+  font-size: 1.5rem;
+  color: var(--accent-bright);
+}
+.header p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--accent-bright) !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.summaryCard,
+.panel {
+  background: linear-gradient(180deg, var(--bg-level-1), var(--bg-level-0));
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+.summaryCard {
+  padding: 1rem 1.2rem;
+}
+.summaryCard span {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.summaryCard strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--accent-bright);
+  font-size: 1.5rem;
+}
+.primaryButton,
+.secondaryButton,
+.dangerButton,
+.linkButton {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--accent-bright);
+  color: var(--bg-level-1);
+}
+.secondaryButton {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-secondary);
+}
+.dangerButton {
+  background: rgba(248, 113, 113, 0.12);
+  color: #f87171;
+}
+.linkButton {
+  background: transparent;
+  color: var(--accent-bright);
+}
+.panel {
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+.panelHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+}
+.panelHeader h3 {
+  color: var(--accent-bright);
+  font-size: 1rem;
+}
+.panelHeader input,
+.dialog input,
+.dialog select,
+.dialog textarea {
+  background: var(--bg-level-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 7px;
+  color: var(--text-primary);
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+}
+.panelHeader input {
+  min-width: 240px;
+}
+.tableWrap {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 680px;
+}
+th,
+td {
+  padding: 0.75rem 1.2rem;
+  text-align: left;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+th {
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+td strong,
+td small {
+  display: block;
+  color: var(--text-primary);
+}
+td small {
+  margin-top: 0.2rem;
+  color: var(--text-secondary);
+}
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-transform: capitalize;
+}
+.active {
+  color: var(--color-profit);
+  background: rgba(34, 197, 94, 0.13);
+}
+.inactive,
+.revoked {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
+}
+.empty {
+  padding: 2rem;
+  text-align: center;
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(3, 6, 12, 0.65);
+  backdrop-filter: blur(6px);
+}
+.dialog {
+  width: 460px;
+  max-width: 92%;
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  background: linear-gradient(180deg, var(--bg-level-1), var(--bg-level-0));
+  border: 1px solid var(--accent-subtle);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  animation: fadeIn 0.22s ease;
+}
+.dialogHeader,
+.dialogActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.dialogHeader h3 {
+  color: var(--accent-bright);
+}
+.closeButton {
+  background: transparent;
+  border: 0;
+  color: var(--text-secondary);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+.dialog label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+.dialog textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (max-width: 768px) {
+  .page {
+    padding: 1rem;
+  }
+  .header {
+    flex-direction: column;
+  }
+  .summaryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .primaryButton {
+    width: 100%;
+    justify-content: center;
+  }
+  .panelHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .panelHeader input {
+    min-width: 0;
+    width: 100%;
+  }
+}
+@media (max-width: 420px) {
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -4,6 +4,7 @@ const User = require("../models/user-model");
 const Trade = require("../models/trade-model");
 const Tags = require("../models/tags-model");
 const Strategy = require("../models/strategy-model");
+const { hasEffectiveProAccess } = require("../services/pro-access-service");
 
 // POST /api/account
 const createAccount = async (req, res) => {
@@ -34,10 +35,7 @@ const createAccount = async (req, res) => {
 
     const userDetails = await User.findById(userId);
 
-    const isPro =
-      userDetails?.plan === "pro" &&
-      userDetails?.planExpiresAt &&
-      new Date(userDetails.planExpiresAt) > new Date();
+    const isPro = await hasEffectiveProAccess(userDetails);
 
     const totalAccounts = await Account.find({ userId }).countDocuments();
 
@@ -168,10 +166,12 @@ const getAccounts = async (req, res) => {
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     // ✅ Recalculate all accounts on fetch (after login)
-    const { recalculateAccountTrades } = require("../services/account-recalculation-service");
-    
+    const {
+      recalculateAccountTrades,
+    } = require("../services/account-recalculation-service");
+
     const accounts = await Account.find({ userId });
-    
+
     // Recalculate balance for each account
     for (const account of accounts) {
       try {
@@ -180,7 +180,10 @@ const getAccounts = async (req, res) => {
           accountId: account._id,
         });
       } catch (recalcError) {
-        console.error(`Failed to recalculate account ${account._id}:`, recalcError);
+        console.error(
+          `Failed to recalculate account ${account._id}:`,
+          recalcError,
+        );
         // Don't fail the whole request, just log the error
       }
     }
@@ -209,8 +212,10 @@ const getAcitveAccount = async (req, res) => {
     }
 
     // ✅ Recalculate active account on fetch (after login)
-    const { recalculateAccountTrades } = require("../services/account-recalculation-service");
-    
+    const {
+      recalculateAccountTrades,
+    } = require("../services/account-recalculation-service");
+
     try {
       await recalculateAccountTrades({
         userId,
@@ -319,11 +324,15 @@ const manualRecalculateAccount = async (req, res) => {
     }
 
     // ✅ Call recalculation service
-    const { recalculateAccountTrades } = require("../services/account-recalculation-service");
-    const { recalculatedTrades, finalBalance } = await recalculateAccountTrades({
-      userId,
-      accountId,
-    });
+    const {
+      recalculateAccountTrades,
+    } = require("../services/account-recalculation-service");
+    const { recalculatedTrades, finalBalance } = await recalculateAccountTrades(
+      {
+        userId,
+        accountId,
+      },
+    );
 
     // Fetch updated account
     const updatedAccount = await Account.findById(accountId).lean();

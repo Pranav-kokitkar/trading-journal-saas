@@ -24,6 +24,11 @@ const {
   getTradeByID,
 } = require("../controllers/admin/adminTrades-controller");
 const { getStats } = require("../controllers/admin/adminDashboard-controller");
+const {
+  getProManagement,
+  grantProAccess,
+  revokeProAccess,
+} = require("../controllers/admin/adminPro-controller");
 const router = express.Router();
 
 //====== USERS =====
@@ -61,5 +66,14 @@ router.route("/trades/:id").get(authMiddleware, adminMiddleware, getTradeByID);
 
 //====== DASHBOARD =====
 router.route("/dashboard").get(authMiddleware, adminMiddleware, getStats);
+
+//====== PRO MANAGEMENT =====
+router
+  .route("/pro-management")
+  .get(authMiddleware, adminMiddleware, getProManagement)
+  .post(authMiddleware, adminMiddleware, grantProAccess);
+router
+  .route("/pro-management/:userId")
+  .delete(authMiddleware, adminMiddleware, revokeProAccess);
 
 module.exports = router;

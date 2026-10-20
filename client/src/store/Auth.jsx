@@ -73,15 +73,34 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-const isPro = Boolean(
-  user?.plan === "pro" &&
-    user?.planExpiresAt &&
-    new Date(user.planExpiresAt) > new Date()
-);
+  const isPro = Boolean(
+    typeof user?.isPro === "boolean"
+      ? user.isPro
+      : user?.plan === "pro" &&
+          user?.planExpiresAt &&
+          new Date(user.planExpiresAt) > new Date(),
+  );
 
 
   useEffect(() => {
     userAuthentication();
+  }, [token]);
+
+  useEffect(() => {
+    if (!token) return undefined;
+
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") {
+        userAuthentication();
+      }
+    };
+
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
   }, [token]);
 
   return (

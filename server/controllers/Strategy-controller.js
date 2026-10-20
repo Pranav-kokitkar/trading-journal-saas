@@ -2,6 +2,7 @@ const User = require("../models/user-model");
 const Strategy = require("../models/strategy-model");
 const Trade = require("../models/trade-model");
 const { getMaxStrategies } = require("../config/planLimits");
+const { hasEffectiveProAccess } = require("../services/pro-access-service");
 
 const createStrategy = async (req, res) => {
   try {
@@ -29,10 +30,7 @@ const createStrategy = async (req, res) => {
       });
     }
 
-    const isPro =
-      user.plan === "pro" &&
-      user.planExpiresAt &&
-      new Date(user.planExpiresAt) > new Date();
+    const isPro = await hasEffectiveProAccess(user);
 
     const maxStrategies = getMaxStrategies(isPro);
     const strategyCount = await Strategy.countDocuments({

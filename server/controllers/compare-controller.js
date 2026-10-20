@@ -3,6 +3,7 @@ const Account = require("../models/account-model");
 const mongoose = require("mongoose");
 const User = require("../models/user-model");
 const { getMaxCompareDimensions } = require("../config/planLimits");
+const { hasEffectiveProAccess } = require("../services/pro-access-service");
 
 const parseIncludeImported = (value, defaultValue = true) => {
   if (value === undefined || value === null || value === "")
@@ -39,6 +40,7 @@ const ALLOWED_DIMENSIONS = [
   "tag",
   "marketType",
   "tradeStatus",
+  "tradeGrade",
 ];
 
 /**
@@ -279,10 +281,7 @@ const Compare = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isPro =
-      user.plan === "pro" &&
-      user.planExpiresAt &&
-      new Date(user.planExpiresAt) > new Date();
+    const isPro = await hasEffectiveProAccess(user);
 
     const maxCompareDimensions = getMaxCompareDimensions(isPro);
     if (dimensionKeys.length > maxCompareDimensions) {

@@ -51,7 +51,7 @@ export const TradeHistory = () => {
   const [selectedTrade, setSelectedTrade] = useState(null);
 
   const { isAuthLoading, isPro, authorizationToken } = useAuth();
-  const { accounts } = useContext(AccountContext);
+  const { accounts, accountDetails } = useContext(AccountContext);
   const restorePage = location.state?.page;
 
   /** ---------------- FILTER HANDLERS ---------------- */
@@ -75,6 +75,7 @@ export const TradeHistory = () => {
     setPage(1);
     setFilters({
       ...defaultFilters,
+      accountId: accountDetails?._id || "",
       includeImported: includeImportedTrades,
     });
   };
@@ -131,6 +132,12 @@ export const TradeHistory = () => {
   useEffect(() => {
     setFilters((prev) => ({ ...prev, includeImported: includeImportedTrades }));
   }, [includeImportedTrades]);
+
+  useEffect(() => {
+    if (accountDetails?._id) {
+      setFilters((prev) => ({ ...prev, accountId: accountDetails._id }));
+    }
+  }, [accountDetails?._id]);
 
   useEffect(() => {
     if (typeof restorePage === "number" && restorePage > 0 && restorePage !== page) {

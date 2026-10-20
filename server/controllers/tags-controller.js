@@ -2,6 +2,7 @@ const Tags = require("../models/tags-model");
 const User = require("../models/user-model");
 const Trade = require("../models/trade-model");
 const { getMaxTags } = require("../config/planLimits");
+const { hasEffectiveProAccess } = require("../services/pro-access-service");
 
 const createTag = async (req, res) => {
   try {
@@ -32,10 +33,7 @@ const createTag = async (req, res) => {
     }
 
     // 3. Check plan validity
-    const isPro =
-      user.plan === "pro" &&
-      user.planExpiresAt &&
-      new Date(user.planExpiresAt) > new Date();
+    const isPro = await hasEffectiveProAccess(user);
 
     // 4. Count existing tags for this user + account
     const totalTags = await Tags.countDocuments({

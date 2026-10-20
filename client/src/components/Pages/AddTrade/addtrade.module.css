@@ -1328,6 +1328,11 @@
   gap: 0.45rem;
 }
 
+.row > .riskTypeGroup {
+  flex: 1;
+  min-width: 240px;
+}
+
 .riskTypeLabel {
   font-size: 0.8rem;
   color: var(--text-secondary);

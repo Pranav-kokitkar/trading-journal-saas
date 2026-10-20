@@ -2,6 +2,17 @@ import styles from "./SideBar.module.css";
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../store/Auth";
 import { useTrades } from "../../store/TradeContext";
+import {
+  FaBalanceScale,
+  FaChartBar,
+  FaChartLine,
+  FaHistory,
+  FaLayerGroup,
+  FaQuestionCircle,
+  FaRocket,
+  FaShieldAlt,
+  FaStickyNote,
+} from "react-icons/fa";
 
 export const Sidebar = ({ onClose }) => {
 
@@ -35,48 +46,50 @@ export const Sidebar = ({ onClose }) => {
         <ul>
           <li>
             <NavLink className={getNavLinkClass} to="/app/dashboard" onClick={onClose}>
-              Dashboard
+              <FaChartLine aria-hidden="true" /> Dashboard
             </NavLink>
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/app/trade-history" onClick={onClose}>
-              Trade History
+              <FaHistory aria-hidden="true" /> Trade History
             </NavLink>
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/app/analytics" onClick={onClose}>
-              Analytics
+              <FaChartBar aria-hidden="true" /> Analytics
             </NavLink>
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/app/trade-setups" onClick={onClose}>
-              Trade Setups
+              <FaLayerGroup aria-hidden="true" /> Trade Setups
             </NavLink>
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/app/add-notes" onClick={onClose}>
-              Notes
+              <FaStickyNote aria-hidden="true" /> Notes
             </NavLink>
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/app/compare" onClick={onClose}>
-              Compare
+              <FaBalanceScale aria-hidden="true" /> Compare
             </NavLink>
           </li>
-          <li>
-            <NavLink className={getNavLinkClass} to="/app/upgrade" onClick={onClose}>
-              Upgrade
-            </NavLink>
-          </li>
+          {!isPro && (
+            <li>
+              <NavLink className={getNavLinkClass} to="/app/upgrade" onClick={onClose}>
+                <FaRocket aria-hidden="true" /> Upgrade
+              </NavLink>
+            </li>
+          )}
           <li>
             <NavLink className={getNavLinkClass} to="/app/contact" onClick={onClose}>
-              Get Help
+              <FaQuestionCircle aria-hidden="true" /> Get Help
             </NavLink>
           </li>
           <li>
             {isAdmin && (
               <NavLink className={getNavLinkClass} to="/admin" onClick={onClose}>
-                Admin
+                <FaShieldAlt aria-hidden="true" /> Admin
               </NavLink>
             )}
           </li>

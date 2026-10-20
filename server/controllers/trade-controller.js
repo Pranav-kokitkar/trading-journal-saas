@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Trade = require("../models/trade-model");
 const cloudinary = require("../config/cloudinary");
 const { getMaxScreenshots } = require("../config/planLimits");
+const { getEffectiveProAccess } = require("../services/pro-access-service");
 
 const parseIncludeImported = (value, defaultValue = true) => {
   if (value === undefined || value === null || value === "")
@@ -172,6 +173,7 @@ const AddTrade = async (req, res) => {
       entryTime,
       tradeNotes,
       tradeStatus,
+      session,
       accountId,
       tags,
       strategy,
@@ -259,10 +261,7 @@ const AddTrade = async (req, res) => {
     const files = Array.isArray(req.files) ? req.files : [];
 
     // ✅ PLAN-BASED LIMIT (BACKEND ENFORCEMENT)
-    const isPro =
-      req.user?.plan === "pro" &&
-      req.user?.planExpiresAt &&
-      new Date(req.user.planExpiresAt) > new Date();
+    const isPro = await getEffectiveProAccess(req.userID || req.user?._id);
 
     const uploadLimit = getMaxScreenshots(isPro);
 
@@ -381,6 +380,7 @@ const AddTrade = async (req, res) => {
       dateTime: entryTimestamp,
       tradeNotes: tradeNotes || "",
       tradeStatus: normalizedTradeStatus,
+      session: (session || "").toString().trim().toLowerCase(),
       tradeGrade: normalizeTradeGrade(tradeGrade),
       tradeConfidence: normalizeTradeConfidence(tradeConfidence ?? confidence),
       confidence: normalizeTradeConfidence(tradeConfidence ?? confidence),
@@ -1017,10 +1017,7 @@ const updateTradeScreenshots = async (req, res) => {
       return res.status(400).json({ message: "No files uploaded" });
     }
 
-    const isPro =
-      req.user?.plan === "pro" &&
-      req.user?.planExpiresAt &&
-      new Date(req.user.planExpiresAt) > new Date();
+    const isPro = await getEffectiveProAccess(req.userID || req.user?._id);
 
     const uploadLimit = getMaxScreenshots(isPro);
 

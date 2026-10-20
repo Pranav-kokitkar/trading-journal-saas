@@ -27,11 +27,13 @@ const AVAILABLE_DIMENSIONS = [
   { key: "tag", label: "Tag", type: "select" },
   { key: "marketType", label: "Market Type", type: "select" },
   { key: "tradeStatus", label: "Trade Status", type: "select" },
+  { key: "tradeGrade", label: "Trade Grade", type: "select" },
 ];
 
 const DIRECTION_OPTIONS = ["long", "short"];
 const STATUS_OPTIONS = ["live", "exited", "missed"];
 const MARKET_TYPE_OPTIONS = ["forex", "crypto", "stocks"];
+const TRADE_GRADE_OPTIONS = ["C", "B", "B+", "A", "A+"];
 
 export const Compare = () => {
   const { authorizationToken, isPro } = useAuth();
@@ -263,6 +265,23 @@ export const Compare = () => {
             {MARKET_TYPE_OPTIONS.map((market) => (
               <option key={market} value={market}>
                 {market.charAt(0).toUpperCase() + market.slice(1)}
+              </option>
+            ))}
+          </select>
+        );
+
+      case "tradeGrade":
+        return (
+          <select
+            value={value}
+            onChange={(e) =>
+              handleInputChange(dimension.key, dataset, e.target.value)
+            }
+          >
+            <option value="">Select Trade Grade</option>
+            {TRADE_GRADE_OPTIONS.map((grade) => (
+              <option key={grade} value={grade}>
+                {grade}
               </option>
             ))}
           </select>

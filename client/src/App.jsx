@@ -31,6 +31,7 @@ import { Upgrade } from "./components/Pages/Upgrade/Upgrade";
 import { TradeSetups } from "./components/Pages/TradeSetups/TradeSetups";
 import { Compare } from "./components/Pages/Comapre/Compare";
 import { AnalyticsDashboard } from "./components/Pages/AnalyticsDashboard/AnalyticsDashboard";
+import { AdminProManagement } from "./components/Admin/adminPro/AdminProManagement";
 
 const router = createBrowserRouter([
   {
@@ -164,6 +165,11 @@ const router = createBrowserRouter([
       {
         path: "accounts/:id",
         element: <AdminAccountDetails />,
+        errorElement: <ErrorPage />,
+      },
+      {
+        path: "pro-management",
+        element: <AdminProManagement />,
         errorElement: <ErrorPage />,
       },
       {

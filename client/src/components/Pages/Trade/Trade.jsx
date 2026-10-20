@@ -1,7 +1,7 @@
 // src/components/.../Trade.jsx
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import styles from "./Trade.module.css";
-import { useContext, useState, useEffect, useRef } from "react";
+import { useContext, useState, useEffect, useRef, useMemo } from "react";
 import { CloseTrade } from "./CloseTrade";
 import { calculateTradeOnExit } from "../../../utils/tradeUtils";
 import { TradeContext, useTrades } from "../../../store/TradeContext";
@@ -13,6 +13,7 @@ import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
 import { TradeChart } from "../../trade/TradeChart";
 import { formatDateTimeUtc } from "../../../utils/formatDateTimeUtc";
 import { getMaxScreenshots } from "../../../config/planLimits";
+import { FaTrash } from "react-icons/fa";
 
 const formatDuration = (trade) => {
   if (trade?.durationText) return trade.durationText;
@@ -50,6 +51,10 @@ export const Trade = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("chart");
   const [selectedScreenshots, setSelectedScreenshots] = useState([]);
+  const [fullscreenScreenshot, setFullscreenScreenshot] = useState(null);
+  const [showAllScreenshots, setShowAllScreenshots] = useState(false);
+  const [screenshotToDelete, setScreenshotToDelete] = useState(null);
+  const [isDeletingScreenshot, setIsDeletingScreenshot] = useState(false);
   const [isUploadingScreenshots, setIsUploadingScreenshots] = useState(false);
   const screenshotInputRef = useRef(null);
   const [isConfidencePickerOpen, setIsConfidencePickerOpen] = useState(false);
@@ -138,6 +143,16 @@ export const Trade = () => {
 
   // Use trade from context if available, otherwise fall back to fetchedTrade
   const trade = fetchedTrade || contextTrade;
+  const tradeScreenshots = useMemo(
+    () => (Array.isArray(trade?.screenshots) ? trade.screenshots : []),
+    [trade?.screenshots],
+  );
+  const hasScreenshots = tradeScreenshots.length > 0;
+  const visibleScreenshots = showAllScreenshots
+    ? tradeScreenshots
+    : tradeScreenshots.slice(0, 2);
+  const hiddenScreenshotCount = Math.max(tradeScreenshots.length - 2, 0);
+  const fullscreenScreenshotIndex = tradeScreenshots.indexOf(fullscreenScreenshot);
 
   // keep tradeStatus synced when we have trade
   useEffect(() => {
@@ -261,6 +276,28 @@ export const Trade = () => {
       mounted = false;
     };
   }, [id, trade, triedRefresh, refreshTrades]);
+
+  useEffect(() => {
+    if (!fullscreenScreenshot) return undefined;
+
+    const handleFullscreenKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setFullscreenScreenshot(null);
+      } else if (event.key === "ArrowLeft" && fullscreenScreenshotIndex > 0) {
+        event.preventDefault();
+        setFullscreenScreenshot(tradeScreenshots[fullscreenScreenshotIndex - 1]);
+      } else if (
+        event.key === "ArrowRight" &&
+        fullscreenScreenshotIndex < tradeScreenshots.length - 1
+      ) {
+        event.preventDefault();
+        setFullscreenScreenshot(tradeScreenshots[fullscreenScreenshotIndex + 1]);
+      }
+    };
+
+    document.addEventListener("keydown", handleFullscreenKeyDown);
+    return () => document.removeEventListener("keydown", handleFullscreenKeyDown);
+  }, [fullscreenScreenshot, fullscreenScreenshotIndex, tradeScreenshots]);
 
   if (isLoading && !trade) {
     return (
@@ -594,8 +631,6 @@ export const Trade = () => {
         toastHelper.error(error.message || "Failed to update strategy");
       });
   };
-  const tradeScreenshots = Array.isArray(trade.screenshots) ? trade.screenshots : [];
-  const hasScreenshots = tradeScreenshots.length > 0;
   const screenshotUploadLimit = getMaxScreenshots(isPro);
   const entryTime = formatDateTimeUtc(trade.entryTime ?? trade.dateTime ?? trade.dateNtime);
   const exitTime = formatDateTimeUtc(trade.exitTime);
@@ -671,6 +706,7 @@ export const Trade = () => {
 
       setFetchedTrade(data);
       setSelectedScreenshots([]);
+      setShowAllScreenshots(true);
       setActiveTab("screenshots");
       if (typeof refreshTrades === "function") {
         await refreshTrades();
@@ -682,6 +718,42 @@ export const Trade = () => {
     } finally {
       setIsUploadingScreenshots(false);
     }
+  };
+
+  const deleteScreenshot = async (imageUrl) => {
+    if (!imageUrl || !authorizationToken || (!trade?._id && !trade?.id)) return;
+
+    setIsDeletingScreenshot(true);
+    try {
+      const response = await fetch(
+        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id || trade.id}/screenshot`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorizationToken,
+          },
+          body: JSON.stringify({ screenshotUrl: imageUrl }),
+        },
+      );
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(data?.message || "Failed to delete screenshot");
+
+      setFetchedTrade(data);
+      setFullscreenScreenshot(null);
+      setScreenshotToDelete(null);
+      if (typeof refreshTrades === "function") await refreshTrades();
+      toastHelper.success("Screenshot deleted");
+    } catch (error) {
+      console.error("Failed to delete screenshot", error);
+      toastHelper.error(error.message || "Failed to delete screenshot");
+    } finally {
+      setIsDeletingScreenshot(false);
+    }
+  };
+
+  const requestDeleteScreenshot = (imageUrl) => {
+    setScreenshotToDelete(imageUrl);
   };
 
   const openSingleExitModal = () => {
@@ -790,12 +862,29 @@ export const Trade = () => {
 
               {hasScreenshots ? (
                 <div className={styles.screenshotList}>
-                  {tradeScreenshots.map((imageUrl, index) => (
-                    <img
+                  {visibleScreenshots.map((imageUrl, index) => (
+                    <div
                       key={`${imageUrl}-${index}`}
-                      src={imageUrl}
-                      alt={`Trade screenshot ${index + 1}`}
-                    />
+                      className={styles.screenshotItem}
+                    >
+                      <button
+                        type="button"
+                        className={styles.screenshotImageButton}
+                        onClick={() => setFullscreenScreenshot(imageUrl)}
+                        aria-label={`Open trade screenshot ${index + 1}`}
+                      >
+                        <img src={imageUrl} alt={`Trade screenshot ${index + 1}`} />
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.deleteScreenshotBtn}
+                        onClick={() => requestDeleteScreenshot(imageUrl)}
+                        aria-label={`Delete trade screenshot ${index + 1}`}
+                        title="Delete screenshot"
+                      >
+                        <FaTrash aria-hidden="true" />
+                      </button>
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -804,9 +893,84 @@ export const Trade = () => {
                   <span className={styles.metricValue}>No screenshots added for this trade.</span>
                 </div>
               )}
+              {hiddenScreenshotCount > 0 && (
+                <button
+                  type="button"
+                  className={styles.screenshotExpansionButton}
+                  onClick={() => setShowAllScreenshots((current) => !current)}
+                >
+                  {showAllScreenshots
+                    ? "Show less"
+                    : `Show all screenshots (${hiddenScreenshotCount})`}
+                </button>
+              )}
             </section>
           )}
         </div>
+
+        {fullscreenScreenshot && (
+          <div
+            className={styles.fullscreenOverlay}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Fullscreen trade screenshot"
+            onClick={() => setFullscreenScreenshot(null)}
+          >
+            <img
+              className={styles.fullscreenImage}
+              src={fullscreenScreenshot}
+              alt="Fullscreen trade screenshot"
+              onClick={(event) => event.stopPropagation()}
+            />
+            {fullscreenScreenshotIndex > 0 && (
+              <button
+                type="button"
+                className={`${styles.fullscreenNav} ${styles.fullscreenPrev}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setFullscreenScreenshot(tradeScreenshots[fullscreenScreenshotIndex - 1]);
+                }}
+                aria-label="Previous screenshot"
+              >
+                ‹
+              </button>
+            )}
+            {fullscreenScreenshotIndex < tradeScreenshots.length - 1 && (
+              <button
+                type="button"
+                className={`${styles.fullscreenNav} ${styles.fullscreenNext}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setFullscreenScreenshot(tradeScreenshots[fullscreenScreenshotIndex + 1]);
+                }}
+                aria-label="Next screenshot"
+              >
+                ›
+              </button>
+            )}
+            <button
+              type="button"
+              className={styles.fullscreenDelete}
+              onClick={(event) => {
+                event.stopPropagation();
+                requestDeleteScreenshot(fullscreenScreenshot);
+              }}
+              disabled={isDeletingScreenshot}
+              aria-label="Delete screenshot"
+              title="Delete screenshot"
+            >
+              <FaTrash aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              className={styles.fullscreenClose}
+              onClick={() => setFullscreenScreenshot(null)}
+              aria-label="Close fullscreen screenshot"
+            >
+              ×
+            </button>
+          </div>
+        )}
 
         {/* Trade Info & Performance */}
         <div className={styles.tradeData}>
@@ -1216,6 +1380,7 @@ export const Trade = () => {
                 <span className={styles.metricLabel}>Tags</span>
                 <span className={styles.metricValue}>No tags added</span>
               </div>
+
             )
           ) : (
             <div className={styles.tagPickerCard}>
@@ -1316,6 +1481,15 @@ export const Trade = () => {
         cancelText="Cancel"
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => confirmDeleteAccount(trade._id)}
+      />
+      <ConfirmationModal
+        isOpen={Boolean(screenshotToDelete)}
+        title="Delete Screenshot?"
+        message="This screenshot will be permanently removed from the trade."
+        confirmText="Delete Screenshot"
+        cancelText="Cancel"
+        onCancel={() => setScreenshotToDelete(null)}
+        onConfirm={() => deleteScreenshot(screenshotToDelete)}
       />
 
       {closeTrade && (

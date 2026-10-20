@@ -1,6 +1,15 @@
 import { NavLink, Link } from "react-router-dom";
 import { useAuth } from "../../../store/Auth";
 import styles from "../../Layout/SideBar.module.css";
+import {
+  FaCrown,
+  FaEnvelope,
+  FaExchangeAlt,
+  FaExternalLinkAlt,
+  FaTachometerAlt,
+  FaUsers,
+  FaWallet,
+} from "react-icons/fa";
 
 export const AdminSidebar = ({ onClose }) => {
   const { user } = useAuth();
@@ -38,7 +47,16 @@ export const AdminSidebar = ({ onClose }) => {
               to="/admin/dashboard"
               onClick={onClose}
             >
-              Dashboard
+              <FaTachometerAlt aria-hidden="true" /> Dashboard
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              className={getNavLinkClass}
+              to="/admin/pro-management"
+              onClick={onClose}
+            >
+              <FaCrown aria-hidden="true" /> Pro Management
             </NavLink>
           </li>
           <li>
@@ -47,7 +65,7 @@ export const AdminSidebar = ({ onClose }) => {
               to="/admin/users"
               onClick={onClose}
             >
-              Users
+              <FaUsers aria-hidden="true" /> Users
             </NavLink>
           </li>
           <li>
@@ -56,7 +74,7 @@ export const AdminSidebar = ({ onClose }) => {
               to="/admin/accounts"
               onClick={onClose}
             >
-              Accounts
+              <FaWallet aria-hidden="true" /> Accounts
             </NavLink>
           </li>
           <li>
@@ -65,7 +83,7 @@ export const AdminSidebar = ({ onClose }) => {
               to="/admin/trades"
               onClick={onClose}
             >
-              Trades
+              <FaExchangeAlt aria-hidden="true" /> Trades
             </NavLink>
           </li>
           <li>
@@ -74,12 +92,12 @@ export const AdminSidebar = ({ onClose }) => {
               to="/admin/contacts"
               onClick={onClose}
             >
-              Contacts
+              <FaEnvelope aria-hidden="true" /> Contacts
             </NavLink>
           </li>
           <li>
             <NavLink className={getNavLinkClass} to="/app" onClick={onClose}>
-              Client
+              <FaExternalLinkAlt aria-hidden="true" /> Client
             </NavLink>
           </li>
         </ul>

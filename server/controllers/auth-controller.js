@@ -1,4 +1,5 @@
 const User = require("../models/user-model");
+const { hasEffectiveProAccess } = require("../services/pro-access-service");
 
 const Register = async (req, res, next) => {
   try {
@@ -59,6 +60,7 @@ const Login = async (req, res, next) => {
       userID: userExist._id.toString(),
       plan: userExist.plan,
       planExpiresAt: userExist.planExpiresAt,
+      isPro: await hasEffectiveProAccess(userExist),
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -75,7 +77,9 @@ const user = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.status(200).json({ userData });
+    const userResponse = userData.toObject();
+    userResponse.isPro = await hasEffectiveProAccess(userData);
+    return res.status(200).json({ userData: userResponse });
   } catch (error) {
     console.error("Error fetching user data:", error);
     res.status(500).json({ message: "Error fetching user data" });

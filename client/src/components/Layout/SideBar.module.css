@@ -113,7 +113,9 @@
   color: var(--nav-item-text);
   text-decoration: none;
   width: 100%;
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
   padding: 0.85rem 1rem;
   font-size: var(--text-sm);
   font-weight: 500;
