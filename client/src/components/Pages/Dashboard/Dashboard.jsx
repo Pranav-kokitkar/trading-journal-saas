@@ -1,5 +1,5 @@
 // src/components/Pages/Dashboard/Dashboard.jsx
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 import styles from "./dashboard.module.css";
 import EquityCurveChart from "./EquityCurveChart";
 import WinLossChart from "./WinLossChart";
@@ -16,10 +16,10 @@ import {
   Bar,
 } from "recharts";
 
-import { PerformanceContext } from "../../../context/PerformanceContext";
 import { useTrades } from "../../../store/TradeContext"; 
 import { UserContext } from "../../../context/UserContext";
 import { AccountContext } from "../../../context/AccountContext";
+import { calculatePerformance } from "../../../utils/Performance";
 import { SkeletonCard, SkeletonChart, SkeletonText } from "../../ui/skeleton/Skeleton";
 
 const formatLabel = (value, fallback) => {
@@ -59,6 +59,49 @@ const isCapitalTrade = (trade) => {
     .trim();
 
   return tradeMode !== "backtest";
+};
+
+const DATE_FILTERS = [
+  { value: "1D", label: "1D" },
+  { value: "7D", label: "7D" },
+  { value: "30D", label: "30D" },
+  { value: "90D", label: "90D" },
+  { value: "YTD", label: "YTD" },
+  { value: "ALL", label: "All Time" },
+];
+const FINISHED_STATUSES = new Set(["closed", "exited"]);
+
+const getTradeDate = (trade) => {
+  const value = trade?.entryTime || trade?.dateTime || trade?.dateNtime;
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const getStrategyName = (trade) => {
+  const strategy = trade?.strategy;
+  if (typeof strategy === "object") return String(strategy?.name || "").trim();
+  return String(strategy || "").trim();
+};
+
+const isWithinDateFilter = (trade, filter) => {
+  if (filter === "ALL") return true;
+
+  const tradeDate = getTradeDate(trade);
+  if (!tradeDate) return false;
+
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  if (filter === "YTD") {
+    return tradeDate >= new Date(now.getFullYear(), 0, 1);
+  }
+
+  const days = Number.parseInt(filter, 10);
+  if (!Number.isFinite(days)) return true;
+
+  start.setDate(start.getDate() - (days - 1));
+  return tradeDate >= start && tradeDate <= now;
 };
 
 const buildKeyInsights = (trades) => {
@@ -206,7 +249,6 @@ const buildEfficiencyStats = (trades) => {
 
 export const Dashboard = () => {
   const { userDetails } = useContext(UserContext);
-  const { performance } = useContext(PerformanceContext);
   const {accountDetails} = useContext(AccountContext);
 
   // Read trades from TradeContext (fallback to empty array)
@@ -214,17 +256,33 @@ export const Dashboard = () => {
     accountTrades = [],
     loading: chartsLoading = false,
   } = useTrades() || {};
-
-  // Accept both "closed" and "exited" as finished trades (case-insensitive)
-  const finishedStatuses = new Set(["closed", "exited"]);
+  const [dateFilter, setDateFilter] = useState("30D");
+  const [strategyFilter, setStrategyFilter] = useState("");
 
   // Filter only capital trades for charts and performance-sensitive visuals
-  const closedTrades = Array.isArray(accountTrades)
-    ? accountTrades.filter((t) =>
-        finishedStatuses.has(String(t.tradeStatus || "").toLowerCase()) &&
-        isCapitalTrade(t)
-      )
-    : [];
+  const closedTrades = useMemo(
+    () =>
+      Array.isArray(accountTrades)
+        ? accountTrades.filter((t) =>
+            FINISHED_STATUSES.has(String(t.tradeStatus || "").toLowerCase()) &&
+            isCapitalTrade(t) &&
+            isWithinDateFilter(t, dateFilter) &&
+            (!strategyFilter || getStrategyName(t) === strategyFilter),
+          )
+        : [],
+    [accountTrades, dateFilter, strategyFilter],
+  );
+
+  const strategyOptions = useMemo(() => {
+    const names = new Set();
+    (Array.isArray(accountTrades) ? accountTrades : []).forEach((trade) => {
+      const name = getStrategyName(trade);
+      if (name) names.add(name);
+    });
+    return Array.from(names).sort((a, b) => a.localeCompare(b));
+  }, [accountTrades]);
+
+  const performance = useMemo(() => calculatePerformance(closedTrades), [closedTrades]);
 
   const hasEnoughInsightData = closedTrades.length >= 10;
   const { weakest, strongest } = buildKeyInsights(closedTrades);
@@ -238,7 +296,15 @@ export const Dashboard = () => {
 
   return (
     <section className={`${styles.dashboard} app-page`}>
-      <TradingDashboard accountDetails={accountDetails} performance={performance} />
+      <TradingDashboard
+        accountDetails={accountDetails}
+        performance={performance}
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
+        strategyFilter={strategyFilter}
+        setStrategyFilter={setStrategyFilter}
+        strategyOptions={strategyOptions}
+      />
 
       <section className={styles.insightsSection}>
         <h2>
@@ -466,7 +532,15 @@ const DashboardLoadingState = () => {
   );
 };
 
-const TradingDashboard = ({ accountDetails, performance }) => {
+const TradingDashboard = ({
+  accountDetails,
+  performance,
+  dateFilter,
+  setDateFilter,
+  strategyFilter,
+  setStrategyFilter,
+  strategyOptions,
+}) => {
   const initialCapital = Number(accountDetails?.initialCapital || 0);
   const totalPnl = Number(performance.totalPnL || 0);
   const growthPercent = initialCapital > 0 ? (totalPnl / initialCapital) * 100 : 0;
@@ -508,6 +582,29 @@ const TradingDashboard = ({ accountDetails, performance }) => {
         <h1 className="app-page-title">
           Trading <span className={styles.span}>Dashboard</span>
         </h1>
+        <div className={styles.dashboardFilters} aria-label="Dashboard filters">
+          <div className={styles.dateFilterGroup} role="group" aria-label="Date range">
+            {DATE_FILTERS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={dateFilter === option.value ? styles.activeFilter : styles.filterButton}
+                onClick={() => setDateFilter(option.value)}
+                aria-pressed={dateFilter === option.value}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+          <label className={styles.strategyFilter}>
+            <select value={strategyFilter} onChange={(event) => setStrategyFilter(event.target.value)}>
+              <option value="">All Strategies</option>
+              {strategyOptions.map((strategy) => (
+                <option key={strategy} value={strategy}>{strategy}</option>
+              ))}
+            </select>
+          </label>
+        </div>
       </div>
       <div className={styles.kpiGrid}>
         {kpiCards.map((item) => (

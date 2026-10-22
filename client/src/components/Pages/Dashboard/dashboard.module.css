@@ -23,6 +23,62 @@
   gap: 30px;
 }
 
+.dashboardFilters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-10);
+  margin-left: auto;
+}
+
+.dateFilterGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  padding: 0.2rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+}
+
+.filterButton,
+.activeFilter {
+  min-height: 34px;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+.filterButton:hover,
+.activeFilter {
+  border-color: var(--accent-primary);
+  background: var(--accent-subtle);
+  color: var(--text-primary);
+}
+
+.strategyFilter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.strategyFilter select {
+  min-height: 34px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--surface-card-strong);
+  color: var(--text-primary);
+  padding: 0.4rem 0.65rem;
+  font: inherit;
+}
+
 .sectionHeader {
   display: flex;
   flex-wrap: wrap;
@@ -599,6 +655,11 @@
   .dashboardHeaderRow {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .dashboardFilters {
+    width: 100%;
+    margin-left: 0;
   }
 
   .controlsBar {

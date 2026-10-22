@@ -106,6 +106,9 @@ export const Sidebar = ({ onClose }) => {
               setIncludeImportedTrades(e.target.checked)
             }
           />
+          <span className={styles.toggleTrack} aria-hidden="true">
+            <span className={styles.toggleThumb} />
+          </span>
           <span>Include Imported Data</span>
         </label>
       </div>

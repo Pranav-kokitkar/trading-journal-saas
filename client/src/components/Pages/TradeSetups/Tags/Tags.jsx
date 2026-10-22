@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../../../store/Auth";
+import { useTrades } from "../../../../store/TradeContext";
 import toast from "react-hot-toast";
 import { ConfirmationModal } from "../../../modals/ConfirmationModal/ConfirmationModal";
 import styles from "./Tags.module.css";
@@ -26,6 +27,57 @@ export const Tags = () => {
   const [tagToUpdate, setTagToUpdate] = useState(null);
 
   const { authorizationToken, isPro } = useAuth();
+  const { accountTrades = [] } = useTrades() || {};
+
+  const tagUsage = useMemo(() => {
+    const usageById = new Map();
+    const usageByName = new Map();
+
+    (Array.isArray(accountTrades) ? accountTrades : []).forEach((trade) => {
+      (Array.isArray(trade?.tags) ? trade.tags : []).forEach((tradeTag) => {
+        const id = String(tradeTag?._id || tradeTag?.id || tradeTag || "");
+        const name = String(tradeTag?.name || "").trim().toLowerCase();
+        if (id) usageById.set(id, (usageById.get(id) || 0) + 1);
+        if (name) usageByName.set(name, (usageByName.get(name) || 0) + 1);
+      });
+    });
+
+    return tags
+      .map((currentTag) => ({
+        ...currentTag,
+        usageCount:
+          usageById.get(String(currentTag._id)) ||
+          usageByName.get(String(currentTag.name || "").trim().toLowerCase()) ||
+          0,
+      }))
+      .sort((a, b) => b.usageCount - a.usageCount || a.name.localeCompare(b.name));
+  }, [accountTrades, tags]);
+
+  const totalApplications = tagUsage.reduce(
+    (total, currentTag) => total + currentTag.usageCount,
+    0,
+  );
+  const usedTags = tagUsage.filter((currentTag) => currentTag.usageCount > 0);
+  const mostUsedTags = usedTags.slice(0, 5);
+  const mostUsedTagIds = new Set(mostUsedTags.map((currentTag) => currentTag._id));
+  const otherTags = tagUsage.filter((currentTag) => !mostUsedTagIds.has(currentTag._id));
+  const chartTags = mostUsedTags.length > 0 ? mostUsedTags : tagUsage.slice(0, 5);
+  const chartTotal = chartTags.reduce(
+    (total, currentTag) => total + currentTag.usageCount,
+    0,
+  );
+  const chartGap = 3;
+  let chartOffset = 0;
+  const chartGradient = chartTotal > 0
+    ? `conic-gradient(transparent 0deg ${chartGap}deg, ${chartTags.map((currentTag) => {
+        const usableDegrees = 360 - chartTags.length * chartGap;
+        const sliceDegrees = (currentTag.usageCount / chartTotal) * usableDegrees;
+        const start = chartOffset + chartGap;
+        const end = start + sliceDegrees;
+        chartOffset = end;
+        return `${currentTag.colour || "#c9a743"} ${start}deg ${end}deg, transparent ${end}deg ${end + chartGap}deg`;
+      }).join(", ")})`
+    : "conic-gradient(#3a3424 0deg 360deg)";
 
   /* -------------------- CREATE TAG -------------------- */
 
@@ -190,6 +242,7 @@ export const Tags = () => {
 
   return (
     <div className={`${styles.tagsPage} app-page`}>
+      <div className={styles.tagsLayout}>
       <div className={styles.mainContent}>
         {/* Page Heading */}
         <div className={styles.heading}>
@@ -277,6 +330,72 @@ export const Tags = () => {
             </div>
           )}
         </div>
+      </div>
+
+      <aside className={styles.usagePanel}>
+        <div className={styles.usageEyebrow}>TAG USE</div>
+        <h3>Most Used Tags</h3>
+        <p className={styles.usageSummary}>
+          {totalApplications} total applications across logged trades
+        </p>
+
+        <div className={styles.usageChart}>
+          <div className={styles.usageDonut} style={{ "--usage-gradient": chartGradient }}>
+            <div className={styles.usageDonutCenter}>
+              <span>TAG USE</span>
+              <strong>{totalApplications}</strong>
+              <small>TOP 5</small>
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.usageList}>
+          {mostUsedTags.length === 0 ? (
+            <p className={styles.usageEmpty}>Tags will appear here as trades are logged.</p>
+          ) : (
+            mostUsedTags.map((currentTag) => {
+              const percentage = totalApplications > 0
+                ? Math.round((currentTag.usageCount / totalApplications) * 100)
+                : 0;
+              return (
+                <div className={styles.usageRow} key={currentTag._id}>
+                  <div className={styles.usageRowHeader}>
+                    <span className={styles.usageTagName}>
+                      <i style={{ backgroundColor: currentTag.colour || "#c9a743" }} />
+                      {currentTag.name}
+                    </span>
+                    <span className={styles.usageCount}>
+                      {currentTag.usageCount} <b>{percentage}%</b>
+                    </span>
+                  </div>
+                  <div className={styles.usageBar}>
+                    <span
+                      style={{
+                        width: `${percentage}%`,
+                        backgroundColor: currentTag.colour || "#c9a743",
+                      }}
+                    />
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {otherTags.length > 0 && (
+          <div className={styles.otherTags}>
+            <h4>Other Tags</h4>
+            <div className={styles.otherTagsList}>
+              {otherTags.map((currentTag) => (
+                <span key={currentTag._id}>
+                  <i style={{ backgroundColor: currentTag.colour || "#c9a743" }} />
+                  {currentTag.name} ({currentTag.usageCount})
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </aside>
       </div>
 
       {/* Confirmation Modal for Delete */}

@@ -632,6 +632,10 @@ export const Trade = () => {
       });
   };
   const screenshotUploadLimit = getMaxScreenshots(isPro);
+  const remainingScreenshotSlots = Math.max(
+    screenshotUploadLimit - tradeScreenshots.length,
+    0,
+  );
   const entryTime = formatDateTimeUtc(trade.entryTime ?? trade.dateTime ?? trade.dateNtime);
   const exitTime = formatDateTimeUtc(trade.exitTime);
   const duration = formatDuration(trade);
@@ -648,8 +652,12 @@ export const Trade = () => {
 
   const handleScreenshotSelection = (event) => {
     const files = Array.from(event.target.files || []);
-    if (files.length > screenshotUploadLimit) {
-      alert(`You can upload a maximum of ${screenshotUploadLimit} screenshots.`);
+    if (files.length > remainingScreenshotSlots) {
+      alert(
+        remainingScreenshotSlots > 0
+          ? `You can upload up to ${remainingScreenshotSlots} more screenshots.`
+          : `This trade already has the maximum of ${screenshotUploadLimit} screenshots.`,
+      );
       event.target.value = "";
       return;
     }
@@ -683,7 +691,7 @@ export const Trade = () => {
     setIsUploadingScreenshots(true);
     try {
       const formData = new FormData();
-      selectedScreenshots.slice(0, screenshotUploadLimit).forEach((file) => {
+      selectedScreenshots.forEach((file) => {
         formData.append("screenshots", file);
       });
 

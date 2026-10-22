@@ -233,9 +233,9 @@ export const TradeProvider = ({ children }) => {
         }
       });
 
-      // Append up to 2 screenshot files (field name: "screenshots")
+      // The server applies the plan-specific screenshot limit.
       if (Array.isArray(screenshots)) {
-        screenshots.slice(0, 2).forEach((file) => {
+        screenshots.forEach((file) => {
           if (file) {
             formData.append("screenshots", file);
           }

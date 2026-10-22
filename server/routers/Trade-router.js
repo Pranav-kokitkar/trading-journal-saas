@@ -1,6 +1,7 @@
 const express = require("express");
 const authMiddleware = require("../middleware/auth-middleware");
 const upload = require("../middleware/upload-middleware");
+const { PLAN_LIMITS } = require("../config/planLimits");
 const {
   AddTrade,
   getAllTrades,
@@ -25,7 +26,11 @@ router
 
 router
   .route("/")
-  .post(authMiddleware, upload.array("screenshots", 2), AddTrade)
+  .post(
+    authMiddleware,
+    upload.array("screenshots", PLAN_LIMITS.PRO.MAX_SCREENSHOTS),
+    AddTrade,
+  )
   .get(authMiddleware, getAllTrades);
 
 router
@@ -43,7 +48,7 @@ router
   .route("/:id/screenshots")
   .patch(
     authMiddleware,
-    upload.array("screenshots", 3),
+    upload.array("screenshots", PLAN_LIMITS.PRO.MAX_SCREENSHOTS),
     updateTradeScreenshots,
   );
 router.route("/:id/screenshot").delete(authMiddleware, deleteTradeScreenshot);

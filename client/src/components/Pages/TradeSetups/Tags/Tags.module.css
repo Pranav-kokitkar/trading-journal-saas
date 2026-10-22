@@ -4,16 +4,22 @@
 
 /* ===== Page Wrapper ===== */
 .tagsPage {
-  display: flex;
-  justify-content: center;
-  padding: 1.5rem;
+  padding: 1.25rem 0;
   min-height: 100vh;
+}
+
+.tagsLayout {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  align-items: start;
+  gap: 1.5rem;
 }
 
 /* ===== Main Content Container ===== */
 .mainContent {
   width: 100%;
-  max-width: 980px;
+  min-width: 0;
 }
 
 /* ===== Page Heading ===== */
@@ -164,6 +170,204 @@
   margin: 0;
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 0.75rem;
+}
+
+/* ===== Tag Usage Rail ===== */
+.usagePanel {
+  position: sticky;
+  top: 1.25rem;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: 1.25rem;
+}
+
+.usageEyebrow {
+  color: var(--accent-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.usagePanel h3 {
+  margin: 0.65rem 0 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+}
+
+.usageSummary {
+  margin: 0.45rem 0 1rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.usageChart {
+  display: grid;
+  place-items: center;
+  min-height: 245px;
+  padding: 1rem;
+  background: var(--bg-level-1);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.usageDonut {
+  position: relative;
+  width: 190px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transform: rotate(-8deg);
+  background:
+    var(--usage-gradient),
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(201, 167, 67, 0.22) 0deg 1deg,
+      transparent 1deg 10deg
+    );
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.usageDonut::before {
+  content: "";
+  position: absolute;
+  width: 126px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--bg-level-1);
+}
+
+.usageDonutCenter {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  gap: 0.15rem;
+  transform: rotate(8deg);
+}
+
+.usageDonutCenter span,
+.usageDonutCenter small {
+  color: var(--muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+}
+
+.usageDonutCenter span {
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.usageDonutCenter strong {
+  color: var(--text-primary);
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.usageList {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1.15rem;
+}
+
+.usageRow {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.usageRowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.usageTagName {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  gap: 0.6rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usageTagName i,
+.otherTagsList i {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 auto;
+  display: inline-block;
+  border-radius: 3px;
+}
+
+.usageCount {
+  flex: 0 0 auto;
+  color: var(--muted);
+}
+
+.usageCount b {
+  margin-left: 0.45rem;
+  color: var(--accent-primary);
+  font-weight: 700;
+}
+
+.usageBar {
+  height: 3px;
+  overflow: hidden;
+  background: rgba(201, 167, 67, 0.18);
+}
+
+.usageBar span {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+}
+
+.usageEmpty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.otherTags {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.otherTags h4 {
+  margin: 0 0 0.65rem;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.otherTagsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.otherTagsList span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 0.72rem;
 }
 
 /* ===== No Tags Message ===== */
@@ -389,6 +593,14 @@
 @media (max-width: 768px) {
   .tagsPage {
     padding: 1rem;
+  }
+
+  .tagsLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .usagePanel {
+    position: static;
   }
 
   .createForm,

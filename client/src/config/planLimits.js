@@ -4,7 +4,7 @@
 export const PLAN_LIMITS = {
   FREE: {
     MAX_SCREENSHOTS: 2,
-    MAX_ACCOUNTS: 1,
+    MAX_ACCOUNTS: 3,
     MAX_TAGS: 3,
     MAX_STRATEGIES: 2,
     MAX_COMPARE_DIMENSIONS: 1,

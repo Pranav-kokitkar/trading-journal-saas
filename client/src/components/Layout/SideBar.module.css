@@ -95,10 +95,38 @@
 }
 
 .globalToggleLabel input[type="checkbox"] {
-  width: 15px;
-  height: 15px;
-  margin: 0;
-  accent-color: var(--accent-primary);
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.toggleTrack {
+  width: 34px;
+  height: 20px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--border-medium);
+  transition: background 0.2s ease;
+}
+
+.toggleThumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  transform: translateX(0);
+  transition: transform 0.2s ease;
+}
+
+.globalToggleLabel input[type="checkbox"]:checked + .toggleTrack {
+  background: var(--accent-primary);
+}
+
+.globalToggleLabel input[type="checkbox"]:checked + .toggleTrack .toggleThumb {
+  transform: translateX(14px);
 }
 
 .nav li {

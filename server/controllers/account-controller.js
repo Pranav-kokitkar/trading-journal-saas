@@ -5,6 +5,7 @@ const Trade = require("../models/trade-model");
 const Tags = require("../models/tags-model");
 const Strategy = require("../models/strategy-model");
 const { hasEffectiveProAccess } = require("../services/pro-access-service");
+const { getMaxAccounts } = require("../config/planLimits");
 
 // POST /api/account
 const createAccount = async (req, res) => {
@@ -39,18 +40,13 @@ const createAccount = async (req, res) => {
 
     const totalAccounts = await Account.find({ userId }).countDocuments();
 
-    if (!isPro) {
-      if (totalAccounts >= 2) {
-        return res
-          .status(403)
-          .json({ message: "Cannt create more than 2 account in free plan " });
-      }
-    } else {
-      if (totalAccounts >= 5) {
-        return res
-          .status(403)
-          .json({ message: "max accounts per user is 5 accounts in pro plan" });
-      }
+    const maxAccounts = getMaxAccounts(isPro);
+    if (totalAccounts >= maxAccounts) {
+      return res.status(403).json({
+        message: isPro
+          ? `Pro plan account limit (${maxAccounts}) reached`
+          : `Free plan account limit (${maxAccounts}) reached. Upgrade to Pro.`,
+      });
     }
 
     // 1) Create the account; currentBalance will auto = initialCapital via schema default
