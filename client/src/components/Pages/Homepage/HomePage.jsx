@@ -17,6 +17,9 @@ export const HomePage =()=> {
         <p className={styles.mutedLine}>
           Your edge isn’t adding more trades — it’s removing bad ones.
         </p>
+        <p className={styles.mutedLine}>
+          Kyros Journal is a trading journal that helps you record trades, use trade analysis to understand trading performance, identify recurring mistakes, and improve your strategies.
+        </p>
 
         <div className={styles.cta}>
           <Link to="/register" className={styles.primaryBtn}>
