@@ -1,5 +1,6 @@
+import { useEffect, useState } from "react";
 import styles from "./SideBar.module.css";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../store/Auth";
 import { useTrades } from "../../store/TradeContext";
 import {
@@ -12,12 +13,23 @@ import {
   FaRocket,
   FaShieldAlt,
   FaStickyNote,
+  FaClipboardCheck,
+  FaChevronDown,
+  FaChevronRight,
+  FaTags,
+  FaProjectDiagram,
 } from "react-icons/fa";
 
 export const Sidebar = ({ onClose }) => {
 
   const { user, isAdmin, isPro, isAuthLoading } = useAuth();
   const { includeImportedTrades, setIncludeImportedTrades } = useTrades() || {};
+  const location = useLocation();
+  const childRouteActive = ["/app/strategies", "/app/tags"].includes(location.pathname);
+  const [setupsExpanded, setSetupsExpanded] = useState(childRouteActive);
+  useEffect(() => {
+    if (childRouteActive) setSetupsExpanded(true);
+  }, [childRouteActive]);
   const userInitial = user?.name?.trim()?.charAt(0)?.toUpperCase() || "U";
 
   const getNavLinkClass = ({ isActive }) => {
@@ -60,8 +72,35 @@ export const Sidebar = ({ onClose }) => {
             </NavLink>
           </li>
           <li>
-            <NavLink className={getNavLinkClass} to="/app/trade-setups" onClick={onClose}>
-              <FaLayerGroup aria-hidden="true" /> Trade Setups
+            <button
+              type="button"
+              className={`${styles.navlink} ${styles.parentButton} ${childRouteActive ? styles.active : ""}`}
+              onClick={() => setSetupsExpanded((expanded) => !expanded)}
+              aria-expanded={setupsExpanded}
+              aria-controls="strategies-tags-submenu"
+            >
+              <FaLayerGroup aria-hidden="true" />
+              <span>Strategies &amp; Tags</span>
+              {setupsExpanded ? <FaChevronDown className={styles.chevron} aria-hidden="true" /> : <FaChevronRight className={styles.chevron} aria-hidden="true" />}
+            </button>
+            {setupsExpanded && (
+              <ul id="strategies-tags-submenu" className={styles.submenu}>
+                <li>
+                  <NavLink className={getNavLinkClass} to="/app/strategies" onClick={onClose}>
+                    <FaProjectDiagram aria-hidden="true" /> Strategies
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink className={getNavLinkClass} to="/app/tags" onClick={onClose}>
+                    <FaTags aria-hidden="true" /> Tags
+                  </NavLink>
+                </li>
+              </ul>
+            )}
+          </li>
+          <li>
+            <NavLink className={getNavLinkClass} to="/app/trading-rules" onClick={onClose}>
+              <FaClipboardCheck aria-hidden="true" /> Trading Rules
             </NavLink>
           </li>
           <li>
@@ -74,6 +113,7 @@ export const Sidebar = ({ onClose }) => {
               <FaBalanceScale aria-hidden="true" /> Compare
             </NavLink>
           </li>
+          <li className={styles.divider} aria-hidden="true" />
           {!isPro && (
             <li>
               <NavLink className={getNavLinkClass} to="/app/upgrade" onClick={onClose}>
@@ -96,32 +136,33 @@ export const Sidebar = ({ onClose }) => {
         </ul>
       </nav>
 
-      <div className={styles.globalToggleWrap}>
-        <label className={styles.globalToggleLabel}>
-          <input
-            type="checkbox"
-            checked={Boolean(includeImportedTrades)}
-            onChange={(e) =>
-              typeof setIncludeImportedTrades === "function" &&
-              setIncludeImportedTrades(e.target.checked)
-            }
-          />
-          <span className={styles.toggleTrack} aria-hidden="true">
-            <span className={styles.toggleThumb} />
-          </span>
-          <span>Include Imported Data</span>
-        </label>
-      </div>
-
-      {/* Bottom User Info */}
-      <Link to="/app/my-account" className={styles.user}>
-        <div className={styles.avatar}>{userInitial}</div>
-        <div className={styles.userMeta}>
-          <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
-          <span className={styles.subText}>Your Account</span>
+      <div className={styles.sidebarFooter}>
+        <div className={styles.globalToggleWrap}>
+          <label className={styles.globalToggleLabel}>
+            <input
+              type="checkbox"
+              checked={Boolean(includeImportedTrades)}
+              onChange={(e) =>
+                typeof setIncludeImportedTrades === "function" &&
+                setIncludeImportedTrades(e.target.checked)
+              }
+            />
+            <span className={styles.toggleTrack} aria-hidden="true">
+              <span className={styles.toggleThumb} />
+            </span>
+            <span>Include Imported Data</span>
+          </label>
         </div>
-        {!isAuthLoading && isPro && <p className={styles.proBadge}>PRO</p>}
-      </Link>
+
+        <Link to="/app/my-account" className={styles.user}>
+          <div className={styles.avatar}>{userInitial}</div>
+          <div className={styles.userMeta}>
+            <p className={styles.username}>{!user ? "user" : `${user.name}`}</p>
+            <span className={styles.subText}>Your Account</span>
+          </div>
+          {!isAuthLoading && isPro && <p className={styles.proBadge}>PRO</p>}
+        </Link>
+      </div>
     </div>
   );
 };

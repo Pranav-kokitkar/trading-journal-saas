@@ -38,6 +38,7 @@
 .outlet {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
   min-width: 0;
   background: transparent;
 }
@@ -46,6 +47,12 @@
 .outlet {
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 769px) {
+  .outlet {
+    height: 100vh;
+  }
 }
 
 @media (min-width: 769px) {

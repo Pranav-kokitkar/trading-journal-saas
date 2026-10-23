@@ -6,7 +6,7 @@ import { ConfirmationModal } from "../../../modals/ConfirmationModal/Confirmatio
 import styles from "./Tags.module.css";
 import { getMaxTags } from "../../../../config/planLimits";
 
-export const Tags = () => {
+export const Tags = ({ showHeading = true }) => {
   const TAG_COLORS = [
     "#6e7cff", // Accent Blue
     "#3dd6a6", // Success Green
@@ -245,10 +245,12 @@ export const Tags = () => {
       <div className={styles.tagsLayout}>
       <div className={styles.mainContent}>
         {/* Page Heading */}
-        <div className={styles.heading}>
-          <h2>Manage Tags</h2>
-          <p>Label trades to identify patterns, mistakes, and improvements</p>
-        </div>
+        {showHeading && (
+          <div className={styles.heading}>
+            <h2>Manage Tags</h2>
+            <p>Label trades to identify patterns, mistakes, and improvements</p>
+          </div>
+        )}
 
         {/* Create Tag Form */}
         <form className={styles.createForm} onSubmit={handleSubmit}>

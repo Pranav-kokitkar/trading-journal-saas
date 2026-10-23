@@ -1,6 +1,8 @@
 require("dotenv").config();
 require("./models/tags-model");
 require("./models/trade-model");
+require("./models/trading-rule-model");
+require("./models/rule-evaluation-model");
 const express = require("express");
 const validateEnv = require("./utils/validateEnv");
 const connectDB = require("./utils/db");
@@ -26,6 +28,7 @@ const strategyRoute = require("./routers/Strategy-router");
 const compareRoute = require("./routers/Compare-router");
 const analyticsRoute = require("./routers/Analytics-router");
 const marketDataRoute = require("./routers/MarketData-router");
+const complianceRoute = require("./routers/Compliance-router");
 const errorMiddleware = require("./middleware/error-middleware");
 
 const app = express();
@@ -126,6 +129,7 @@ app.use("/api/strategy", strategyRoute);
 app.use("/api/compare", compareRoute);
 app.use("/api/analytics", analyticsRoute);
 app.use("/api/market-data", marketDataRoute);
+app.use("/api/compliance", complianceRoute);
 app.use(errorMiddleware);
 
 const PORT = process.env.PORT || 3000;

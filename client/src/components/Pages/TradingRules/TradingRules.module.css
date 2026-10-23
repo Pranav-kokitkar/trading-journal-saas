@@ -1,0 +1,63 @@
+.page { display: grid; gap: var(--space-6); }
+.page h1 { margin: 0; color: var(--text-primary); }
+.page h1 span { color: var(--accent-primary); }
+.page p { color: var(--text-secondary); }
+.summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); }
+.summary div, .card { background: var(--surface-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); box-shadow: var(--shadow-card); padding: var(--space-5); }
+.summary div { display: grid; gap: var(--space-2); }
+.summary strong { color: var(--text-primary); font-size: 1.5rem; }
+.summary span, .rule span { color: var(--text-muted); font-size: var(--text-sm); }
+.grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: var(--space-4); align-items: start; }
+.leftColumn { display: grid; gap: var(--space-4); min-width: 0; }
+.card { display: grid; gap: var(--space-4); }
+.createRuleCard { position: sticky; top: 0; z-index: 20; }
+.card h2 { margin: 0; color: var(--text-primary); font-size: var(--text-lg); }
+.sectionSubtitle { margin: 4px 0 0; font-size: var(--text-sm); }
+.card label { display: grid; gap: var(--space-2); color: var(--text-secondary); font-size: var(--text-sm); }
+.card input, .card textarea, .card select { width: 100%; box-sizing: border-box; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--surface-card-strong); color: var(--text-primary); padding: .65rem .75rem; font: inherit; }
+.card textarea { min-height: 70px; resize: vertical; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.check { display: flex !important; grid-template-columns: auto 1fr; align-items: center; }
+.check input { width: auto; }
+.actions, .ruleActions, .filters, .listHeader { display: flex; gap: var(--space-2); align-items: center; }
+.actions button, .ruleActions button { border: 0; border-radius: var(--radius-sm); padding: .6rem .8rem; background: var(--accent-primary); color: white; cursor: pointer; }
+.actions .secondary, .ruleActions button { background: var(--surface-card-strong); color: var(--text-secondary); border: 1px solid var(--border-default); }
+.listHeader { justify-content: space-between; flex-wrap: wrap; }
+.filters { flex-wrap: wrap; }
+.filters input, .filters select { width: auto; min-width: 120px; padding: .45rem; }
+.rules { display: grid; gap: var(--space-3); }
+.rulesScroll { max-height: 430px; overflow-y: auto; padding-right: var(--space-2); overscroll-behavior: contain; }
+.rule { display: flex; justify-content: space-between; gap: var(--space-3); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); }
+.rule > div:first-child { display: grid; gap: 4px; }
+.rule strong { color: var(--text-primary); }
+.rule p { margin: 4px 0 0; font-size: var(--text-sm); }
+.ruleActions { align-items: flex-start; flex-wrap: wrap; justify-content: flex-end; }
+.ruleActions .danger { color: var(--color-loss); }
+.ruleActions .enableButton,
+.ruleActions .disableButton,
+.ruleActions .deleteButton { display: inline-flex; align-items: center; justify-content: center; min-height: 2.25rem; }
+.ruleActions .enableButton { color: var(--color-profit); }
+.ruleActions .disableButton { color: var(--color-loss); }
+.ruleActions .deleteButton { width: 2.25rem; padding: .6rem; color: var(--color-loss); }
+.ruleActions .deleteButton:hover { background: var(--surface-card-strong); color: var(--color-loss); }
+.viewTradeButton { width: fit-content; border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--surface-card-strong); color: var(--text-secondary); padding: .5rem .75rem; cursor: pointer; }
+.viewTradeButton:disabled { opacity: .55; cursor: wait; }
+.state { border-radius: var(--radius-pill); padding: .25rem .55rem; font-size: .75rem; }
+.enabled { background: var(--color-profit-subtle); color: var(--color-profit); }
+.disabled { background: rgba(148, 163, 184, .12); color: var(--text-muted); }
+.empty { margin: 0; padding: var(--space-4) 0; }
+.errorState { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--color-loss); border-radius: var(--radius-lg); background: var(--color-loss-subtle); color: var(--text-secondary); }
+.errorState strong { color: var(--color-loss); }
+.errorState span { flex: 1 1 240px; }
+.errorState button { border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--surface-card-strong); color: var(--text-primary); padding: .5rem .75rem; cursor: pointer; }
+.pagination { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--border-subtle); color: var(--text-muted); font-size: var(--text-sm); }
+.pagination button { border: 1px solid var(--border-default); border-radius: var(--radius-sm); background: var(--surface-card-strong); color: var(--text-secondary); padding: .5rem .75rem; cursor: pointer; }
+.pagination button:disabled { opacity: .45; cursor: not-allowed; }
+.badge { display: inline-flex; align-items: center; justify-content: center; width: fit-content; min-height: 1.5rem; border-radius: 999px; padding: .25rem .65rem; font-size: .75rem !important; line-height: 1; text-transform: capitalize; white-space: nowrap; }
+.info { background: var(--accent-subtle); color: var(--accent-primary) !important; }
+.warning { background: var(--badge-neutral-bg); color: var(--color-neutral) !important; }
+.critical { background: var(--color-loss-subtle); color: var(--color-loss) !important; }
+@media (max-width: 1100px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .createRuleCard { position: static; } }
+@media (max-width: 900px) { .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .summary { grid-template-columns: 1fr 1fr; } .row { grid-template-columns: 1fr; } .rule { flex-direction: column; } .ruleActions { justify-content: flex-start; } .filters input, .filters select { flex: 1 1 100%; width: 100%; } .pagination { flex-wrap: wrap; } }

@@ -76,8 +76,12 @@
 }
 
 .globalToggleWrap {
-  margin-top: 0.9rem;
+  margin-top: 0;
   padding: 0.3rem 0.25rem 0.75rem;
+}
+
+.sidebarFooter {
+  margin-top: auto;
 }
 
 .globalToggleLabel {
@@ -136,6 +140,12 @@
   transition: all 0.2s ease;
 }
 
+.nav > ul > li {
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
 /* ===== Nav Links ===== */
 .navlink {
   color: var(--nav-item-text);
@@ -151,6 +161,57 @@
   transition: all 0.2s ease;
   position: relative;
   border: 1px solid transparent;
+}
+
+.parentButton {
+  appearance: none;
+  box-sizing: border-box;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--nav-item-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.parentButton span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chevron {
+  margin-left: auto;
+  font-size: 0.7rem;
+}
+
+.nav .submenu {
+  list-style: none;
+  box-sizing: border-box;
+  padding: 0 0 0 1.25rem;
+  margin: 0.2rem 0 0;
+  display: grid;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+.nav .submenu .navlink {
+  padding: 0.65rem 0.85rem;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.nav .submenu .navlink svg {
+  font-size: 0.8rem;
+}
+
+.divider {
+  height: 1px;
+  margin: 0.45rem 0;
+  background: var(--border-subtle);
 }
 
 .navlink:hover {
@@ -176,7 +237,7 @@
   align-items: center;
   padding: var(--space-md);
   border-top: 1px solid var(--border-default);
-  margin-top: auto;
+  margin-top: 0;
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s ease;

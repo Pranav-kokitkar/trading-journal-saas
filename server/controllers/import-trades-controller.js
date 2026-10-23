@@ -296,6 +296,13 @@ const importTradesController = async (req, res) => {
       accountId,
     }));
 
+    try {
+      const { evaluateAccountCompliance } = require("../services/compliance-service");
+      await evaluateAccountCompliance({ userId, accountId });
+    } catch (complianceError) {
+      console.error("Failed to evaluate imported trade compliance:", complianceError);
+    }
+
     return res.status(200).json({
       totalImported,
       tagsCreated,

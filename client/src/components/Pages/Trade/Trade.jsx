@@ -779,8 +779,11 @@ export const Trade = () => {
             onClick={() =>
               navigate(historyState.from || "/app/trade-history", {
                 state:
-                  typeof historyState.page === "number"
-                    ? { page: historyState.page }
+                  historyState.filters || typeof historyState.page === "number"
+                    ? {
+                        ...(typeof historyState.page === "number" ? { page: historyState.page } : {}),
+                        ...(historyState.filters ? { filters: historyState.filters } : {}),
+                      }
                     : undefined,
               })
             }

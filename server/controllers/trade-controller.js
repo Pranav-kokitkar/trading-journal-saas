@@ -412,6 +412,13 @@ const AddTrade = async (req, res) => {
 
     const savedTrade = await Trade.create(tradeToSave);
 
+    try {
+      const { evaluateTradeCompliance } = require("../services/compliance-service");
+      await evaluateTradeCompliance({ userId, tradeId: savedTrade._id });
+    } catch (complianceError) {
+      console.error("Failed to evaluate trade compliance after create:", complianceError);
+    }
+
     // Write audit log for creation
     try {
       await auditService.log({
@@ -441,6 +448,17 @@ const AddTrade = async (req, res) => {
         "Failed to recalculate account after adding trade:",
         recalcError,
       );
+    }
+
+    try {
+      const { reevaluateAffectedDay } = require("../services/compliance-service");
+      await reevaluateAffectedDay({
+        userId,
+        accountId: new mongoose.Types.ObjectId(accountId),
+        date: tradeToSave.dateTime,
+      });
+    } catch (complianceError) {
+      console.error("Failed to recalculate daily trade compliance after create:", complianceError);
     }
 
     return res.status(201).json({
@@ -723,6 +741,24 @@ const closeTradeByID = async (req, res, next) => {
         console.error("Failed to write audit log for trade metadata update", e);
       }
 
+      try {
+        const { evaluateTradeCompliance } = require("../services/compliance-service");
+        await evaluateTradeCompliance({ userId, tradeId: updated._id });
+      } catch (complianceError) {
+        console.error("Failed to evaluate trade compliance after update:", complianceError        );
+      }
+
+      try {
+        const { reevaluateAffectedDay } = require("../services/compliance-service");
+        await reevaluateAffectedDay({
+          userId,
+          accountId: trade.accountId,
+          date: trade.dateTime,
+        });
+      } catch (complianceError) {
+        console.error("Failed to recalculate daily trade compliance after update:", complianceError);
+      }
+
       return res.status(200).json({
         success: true,
         trade: normalizeTradeResponse(updated),
@@ -900,6 +936,24 @@ const closeTradeByID = async (req, res, next) => {
       );
     }
 
+    try {
+      const { reevaluateAffectedDay } = require("../services/compliance-service");
+      await reevaluateAffectedDay({
+        userId,
+        accountId: trade.accountId,
+        date: trade.dateTime,
+      });
+    } catch (complianceError) {
+      console.error("Failed to recalculate daily trade compliance after close:", complianceError);
+    }
+
+    try {
+      const { evaluateTradeCompliance } = require("../services/compliance-service");
+      await evaluateTradeCompliance({ userId, tradeId: updated._id });
+    } catch (complianceError) {
+      console.error("Failed to evaluate trade compliance after close:", complianceError);
+    }
+
     return res.status(200).json({
       success: true,
       trade: normalizeTradeResponse(updated),
@@ -917,7 +971,7 @@ const deleteTradeById = async (req, res, next) => {
   try {
     const id = req.params.id;
     const userId = req.userID || req.user?._id;
-    const trade = await Trade.findById(id).lean();
+    const trade = await Trade.findOne({ _id: id, userId }).lean();
     if (!trade) return res.status(404).json({ message: "Trade not found" });
 
     // Soft-delete: set flags
@@ -956,6 +1010,17 @@ const deleteTradeById = async (req, res, next) => {
         "Failed to recalculate account after trade delete:",
         recalcError,
       );
+    }
+
+    try {
+      const { reevaluateAffectedDay } = require("../services/compliance-service");
+      await reevaluateAffectedDay({
+        userId,
+        accountId: trade.accountId,
+        date: trade.dateTime,
+      });
+    } catch (complianceError) {
+      console.error("Failed to recalculate daily trade compliance after deletion:", complianceError);
     }
 
     res.status(200).json({ message: "trade soft-deleted", recalculated: true });

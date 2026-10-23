@@ -35,9 +35,13 @@
 .tabNavigation {
   display: flex;
   gap: 0.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 20;
   margin-bottom: 1.5rem;
   border-bottom: 2px solid var(--border-subtle);
   padding-bottom: 0;
+  background: var(--surface-card);
 }
 
 .tabButton {
@@ -111,6 +115,7 @@
   }
 
   .tabNavigation {
+    top: 72px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }

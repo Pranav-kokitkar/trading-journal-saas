@@ -19,7 +19,7 @@ const formatMoney = (value) => {
 
 const getTradeId = (trade) => trade?.id ?? trade?._id ?? trade?.tradeNumber;
 
-export const TradeHistoryTradeModal = ({ trade, onClose, page }) => {
+export const TradeHistoryTradeModal = ({ trade, onClose, page, returnTo = "/app/trade-history", returnFilters }) => {
   const navigate = useNavigate();
   useBodyScrollLock(Boolean(trade));
 
@@ -174,7 +174,11 @@ export const TradeHistoryTradeModal = ({ trade, onClose, page }) => {
             onClick={() => {
               onClose?.();
               navigate(`/app/trade/${getTradeId(trade)}`, {
-                state: { from: "/app/trade-history", page },
+                state: {
+                  from: returnTo,
+                  page,
+                  ...(returnFilters ? { filters: returnFilters } : {}),
+                },
               });
             }}
           >

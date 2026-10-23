@@ -28,10 +28,13 @@ import { AdminTradesProvider } from "./components/Admin/store/AdminTradesContext
 import { AdminTradeDetails } from "./components/Admin/adminTrades/AdminTradeDetails";
 import { AdminUserDetails } from "./components/Admin/adminUsers/AdminUserDetails";
 import { Upgrade } from "./components/Pages/Upgrade/Upgrade";
-import { TradeSetups } from "./components/Pages/TradeSetups/TradeSetups";
+import { Navigate } from "react-router-dom";
+import { Strategies } from "./components/Pages/Strategies/Strategies";
+import { Tags } from "./components/Pages/Tags/Tags";
 import { Compare } from "./components/Pages/Comapre/Compare";
 import { AnalyticsDashboard } from "./components/Pages/AnalyticsDashboard/AnalyticsDashboard";
 import { AdminProManagement } from "./components/Admin/adminPro/AdminProManagement";
+import { TradingRules } from "./components/Pages/TradingRules/TradingRules";
 
 const router = createBrowserRouter([
   {
@@ -110,7 +113,14 @@ const router = createBrowserRouter([
         element: <AnalyticsDashboard />,
         errorElement: <ErrorPage />,
       },
-      { path: "trade-setups", element: <TradeSetups/>, errorElement: <ErrorPage /> },
+      {
+        path: "trading-rules",
+        element: <TradingRules />,
+        errorElement: <ErrorPage />,
+      },
+      { path: "trade-setups", element: <Navigate to="/app/tags" replace />, errorElement: <ErrorPage /> },
+      { path: "strategies", element: <Strategies />, errorElement: <ErrorPage /> },
+      { path: "tags", element: <Tags />, errorElement: <ErrorPage /> },
 
       { index: true, element: <Dashboard /> },
     ],

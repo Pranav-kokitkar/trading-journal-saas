@@ -43,7 +43,10 @@ export const TradeHistory = () => {
     totalTrades,
   } = useTrades();
 
-  const [filters, setFilters] = useState(defaultFilters);
+  const [filters, setFilters] = useState(() => ({
+    ...defaultFilters,
+    ...(location.state?.filters || {}),
+  }));
   const [strategies, setStrategies] = useState([]);
   const [tags, setTags] = useState([]);
   const [showProTooltip, setShowProTooltip] = useState(null);
@@ -408,6 +411,7 @@ export const TradeHistory = () => {
         <TradeHistoryTradeModal
           trade={selectedTrade}
           page={page}
+          returnFilters={filters}
           onClose={handleCloseTradeModal}
         />
       </div>

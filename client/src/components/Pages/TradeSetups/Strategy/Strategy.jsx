@@ -6,7 +6,7 @@ import styles from "./Strategy.module.css";
 import { getMaxStrategies } from "../../../../config/planLimits";
 import { SkeletonCard, SkeletonText } from "../../../ui/skeleton/Skeleton";
 
-export const Strategy = () => {
+export const Strategy = ({ showHeading = true }) => {
   const { authorizationToken, isPro } = useAuth();
 
   const [strategy, setStrategy] = useState({
@@ -248,10 +248,12 @@ export const Strategy = () => {
     <div className={`${styles.strategyPage} app-page`}>
       <div className={styles.mainContent}>
         {/* Page Heading */}
-        <div className={styles.heading}>
-          <h2>Manage Strategies</h2>
-          <p>Track performance by strategy and identify your trading edge</p>
-        </div>
+        {showHeading && (
+          <div className={styles.heading}>
+            <h2>Manage Strategies</h2>
+            <p>Track performance by strategy and identify your trading edge</p>
+          </div>
+        )}
 
         {/* Create Strategy Form */}
         <form className={styles.createForm} onSubmit={handleSubmit}>
