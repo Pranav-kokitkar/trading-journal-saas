@@ -35,6 +35,7 @@ import { Compare } from "./components/Pages/Comapre/Compare";
 import { AnalyticsDashboard } from "./components/Pages/AnalyticsDashboard/AnalyticsDashboard";
 import { AdminProManagement } from "./components/Admin/adminPro/AdminProManagement";
 import { TradingRules } from "./components/Pages/TradingRules/TradingRules";
+import { Features } from "./components/Pages/Features/Features";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,11 @@ const router = createBrowserRouter([
   {
     path: "/contact",
     element: <Contact />,
+    errorElement: <ErrorPage />,
+  },
+  {
+    path: "/features",
+    element: <Features />,
     errorElement: <ErrorPage />,
   },
 

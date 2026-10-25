@@ -99,6 +99,9 @@ export const HomePage =()=> {
           <Link to="/register" className={styles.primaryBtn}>
             Refine Your Strategy
           </Link>
+          <Link to="/features" className={styles.secondaryBtn}>
+            Explore Features
+          </Link>
         </div>
       </section>
 

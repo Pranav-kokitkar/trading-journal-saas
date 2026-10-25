@@ -16,6 +16,9 @@ export const Navbar = () => {
       </Link>
 
       <nav className={styles.links}>
+        <Link to="/features" className={styles.featuresLink}>
+          Features
+        </Link>
         <Link to="/register" className={styles.navBtn}>
           Start Free
         </Link>
