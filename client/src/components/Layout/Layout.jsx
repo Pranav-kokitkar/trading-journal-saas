@@ -65,7 +65,7 @@ export const Layout = () => {
   }, [IsCreateModalOpen, isAuthLoading, isPro]);
 
   return (
-    <div className={styles.layout}>
+    <div className={`${styles.layout} ${location.pathname === "/app/add-trade" ? styles.addTradeLayout : ""}`}>
       {/* Mobile Header - Always render, CSS controls visibility */}
       <header className={styles.mobileHeader}>
         <button
@@ -92,7 +92,7 @@ export const Layout = () => {
       {isOpen && <div className={styles.overlay} onClick={closeSidebar}></div>}
 
       {/* Main content */}
-      <main className={styles.outlet}>
+      <main className={`${styles.outlet} ${location.pathname === "/app/add-trade" ? styles.addTradeOutlet : ""}`}>
         <Outlet />
       </main>
 

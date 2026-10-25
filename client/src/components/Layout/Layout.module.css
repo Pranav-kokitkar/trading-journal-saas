@@ -10,6 +10,10 @@
   overflow-x: hidden;
 }
 
+.addTradeLayout {
+  overflow: clip;
+}
+
 @media (min-width: 769px) {
   .layout {
     margin-left: 0;
@@ -265,4 +269,9 @@
   .plusIcon {
     font-size: 1.4rem;
   }
+}
+
+.addTradeOutlet {
+  overflow-y: visible;
+  height: auto;
 }

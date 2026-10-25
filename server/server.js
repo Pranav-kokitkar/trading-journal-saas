@@ -38,6 +38,7 @@ app.set("trust proxy", 1);
 // CORS configuration - MUST be before other middleware
 const defaultAllowedOrigins = [
   "http://localhost:5173",
+  "http://127.0.0.1:5173",
   "http://localhost:5174",
   "http://139.59.65.78",
   "http://139-59-65-78.sslip.io",
