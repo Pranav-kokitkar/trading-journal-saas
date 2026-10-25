@@ -13,6 +13,19 @@ const reasonLabels = {
 
 const emptyForm = { email: "", duration: "lifetime", expiresAt: "", reason: "founder_owner", note: "" };
 
+const readResponse = async (response) => {
+  const contentType = response.headers.get("content-type") || "";
+  const result = contentType.includes("application/json")
+    ? await response.json()
+    : { message: `The API returned an unexpected response (${response.status}). Check that the backend is running and VITE_API_URL points to it.` };
+
+  if (!response.ok) {
+    throw new Error(result.message || "Request failed");
+  }
+
+  return result;
+};
+
 export const AdminProManagement = () => {
   const { authorizationToken } = useAuth();
   const [data, setData] = useState({ summary: {}, users: [], history: [] });
@@ -28,8 +41,7 @@ export const AdminProManagement = () => {
       const response = await fetch(`${API_BASE_URL}/admin/pro-management?search=${encodeURIComponent(query)}`, {
         headers: { Authorization: authorizationToken },
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Failed to load Pro management");
+      const result = await readResponse(response);
       setData(result);
     } catch (error) {
       toast.error(error.message);
@@ -54,8 +66,7 @@ export const AdminProManagement = () => {
         headers: { Authorization: authorizationToken, "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Failed to grant Pro access");
+      await readResponse(response);
       toast.success("Complimentary Pro access granted");
       setDialogOpen(false);
       setForm(emptyForm);
@@ -74,8 +85,7 @@ export const AdminProManagement = () => {
         method: "DELETE",
         headers: { Authorization: authorizationToken },
       });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message || "Failed to revoke Pro access");
+      await readResponse(response);
       toast.success("Complimentary Pro access revoked");
       await loadData();
     } catch (error) {
