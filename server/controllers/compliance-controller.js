@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
+const User = require("../models/user-model");
 const Account = require("../models/account-model");
 const Strategy = require("../models/strategy-model");
 const TradingRule = require("../models/trading-rule-model");
+const { getMaxActiveRules } = require("../config/planLimits");
+const { hasEffectiveProAccess } = require("../services/pro-access-service");
 const RuleEvaluation = require("../models/rule-evaluation-model");
 const {
   RULE_TYPES,
@@ -16,6 +19,26 @@ const ruleTypesByCategory = {
 
 const getUserId = (req) => req.userID || req.user?._id;
 const validId = (value) => mongoose.Types.ObjectId.isValid(value);
+const activeRuleLocks = new Map();
+
+const withActiveRuleLock = async (userId, callback) => {
+  const previous = activeRuleLocks.get(String(userId)) || Promise.resolve();
+  let release;
+  const current = new Promise((resolve) => {
+    release = resolve;
+  });
+  const queued = previous.then(() => current);
+  activeRuleLocks.set(String(userId), queued);
+  await previous;
+  try {
+    return await callback();
+  } finally {
+    release();
+    if (activeRuleLocks.get(String(userId)) === queued) {
+      activeRuleLocks.delete(String(userId));
+    }
+  }
+};
 
 const validateRuleInput = async (body, userId, existing = null) => {
   const accountId = body.accountId || existing?.accountId;
@@ -64,11 +87,30 @@ const createRule = async (req, res) => {
   try {
     const userId = getUserId(req);
     const scope = await validateRuleInput(req.body, userId);
-    const rule = await TradingRule.create({ ...req.body, ...scope, userId });
+    const rule = await withActiveRuleLock(userId, async () => {
+      const user = await User.findById(userId).select("plan planExpiresAt");
+      const isPro = await hasEffectiveProAccess(user);
+      const maxActiveRules = getMaxActiveRules(isPro);
+      const activeRuleCount = await TradingRule.countDocuments({
+        userId,
+        enabled: true,
+      });
+      if (activeRuleCount >= maxActiveRules && req.body.enabled !== false) {
+        const error = new Error(
+          `Free plan active trading rule limit (${maxActiveRules}) reached. Upgrade to Pro.`,
+        );
+        error.code = "ACTIVE_RULE_LIMIT_REACHED";
+        throw error;
+      }
+      return TradingRule.create({ ...req.body, ...scope, userId });
+    });
     await evaluateAccountCompliance({ userId, accountId: rule.accountId });
     return res.status(201).json(rule);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(error.code === "ACTIVE_RULE_LIMIT_REACHED" ? 403 : 400).json({
+      message: error.message,
+      ...(error.code ? { code: error.code } : {}),
+    });
   }
 };
 
@@ -78,24 +120,44 @@ const updateRule = async (req, res) => {
     const rule = await TradingRule.findOne({ _id: req.params.id, userId });
     if (!rule) return res.status(404).json({ message: "Rule not found" });
     const scope = await validateRuleInput({ ...rule.toObject(), ...req.body }, userId, rule);
-    Object.assign(rule, req.body, scope);
-    await rule.save();
+    await withActiveRuleLock(userId, async () => {
+      if (req.body.enabled === true && rule.enabled !== true) {
+        const user = await User.findById(userId).select("plan planExpiresAt");
+        const isPro = await hasEffectiveProAccess(user);
+        const maxActiveRules = getMaxActiveRules(isPro);
+        const activeRuleCount = await TradingRule.countDocuments({
+          userId,
+          enabled: true,
+          _id: { $ne: rule._id },
+        });
+        if (activeRuleCount >= maxActiveRules) {
+          const error = new Error(
+            `Free plan active trading rule limit (${maxActiveRules}) reached. Upgrade to Pro.`,
+          );
+          error.code = "ACTIVE_RULE_LIMIT_REACHED";
+          throw error;
+        }
+      }
+      Object.assign(rule, req.body, scope);
+      await rule.save();
+    });
     await evaluateAccountCompliance({ userId, accountId: rule.accountId });
     return res.json(rule);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(error.code === "ACTIVE_RULE_LIMIT_REACHED" ? 403 : 400).json({
+      message: error.message,
+      ...(error.code ? { code: error.code } : {}),
+    });
   }
 };
 
 const deleteRule = async (req, res) => {
-  const rule = await TradingRule.findOneAndUpdate(
+  const rule = await TradingRule.findOneAndDelete(
     { _id: req.params.id, userId: getUserId(req) },
-    { enabled: false },
-    { new: true },
   );
   if (!rule) return res.status(404).json({ message: "Rule not found" });
   await evaluateAccountCompliance({ userId: getUserId(req), accountId: rule.accountId });
-  return res.json({ message: "Rule archived", rule });
+  return res.json({ message: "Rule deleted", rule });
 };
 
 const getTradeCompliance = async (req, res) => {
@@ -130,8 +192,8 @@ const getSummary = async (req, res) => {
       { $group: { _id: { tradeId: "$tradeId", ruleId: "$ruleId" }, evaluation: { $first: "$$ROOT" } } },
       { $replaceRoot: { newRoot: "$evaluation" } },
       { $lookup: { from: "tradingrules", localField: "ruleId", foreignField: "_id", as: "rule" } },
-      { $unwind: "$rule" },
-      { $match: { "rule.enabled": true } },
+      { $unwind: { path: "$rule", preserveNullAndEmptyArrays: true } },
+      { $match: { $or: [{ "rule.enabled": true }, { rule: { $exists: false } }] } },
       { $lookup: { from: "trades", localField: "tradeId", foreignField: "_id", as: "trade" } },
       { $unwind: "$trade" },
       { $match: { "trade.deleted": { $ne: true } } },

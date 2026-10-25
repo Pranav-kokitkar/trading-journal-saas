@@ -39,6 +39,7 @@ const createTag = async (req, res) => {
     const totalTags = await Tags.countDocuments({
       userId,
       accountId,
+      deleted: { $ne: true },
     });
 
     // 5. Enforce limits
@@ -55,6 +56,7 @@ const createTag = async (req, res) => {
       userId,
       accountId,
       name: name.trim(),
+      deleted: { $ne: true },
     });
 
     if (duplicateTag) {

@@ -33,6 +33,7 @@ const SORT_OPTIONS = [
 
 const defaultFilters = {
   accountId: "",
+  strategyId: "",
   startDate: "",
   endDate: "",
   minTrades: 0,
@@ -409,8 +410,8 @@ const InsightItem = ({ type, title, description, suggestion }) => {
 };
 
 export const AnalyticsDashboard = () => {
-  const { authorizationToken, isAuthLoading } = useAuth();
-  const { accounts = [] } = useContext(AccountContext);
+  const { authorizationToken, isAuthLoading, isPro } = useAuth();
+  const { accounts = [], accountDetails } = useContext(AccountContext);
   const {
     accountTrades = [],
     trades = [],
@@ -425,6 +426,37 @@ export const AnalyticsDashboard = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(false);
+  const [strategies, setStrategies] = useState([]);
+
+  useEffect(() => {
+    if (!authorizationToken) return;
+    fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy?all=true`, {
+      headers: { Authorization: authorizationToken },
+    })
+      .then((response) => response.json().then((data) => ({ response, data })))
+      .then(({ response, data }) => {
+        if (response.ok) setStrategies(Array.isArray(data) ? data : []);
+      })
+      .catch(() => toast.error("Failed to fetch strategies"));
+  }, [authorizationToken]);
+
+  useEffect(() => {
+    if (accountDetails?._id) {
+      setFilters((previous) => ({
+        ...previous,
+        accountId: accountDetails._id,
+        strategyId:
+          previous.strategyId &&
+          strategies.some(
+            (strategy) =>
+              String(strategy._id) === String(previous.strategyId) &&
+              String(strategy.accountId) === String(accountDetails._id),
+          )
+            ? previous.strategyId
+            : "",
+      }));
+    }
+  }, [accountDetails?._id, strategies]);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -437,12 +469,17 @@ export const AnalyticsDashboard = () => {
           sortBy,
           order,
           minTrades: String(Number(filters.minTrades) || 0),
-          includeImported: includeImportedTrades ? "true" : "false",
+          includeImported: "true",
         });
 
         if (filters.accountId) params.set("accountId", filters.accountId);
-        if (filters.startDate) params.set("startDate", filters.startDate);
-        if (filters.endDate) params.set("endDate", filters.endDate);
+        if (filters.strategyId) params.set("strategyId", filters.strategyId);
+        if (isPro && filters.startDate) params.set("startDate", filters.startDate);
+        if (isPro && filters.endDate) params.set("endDate", filters.endDate);
+        if (isPro && Number(filters.minTrades) > 0) {
+          params.set("minTrades", String(Number(filters.minTrades)));
+        }
+        if (isPro && !includeImportedTrades) params.set("includeImported", "false");
 
         const response = await fetch(
           `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/analytics?${params.toString()}`,
@@ -476,9 +513,11 @@ export const AnalyticsDashboard = () => {
     authorizationToken,
     activeDimension,
     filters.accountId,
+    filters.strategyId,
     filters.startDate,
     filters.endDate,
     filters.minTrades,
+    isPro,
     sortBy,
     order,
     includeImportedTrades,
@@ -486,7 +525,7 @@ export const AnalyticsDashboard = () => {
 
   useEffect(() => {
     setShowMore(false);
-  }, [activeDimension, filters.accountId, filters.startDate, filters.endDate, filters.minTrades, sortBy, order]);
+  }, [activeDimension, filters.accountId, filters.strategyId, filters.startDate, filters.endDate, filters.minTrades, sortBy, order, isPro]);
 
   useEffect(() => {
     if (!filters.accountId || typeof refreshAllAccountTrades !== "function") return;
@@ -511,10 +550,20 @@ export const AnalyticsDashboard = () => {
       return (
         isExitedTrade(trade) &&
         (!filters.accountId || tradeAccountId === String(filters.accountId)) &&
+        (!filters.strategyId ||
+          String(trade?.strategy?._id || trade?.strategy || "") ===
+            String(filters.strategyId)) &&
         isTradeWithinDate(trade, filters.startDate, filters.endDate)
       );
     });
-  }, [accountTrades, trades, filters.accountId, filters.startDate, filters.endDate]);
+  }, [
+    accountTrades,
+    trades,
+    filters.accountId,
+    filters.strategyId,
+    filters.startDate,
+    filters.endDate,
+  ]);
 
   const insights = useMemo(
     () => getDimensionInsights(rows, activeDimension, behaviorTrades),
@@ -547,6 +596,22 @@ export const AnalyticsDashboard = () => {
       ...prev,
       [name]: name === "minTrades" ? Math.max(0, Number(value) || 0) : value,
     }));
+  };
+
+  const handleProFilterClick = (event) => {
+    if (!isPro) {
+      event.preventDefault();
+      toast("This analytics filter is available on the Pro plan.");
+    }
+  };
+
+  const resetFilters = () => {
+    setFilters({
+      ...defaultFilters,
+      accountId: accountDetails?._id || "",
+    });
+    setSortBy("expectancy");
+    setOrder("desc");
   };
 
   return (
@@ -592,17 +657,37 @@ export const AnalyticsDashboard = () => {
           ))}
         </select>
 
+        <select
+          name="strategyId"
+          value={filters.strategyId}
+          onChange={handleFilterChange}
+          disabled={!filters.accountId && strategies.length === 0}
+        >
+          <option value="">All Strategies</option>
+          {strategies
+            .filter((strategy) => !filters.accountId || String(strategy.accountId) === String(filters.accountId))
+            .map((strategy) => (
+              <option key={strategy._id} value={strategy._id}>
+                {strategy.name}
+              </option>
+            ))}
+        </select>
+
         <input
           type="date"
           name="startDate"
           value={filters.startDate}
           onChange={handleFilterChange}
+          onClick={handleProFilterClick}
+          disabled={!isPro}
         />
         <input
           type="date"
           name="endDate"
           value={filters.endDate}
           onChange={handleFilterChange}
+          onClick={handleProFilterClick}
+          disabled={!isPro}
         />
 
         <input
@@ -612,9 +697,16 @@ export const AnalyticsDashboard = () => {
           value={filters.minTrades}
           onChange={handleFilterChange}
           placeholder="Min trades"
+          onClick={handleProFilterClick}
+          disabled={!isPro}
         />
 
-        <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          onClick={handleProFilterClick}
+          disabled={!isPro}
+        >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
               Sort: {option.label}
@@ -622,8 +714,21 @@ export const AnalyticsDashboard = () => {
           ))}
         </select>
 
-        <button type="button" onClick={() => setOrder((prev) => (prev === "asc" ? "desc" : "asc"))}>
+        <button
+          type="button"
+          onClick={(event) => {
+            if (!isPro) {
+              handleProFilterClick(event);
+              return;
+            }
+            setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+          }}
+          disabled={!isPro}
+        >
           {order === "asc" ? "Ascending" : "Descending"}
+        </button>
+        <button type="button" className={styles.resetFiltersButton} onClick={resetFilters}>
+          Reset Filters
         </button>
       </div>
 

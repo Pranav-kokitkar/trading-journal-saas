@@ -13,6 +13,10 @@ const {
 const {
   recalculateAccountTrades,
 } = require("../services/account-recalculation-service");
+const {
+  getPlanLimits,
+} = require("../config/planLimits");
+const { hasEffectiveProAccess } = require("../services/pro-access-service");
 
 const getAccountIdForImport = async (req, userId) => {
   const accountIdFromBody = req.body?.accountId || req.query?.accountId;
@@ -149,6 +153,16 @@ const importTradesController = async (req, res) => {
       return res.status(400).json({ message: "No trades found to import" });
     }
 
+    const user = await User.findById(userId).select("plan planExpiresAt");
+    const isPro = await hasEffectiveProAccess(user);
+    const limits = getPlanLimits(isPro);
+    if (inputRows.length > limits.MAX_IMPORT_TRADES) {
+      return res.status(403).json({
+        message: `Free plan imports are limited to ${limits.MAX_IMPORT_TRADES} trades per import. Upgrade to Pro for full import functionality.`,
+        code: "IMPORT_LIMIT_REACHED",
+      });
+    }
+
     const normalizedRows = [];
     const tagNameSet = new Set();
     const strategyNameSet = new Set();
@@ -183,10 +197,48 @@ const importTradesController = async (req, res) => {
       });
     }
 
+    const existingTradeCount = await Trade.countDocuments({
+      userId,
+      deleted: { $ne: true },
+    });
+    if (existingTradeCount + normalizedRows.length > limits.MAX_TRADES) {
+      return res.status(403).json({
+        message: `This import would exceed the Free plan limit of ${limits.MAX_TRADES} saved trades. Remove some rows or upgrade to Pro.`,
+        code: "TRADE_LIMIT_REACHED",
+      });
+    }
+
     const [tagMap, strategyMap] = await Promise.all([
       preloadAndMapTags({ userId, accountId }),
       preloadAndMapStrategies({ userId, accountId }),
     ]);
+
+    if (Number.isFinite(limits.MAX_TAGS)) {
+      const existingTags = await Tags.countDocuments({ userId, accountId });
+      const missingTags = [...tagNameSet].filter((name) => !tagMap.has(name));
+      if (existingTags + missingTags.length > limits.MAX_TAGS) {
+        return res.status(403).json({
+          message: `This import would exceed the Free plan limit of ${limits.MAX_TAGS} tags. Upgrade to Pro.`,
+          code: "TAG_LIMIT_REACHED",
+        });
+      }
+    }
+    if (Number.isFinite(limits.MAX_STRATEGIES)) {
+      const existingStrategies = await Strategy.countDocuments({
+        userId,
+        accountId,
+        $or: [{ status: { $exists: false } }, { status: { $ne: "archived" } }],
+      });
+      const missingStrategies = [...strategyNameSet].filter(
+        (name) => !strategyMap.has(name),
+      );
+      if (existingStrategies + missingStrategies.length > limits.MAX_STRATEGIES) {
+        return res.status(403).json({
+          message: `This import would exceed the Free plan limit of ${limits.MAX_STRATEGIES} strategies. Upgrade to Pro.`,
+          code: "STRATEGY_LIMIT_REACHED",
+        });
+      }
+    }
 
     const tagsCreated = await ensureTagMap({
       userId,

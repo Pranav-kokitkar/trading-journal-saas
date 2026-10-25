@@ -42,6 +42,7 @@ const getAnalyticsByDimension = async ({
   userId,
   dimension,
   accountId,
+  strategyId,
   startDate,
   endDate,
   minTrades = 0,
@@ -66,6 +67,9 @@ const getAnalyticsByDimension = async ({
 
   if (accountId) {
     baseMatch.accountId = new mongoose.Types.ObjectId(accountId);
+  }
+  if (strategyId) {
+    baseMatch.strategy = new mongoose.Types.ObjectId(strategyId);
   }
 
   if (!includeImported) {

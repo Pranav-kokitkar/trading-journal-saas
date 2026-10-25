@@ -1,4 +1,5 @@
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../store/Auth";
 import { AccountContext } from "../../../context/AccountContext";
@@ -41,6 +42,7 @@ const typeConfig = {
 
 export const TradingRules = () => {
   const { authorizationToken } = useAuth();
+  const navigate = useNavigate();
   const { accountDetails } = useContext(AccountContext);
   const [rules, setRules] = useState([]);
   const [strategies, setStrategies] = useState([]);
@@ -58,6 +60,7 @@ export const TradingRules = () => {
   const violationBatchSize = 3;
   const [selectedTrade, setSelectedTrade] = useState(null);
   const [tradeLoading, setTradeLoading] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
 
   const accountId = accountDetails?._id;
   const request = useCallback(async (path, options = {}) => {
@@ -69,7 +72,11 @@ export const TradingRules = () => {
     const data = contentType.includes("application/json")
       ? await response.json()
       : { message: `The API returned an unexpected response (${response.status}). Check that the backend is running and VITE_API_URL points to it.` };
-    if (!response.ok) throw new Error(data.message || "Request failed");
+    if (!response.ok) {
+      const error = new Error(data.message || "Request failed");
+      error.code = data.code;
+      throw error;
+    }
     return data;
   }, [authorizationToken]);
 
@@ -150,7 +157,10 @@ export const TradingRules = () => {
       resetForm();
       setRulePage(1);
       await load();
-    } catch (error) { toast.error(error.message); }
+    } catch (error) {
+      setLimitReached(error.code === "ACTIVE_RULE_LIMIT_REACHED");
+      toast.error(error.message);
+    }
   };
 
   const edit = (rule) => {
@@ -173,7 +183,10 @@ export const TradingRules = () => {
       setRulePage(1);
       await load();
     }
-    catch (error) { toast.error(error.message); }
+    catch (error) {
+      setLimitReached(error.code === "ACTIVE_RULE_LIMIT_REACHED");
+      toast.error(error.message);
+    }
   };
 
   const deleteRule = async (rule) => {
@@ -214,6 +227,13 @@ export const TradingRules = () => {
         <div><strong>{summary?.counts?.not_evaluable || 0}</strong><span>Not evaluable</span></div>
       </div>
       {error && <div className={styles.errorState} role="alert"><strong>Unable to load trading rules</strong><span>{error}</span><button type="button" onClick={load}>Retry</button></div>}
+      {limitReached && (
+        <div className={styles.errorState} role="alert">
+          <strong>Free plan active-rule limit reached</strong>
+          <span>Disable an active rule or upgrade to Pro to create or enable another rule.</span>
+          <button type="button" onClick={() => navigate("/app/upgrade")}>Upgrade to Pro</button>
+        </div>
+      )}
       <div className={styles.grid}>
         <div className={styles.leftColumn}>
         <div className={styles.card}>

@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const User = require("../models/user-model");
+const { hasEffectiveProAccess } = require("../services/pro-access-service");
 const {
   getAnalyticsByDimension,
   DIMENSION_CONFIG,
@@ -26,6 +28,7 @@ const getAnalyticsController = async (req, res) => {
     const {
       dimension,
       accountId,
+      strategyId,
       startDate,
       endDate,
       minTrades = 0,
@@ -44,13 +47,8 @@ const getAnalyticsController = async (req, res) => {
     if (accountId && !mongoose.Types.ObjectId.isValid(accountId)) {
       return res.status(400).json({ message: "Invalid accountId" });
     }
-
-    if (startDate && Number.isNaN(new Date(startDate).getTime())) {
-      return res.status(400).json({ message: "Invalid startDate" });
-    }
-
-    if (endDate && Number.isNaN(new Date(endDate).getTime())) {
-      return res.status(400).json({ message: "Invalid endDate" });
+    if (strategyId && !mongoose.Types.ObjectId.isValid(strategyId)) {
+      return res.status(400).json({ message: "Invalid strategyId" });
     }
 
     const parsedMinTrades = Number.parseInt(minTrades, 10);
@@ -58,6 +56,54 @@ const getAnalyticsController = async (req, res) => {
       return res
         .status(400)
         .json({ message: "minTrades must be a non-negative integer" });
+    }
+
+    const user = await User.findById(userId).select("plan planExpiresAt");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    const isPro = await hasEffectiveProAccess(user);
+    if (
+      !isPro &&
+      (startDate ||
+        endDate ||
+        parsedMinTrades > 0 ||
+        sortBy !== "expectancy" ||
+        order !== "desc" ||
+        parseIncludeImported(includeImported, true) === false)
+    ) {
+      return res.status(403).json({
+        message:
+          "Date, minimum-trade, sorting, ordering, and imported-trade analytics filters are available on the Pro plan. Upgrade to Pro.",
+        code: "PRO_ANALYTICS_FILTER_REQUIRED",
+      });
+    }
+
+    if (accountId) {
+      const ownsAccount = await require("../models/account-model").exists({
+        _id: accountId,
+        userId,
+        deleted: { $ne: true },
+      });
+      if (!ownsAccount) return res.status(404).json({ message: "Account not found" });
+    }
+    if (strategyId) {
+      const strategy = await require("../models/strategy-model")
+        .findOne({ _id: strategyId, userId })
+        .select("accountId")
+        .lean();
+      if (!strategy) return res.status(404).json({ message: "Strategy not found" });
+      if (accountId && String(strategy.accountId) !== String(accountId)) {
+        return res.status(400).json({
+          message: "Strategy does not belong to the selected account",
+        });
+      }
+    }
+
+    if (startDate && Number.isNaN(new Date(startDate).getTime())) {
+      return res.status(400).json({ message: "Invalid startDate" });
+    }
+
+    if (endDate && Number.isNaN(new Date(endDate).getTime())) {
+      return res.status(400).json({ message: "Invalid endDate" });
     }
 
     if (sortBy && !SORT_FIELD_MAP[sortBy]) {
@@ -77,6 +123,7 @@ const getAnalyticsController = async (req, res) => {
       userId,
       dimension,
       accountId,
+      strategyId,
       startDate,
       endDate,
       minTrades: parsedMinTrades,

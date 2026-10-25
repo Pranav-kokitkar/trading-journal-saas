@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Trade = require("../models/trade-model");
 const cloudinary = require("../config/cloudinary");
-const { getMaxScreenshots } = require("../config/planLimits");
+const { getMaxScreenshots, getMaxTrades } = require("../config/planLimits");
 const { getEffectiveProAccess } = require("../services/pro-access-service");
 
 const parseIncludeImported = (value, defaultValue = true) => {
@@ -262,6 +262,18 @@ const AddTrade = async (req, res) => {
 
     // ✅ PLAN-BASED LIMIT (BACKEND ENFORCEMENT)
     const isPro = await getEffectiveProAccess(req.userID || req.user?._id);
+
+    const maxTrades = getMaxTrades(isPro);
+    const savedTradeCount = await Trade.countDocuments({
+      userId,
+      deleted: { $ne: true },
+    });
+    if (savedTradeCount >= maxTrades) {
+      return res.status(403).json({
+        message: `Free plan trade limit (${maxTrades}) reached. Upgrade to Pro to save more trades.`,
+        code: "TRADE_LIMIT_REACHED",
+      });
+    }
 
     const uploadLimit = getMaxScreenshots(isPro);
 
@@ -543,6 +555,14 @@ const getAllTrades = async (req, res) => {
         return res.status(400).json({ message: "Invalid tag" });
       }
       query.tags = tag;
+    }
+
+    const isPro = await getEffectiveProAccess(userId);
+    if ((pnlValue || rrValue) && !isPro) {
+      return res.status(403).json({
+        message: "P&L and risk-to-reward filters are available on the Pro plan. Upgrade to Pro.",
+        code: "PRO_FILTER_REQUIRED",
+      });
     }
 
     if (pnlValue) {
@@ -1185,11 +1205,24 @@ const restoreTradeById = async (req, res) => {
   try {
     const id = req.params.id;
     const userId = req.userID || req.user?._id;
-    const trade = await Trade.findById(id).lean();
+    const trade = await Trade.findOne({ _id: id, userId }).lean();
     if (!trade) return res.status(404).json({ message: "Trade not found" });
 
+    const isPro = await getEffectiveProAccess(userId);
+    const maxTrades = getMaxTrades(isPro);
+    const savedTradeCount = await Trade.countDocuments({
+      userId,
+      deleted: { $ne: true },
+    });
+    if (trade.deleted && savedTradeCount >= maxTrades) {
+      return res.status(403).json({
+        message: `Free plan trade limit (${maxTrades}) reached. Upgrade to Pro to restore this trade.`,
+        code: "TRADE_LIMIT_REACHED",
+      });
+    }
+
     const updated = await Trade.findOneAndUpdate(
-      { _id: id },
+      { _id: id, userId },
       { deleted: false, deletedAt: null, deletedBy: null },
       { new: true },
     ).lean();

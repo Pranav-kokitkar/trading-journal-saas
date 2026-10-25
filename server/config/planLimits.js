@@ -1,17 +1,23 @@
 const PLAN_LIMITS = {
   FREE: {
+    MAX_TRADES: 100,
     MAX_SCREENSHOTS: 2,
-    MAX_ACCOUNTS: 3,
-    MAX_TAGS: 3,
+    MAX_ACCOUNTS: 1,
+    MAX_TAGS: 10,
     MAX_STRATEGIES: 2,
+    MAX_ACTIVE_RULES: 3,
     MAX_COMPARE_DIMENSIONS: 1,
+    MAX_IMPORT_TRADES: 25,
   },
   PRO: {
+    MAX_TRADES: Infinity,
     MAX_SCREENSHOTS: 5,
-    MAX_ACCOUNTS: 10,
-    MAX_TAGS: 40,
-    MAX_STRATEGIES: 30,
+    MAX_ACCOUNTS: Infinity,
+    MAX_TAGS: Infinity,
+    MAX_STRATEGIES: Infinity,
+    MAX_ACTIVE_RULES: Infinity,
     MAX_COMPARE_DIMENSIONS: 7,
+    MAX_IMPORT_TRADES: Infinity,
   },
 };
 
@@ -47,6 +53,10 @@ const getMaxCompareDimensions = (isPro) => {
     : PLAN_LIMITS.FREE.MAX_COMPARE_DIMENSIONS;
 };
 
+const getMaxTrades = (isPro) => getPlanLimits(isPro).MAX_TRADES;
+const getMaxActiveRules = (isPro) => getPlanLimits(isPro).MAX_ACTIVE_RULES;
+const getMaxImportTrades = (isPro) => getPlanLimits(isPro).MAX_IMPORT_TRADES;
+
 module.exports = {
   PLAN_LIMITS,
   getPlanLimits,
@@ -55,4 +65,7 @@ module.exports = {
   getMaxTags,
   getMaxStrategies,
   getMaxCompareDimensions,
+  getMaxTrades,
+  getMaxActiveRules,
+  getMaxImportTrades,
 };

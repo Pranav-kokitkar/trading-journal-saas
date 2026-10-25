@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../../store/Auth";
 import { useTrades } from "../../../../store/TradeContext";
 import toast from "react-hot-toast";
@@ -27,6 +28,7 @@ export const Tags = ({ showHeading = true }) => {
   const [tagToUpdate, setTagToUpdate] = useState(null);
 
   const { authorizationToken, isPro } = useAuth();
+  const navigate = useNavigate();
   const { accountTrades = [] } = useTrades() || {};
 
   const tagUsage = useMemo(() => {
@@ -255,6 +257,14 @@ export const Tags = ({ showHeading = true }) => {
         {/* Create Tag Form */}
         <form className={styles.createForm} onSubmit={handleSubmit}>
           <h3>Create New Tag</h3>
+          {!isPro && tags.length >= getMaxTags(false) && (
+            <div role="alert">
+              Free accounts can create up to {getMaxTags(false)} tags.
+              <button type="button" onClick={() => navigate("/app/upgrade")}>
+                Upgrade to Pro
+              </button>
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <label>Tag Name</label>

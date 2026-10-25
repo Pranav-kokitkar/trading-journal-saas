@@ -225,6 +225,15 @@
   font-weight: var(--weight-medium);
 }
 
+.filtersCard .resetFiltersButton {
+  color: var(--text-primary);
+  background: var(--btn-secondary-bg);
+}
+
+.filtersCard .resetFiltersButton:hover {
+  background: var(--btn-secondary-bg-hover);
+}
+
 .tableCard,
 .chartCard {
   border: 1px solid var(--border-subtle);
