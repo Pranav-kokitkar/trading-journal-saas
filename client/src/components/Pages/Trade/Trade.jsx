@@ -13,6 +13,7 @@ import { SkeletonCard, SkeletonText } from "../../ui/skeleton/Skeleton";
 import { TradeChart } from "../../trade/TradeChart";
 import { formatDateTimeUtc } from "../../../utils/formatDateTimeUtc";
 import { getMaxScreenshots } from "../../../config/planLimits";
+import { API_BASE_URL } from "../../../config/api";
 import { FaTrash } from "react-icons/fa";
 
 const formatDuration = (trade) => {
@@ -112,7 +113,7 @@ export const Trade = () => {
     }
 
     const response = await fetch(
-      `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${trade._id || trade.id}`,
+      `${API_BASE_URL}/trades/${trade._id || trade.id}`,
       {
         method: "PATCH",
         headers: {
@@ -167,7 +168,7 @@ export const Trade = () => {
 
       try {
         const response = await fetch(
-          `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/strategy`,
+          `${API_BASE_URL}/strategy`,
           {
             headers: {
               Authorization: authorizationToken,
@@ -229,7 +230,7 @@ export const Trade = () => {
       try {
         setIsLoading(true);
         const res = await fetch(
-          `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/${id}`,
+          `${API_BASE_URL}/trades/${id}`,
           {
             method: "GET",
             headers: {

@@ -243,7 +243,7 @@ export const TradeProvider = ({ children }) => {
       }
 
       const response = await fetch(
-        `${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/trades/`,
+        `${API_BASE_URL}/trades/`,
         {
           method: "POST",
           headers: {

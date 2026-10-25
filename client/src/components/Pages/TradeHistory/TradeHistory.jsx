@@ -152,6 +152,35 @@ export const TradeHistory = () => {
     refreshTrades(filters);
   }, [filters, page]);
 
+  useEffect(() => {
+    const refreshVisibleTrades = () => {
+      if (document.visibilityState === "visible" && authorizationToken) {
+        refreshTrades(filters);
+      }
+    };
+
+    window.addEventListener("focus", refreshVisibleTrades);
+    document.addEventListener("visibilitychange", refreshVisibleTrades);
+
+    return () => {
+      window.removeEventListener("focus", refreshVisibleTrades);
+      document.removeEventListener("visibilitychange", refreshVisibleTrades);
+    };
+  }, [authorizationToken, filters, refreshTrades]);
+
+  useEffect(() => {
+    if (!selectedTrade) return;
+
+    const selectedTradeId = selectedTrade._id ?? selectedTrade.id;
+    const refreshedTrade = trades.find(
+      (trade) => (trade._id ?? trade.id) === selectedTradeId,
+    );
+
+    if (refreshedTrade && refreshedTrade !== selectedTrade) {
+      setSelectedTrade(refreshedTrade);
+    }
+  }, [selectedTrade, trades]);
+
   const filteredStrategies = filters.accountId
     ? strategies.filter((s) => s.accountId === filters.accountId)
     : strategies;

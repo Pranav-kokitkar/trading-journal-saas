@@ -2,6 +2,7 @@ import styles from "./addtrade.module.css";
 import { useAuth } from "../../../store/Auth";
 import { useEffect, useState } from "react";
 import { getMaxScreenshots } from "../../../config/planLimits";
+import { API_BASE_URL } from "../../../config/api";
 
 export const TradeInfo = ({
   trade,
@@ -36,14 +37,15 @@ export const TradeInfo = ({
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files || []);
+    const remainingSlots = Math.max(uploadLimit - screenshots.length, 0);
 
-    if (files.length > uploadLimit) {
-      alert(`You can upload a maximum of ${uploadLimit} screenshots.`);
+    if (files.length > remainingSlots) {
+      alert(`You can upload up to ${remainingSlots} more screenshots.`);
       e.target.value = "";
       return;
     }
 
-    setScreenshots(files);
+    setScreenshots((current) => [...current, ...files]);
   };
 
   const handleRatingChange = (value) => {
@@ -78,20 +80,21 @@ export const TradeInfo = ({
       file.type.startsWith("image/"),
     );
 
-    if (files.length > uploadLimit) {
-      alert(`You can upload a maximum of ${uploadLimit} screenshots.`);
+    const remainingSlots = Math.max(uploadLimit - screenshots.length, 0);
+    if (files.length > remainingSlots) {
+      alert(`You can upload up to ${remainingSlots} more screenshots.`);
       return;
     }
 
     if (files.length > 0) {
-      setScreenshots(files);
+      setScreenshots((current) => [...current, ...files]);
     }
   };
 
   /* ---------------- FETCH TAGS (ACCOUNT BASED) ---------------- */
   const getAllTags = async () => {
     try {
-      const response = await fetch(`${(import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000"))}/api/tags`, {
+      const response = await fetch(`${API_BASE_URL}/tags`, {
         headers: {
           Authorization: authorizationToken,
         },
@@ -106,7 +109,7 @@ export const TradeInfo = ({
 
   useEffect(() => {
     getAllTags();
-  }, []);
+  }, [authorizationToken]);
 
   /* ---------------- TAG TOGGLE ---------------- */
 
@@ -289,7 +292,7 @@ export const TradeInfo = ({
               <p className={styles.uploadPrimaryText}>
                 Drag &amp; drop your screenshots here, or <span className={styles.uploadBrowseText}>click to browse</span>
               </p>
-              <p className={styles.uploadSecondaryText}>Max 2 images. Supports PNG, JPG.</p>
+              <p className={styles.uploadSecondaryText}>Up to {uploadLimit} images. Supports PNG, JPG.</p>
             </div>
           </div>
         </label>

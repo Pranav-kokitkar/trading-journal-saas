@@ -6,8 +6,5 @@ const fallbackBaseUrl = import.meta.env.PROD
 const rawBaseUrl =
   envBaseUrl && envBaseUrl.length > 0 ? envBaseUrl : fallbackBaseUrl;
 
-export const BASE_URL = rawBaseUrl.replace(/\/+$/, "");
+export const BASE_URL = rawBaseUrl.replace(/\/+$/, "").replace(/\/api$/i, "");
 export const API_BASE_URL = `${BASE_URL}/api`;
-
-// Temporary debug log for production API resolution.
-console.log("BASE_URL:", BASE_URL);

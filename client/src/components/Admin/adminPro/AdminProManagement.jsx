@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { FaCrown } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useAuth } from "../../../store/Auth";
+import { API_BASE_URL } from "../../../config/api";
 import styles from "./AdminProManagement.module.css";
 
-const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? window.location.origin : "http://localhost:3000");
 const reasonLabels = {
   founder_owner: "Founder/Owner",
   friend: "Friend",
@@ -25,7 +25,7 @@ export const AdminProManagement = () => {
   const loadData = useCallback(async (query = search) => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/api/admin/pro-management?search=${encodeURIComponent(query)}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/pro-management?search=${encodeURIComponent(query)}`, {
         headers: { Authorization: authorizationToken },
       });
       const result = await response.json();
@@ -49,7 +49,7 @@ export const AdminProManagement = () => {
     event.preventDefault();
     setSaving(true);
     try {
-      const response = await fetch(`${API_URL}/api/admin/pro-management`, {
+      const response = await fetch(`${API_BASE_URL}/admin/pro-management`, {
         method: "POST",
         headers: { Authorization: authorizationToken, "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -70,7 +70,7 @@ export const AdminProManagement = () => {
   const revokeAccess = async (userId) => {
     if (!window.confirm("Revoke complimentary Pro access for this user?")) return;
     try {
-      const response = await fetch(`${API_URL}/api/admin/pro-management/${userId}`, {
+      const response = await fetch(`${API_BASE_URL}/admin/pro-management/${userId}`, {
         method: "DELETE",
         headers: { Authorization: authorizationToken },
       });
